@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DiscordController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -27,8 +28,11 @@ Route::post('/logout', function (Request $request) {
     return response()->json(['message' => 'Logged out.']);
 })->middleware('auth');
 
-Route::prefix('discord')->group(function () {
-    Route::get('/test', fn() => response()->json(['message' => 'Hello World']));
+Route::prefix('discord')->controller(DiscordController::class)->group(function () {
+    Route::get('/test', 'test');
+    Route::get('/channels', 'channels');
+    Route::get('/permissions', 'permissions');
+    Route::get('/members', 'members');
 });
 
 // Protected routes go here
