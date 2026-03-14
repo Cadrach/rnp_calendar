@@ -1,5 +1,7 @@
 <?php
 
+use App\Exceptions\DiscordApiException;
+use App\Services\DiscordClient;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -19,5 +21,14 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
-    })->create();
+        $exceptions->render(function (DiscordApiException $e) {
+            return response()->json(['message' => 'Discord API error.', 'error' => $e->getError()], $e->getCode());
+        });
+    })
+    ->booted(function (Application $app): void {
+        $app->singleton(DiscordClient::class, fn() => new DiscordClient(
+            token:   config('services.discord.token'),
+            guildId: config('services.discord.guild_id'),
+        ));
+    })
+    ->create();

@@ -28,6 +28,12 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'discord' => [
+        'token'                   => env('DISCORD_BOT_TOKEN'),
+        'guild_id'                => env('DISCORD_GUILD_ID'),
+        'propositions_channel_id' => env('DISCORD_CHANNEL_ID_PROPOSITIONS'),
+    ],
+
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),
