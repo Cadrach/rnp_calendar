@@ -31,6 +31,7 @@ Route::post('/logout', function (Request $request) {
 Route::prefix('discord')->controller(DiscordController::class)->group(function () {
     Route::get('/test', 'test');
     Route::get('/channels', 'channels');
+    Route::get('/propositions', 'propositions');
     Route::get('/permissions', 'permissions');
     Route::get('/members', 'members');
 });

@@ -32,6 +32,35 @@ class DiscordController extends Controller
         return response()->json($response->json());
     }
 
+    public function propositions(): JsonResponse
+    {
+        $guildId = env('DISCORD_GUILD_ID');
+        $channelId = env('DISCORD_CHANNEL_ID_PROPOSITIONS');
+
+        $responses = Http::pool(fn($pool) => [
+            $pool->as('active')->withHeaders(['Authorization' => 'Bot ' . env('DISCORD_BOT_TOKEN')])
+                ->get("{$this->baseUrl}/guilds/{$guildId}/threads/active"),
+            $pool->as('archived')->withHeaders(['Authorization' => 'Bot ' . env('DISCORD_BOT_TOKEN')])
+                ->get("{$this->baseUrl}/channels/{$channelId}/threads/archived/public"),
+        ]);
+
+        if ($responses['active']->failed()) {
+            return response()->json(['message' => 'Discord API error.', 'error' => $responses['active']->json()], $responses['active']->status());
+        }
+        if ($responses['archived']->failed()) {
+            return response()->json(['message' => 'Discord API error.', 'error' => $responses['archived']->json()], $responses['archived']->status());
+        }
+
+        $active = collect($responses['active']->json('threads'))
+            ->filter(fn($thread) => $thread['parent_id'] === $channelId);
+
+        $archived = collect($responses['archived']->json('threads'));
+
+        $threads = $active->merge($archived)->values();
+
+        return response()->json($threads);
+    }
+
     public function permissions(): JsonResponse
     {
         $guildId = env('DISCORD_GUILD_ID');
