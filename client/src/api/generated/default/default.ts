@@ -29,63 +29,38 @@ import type {
   User
 } from '../model';
 
-import { customInstance } from '../../axios-instance';
+import { axiosInstance } from '../../axios-instance';
 import type { ErrorType } from '../../axios-instance';
 
 
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
-export type postAuthLogoutResponse200 = {
-  data: PostAuthLogout200
-  status: 200
-}
 
-export type postAuthLogoutResponse401 = {
-  data: AuthenticationExceptionResponse
-  status: 401
-}
-
-export type postAuthLogoutResponseSuccess = (postAuthLogoutResponse200) & {
-  headers: Headers;
-};
-export type postAuthLogoutResponseError = (postAuthLogoutResponse401) & {
-  headers: Headers;
-};
-
-export type postAuthLogoutResponse = (postAuthLogoutResponseSuccess | postAuthLogoutResponseError)
-
-export const getPostAuthLogoutUrl = () => {
-
-
-  
-
-  return `/auth/logout`
-}
-
-export const postAuthLogout = async ( options?: RequestInit): Promise<postAuthLogoutResponse> => {
-  
-  return customInstance<postAuthLogoutResponse>(getPostAuthLogoutUrl(),
-  {      
-    ...options,
-    method: 'POST'
+export const postAuthLogout = (
     
-    
-  }
-);}
+ options?: SecondParameter<typeof axiosInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return axiosInstance<PostAuthLogout200>(
+      {url: `/auth/logout`, method: 'POST', signal
+    },
+      options);
+    }
   
-
 
 
 export const getPostAuthLogoutMutationOptions = <TError = ErrorType<AuthenticationExceptionResponse>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postAuthLogout>>, TError,void, TContext>, }
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postAuthLogout>>, TError,void, TContext>, request?: SecondParameter<typeof axiosInstance>}
 ): UseMutationOptions<Awaited<ReturnType<typeof postAuthLogout>>, TError,void, TContext> => {
 
 const mutationKey = ['postAuthLogout'];
-const {mutation: mutationOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
+      : {mutation: { mutationKey, }, request: undefined};
 
       
 
@@ -93,7 +68,7 @@ const {mutation: mutationOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof postAuthLogout>>, void> = () => {
           
 
-          return  postAuthLogout()
+          return  postAuthLogout(requestOptions)
         }
 
 
@@ -108,7 +83,7 @@ const {mutation: mutationOptions} = options ?
     export type PostAuthLogoutMutationError = ErrorType<AuthenticationExceptionResponse>
 
     export const usePostAuthLogout = <TError = ErrorType<AuthenticationExceptionResponse>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postAuthLogout>>, TError,void, TContext>, }
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postAuthLogout>>, TError,void, TContext>, request?: SecondParameter<typeof axiosInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof postAuthLogout>>,
         TError,
@@ -117,45 +92,18 @@ const {mutation: mutationOptions} = options ?
       > => {
       return useMutation(getPostAuthLogoutMutationOptions(options), queryClient);
     }
-    export type getUserResponse200 = {
-  data: User
-  status: 200
-}
-
-export type getUserResponse401 = {
-  data: AuthenticationExceptionResponse
-  status: 401
-}
-
-export type getUserResponseSuccess = (getUserResponse200) & {
-  headers: Headers;
-};
-export type getUserResponseError = (getUserResponse401) & {
-  headers: Headers;
-};
-
-export type getUserResponse = (getUserResponseSuccess | getUserResponseError)
-
-export const getGetUserUrl = () => {
-
-
-  
-
-  return `/user`
-}
-
-export const getUser = async ( options?: RequestInit): Promise<getUserResponse> => {
-  
-  return customInstance<getUserResponse>(getGetUserUrl(),
-  {      
-    ...options,
-    method: 'GET'
+    export const getUser = (
     
-    
-  }
-);}
+ options?: SecondParameter<typeof axiosInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return axiosInstance<User>(
+      {url: `/user`, method: 'GET', signal
+    },
+      options);
+    }
   
-
 
 
 
@@ -166,16 +114,16 @@ export const getGetUserQueryKey = () => {
     }
 
     
-export const getGetUserQueryOptions = <TData = Awaited<ReturnType<typeof getUser>>, TError = ErrorType<AuthenticationExceptionResponse>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>>, }
+export const getGetUserQueryOptions = <TData = Awaited<ReturnType<typeof getUser>>, TError = ErrorType<AuthenticationExceptionResponse>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
 ) => {
 
-const {query: queryOptions} = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getGetUserQueryKey();
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getUser>>> = ({ signal }) => getUser({ signal });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getUser>>> = ({ signal }) => getUser(requestOptions, signal);
 
       
 
@@ -195,7 +143,7 @@ export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError =
           TError,
           Awaited<ReturnType<typeof getUser>>
         > , 'initialData'
-      >, }
+      >, request?: SecondParameter<typeof axiosInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError = ErrorType<AuthenticationExceptionResponse>>(
@@ -205,16 +153,16 @@ export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError =
           TError,
           Awaited<ReturnType<typeof getUser>>
         > , 'initialData'
-      >, }
+      >, request?: SecondParameter<typeof axiosInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError = ErrorType<AuthenticationExceptionResponse>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>>, }
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError = ErrorType<AuthenticationExceptionResponse>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>>, }
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 

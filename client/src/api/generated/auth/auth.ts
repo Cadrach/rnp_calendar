@@ -32,64 +32,40 @@ import type {
   ValidationExceptionResponse
 } from '../model';
 
-import { customInstance } from '../../axios-instance';
+import { axiosInstance } from '../../axios-instance';
 import type { ErrorType } from '../../axios-instance';
 
 
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
-export type authDiscordRequestResponse200 = {
-  data: AuthDiscordRequest200
-  status: 200
-}
 
-export type authDiscordRequestResponse422 = {
-  data: ValidationExceptionResponse
-  status: 422
-}
-
-export type authDiscordRequestResponseSuccess = (authDiscordRequestResponse200) & {
-  headers: Headers;
-};
-export type authDiscordRequestResponseError = (authDiscordRequestResponse422) & {
-  headers: Headers;
-};
-
-export type authDiscordRequestResponse = (authDiscordRequestResponseSuccess | authDiscordRequestResponseError)
-
-export const getAuthDiscordRequestUrl = () => {
-
-
+export const authDiscordRequest = (
+    authDiscordRequestBody: AuthDiscordRequestBody,
+ options?: SecondParameter<typeof axiosInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return axiosInstance<AuthDiscordRequest200>(
+      {url: `/auth/discord/request`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: authDiscordRequestBody, signal
+    },
+      options);
+    }
   
-
-  return `/auth/discord/request`
-}
-
-export const authDiscordRequest = async (authDiscordRequestBody: AuthDiscordRequestBody, options?: RequestInit): Promise<authDiscordRequestResponse> => {
-  
-  return customInstance<authDiscordRequestResponse>(getAuthDiscordRequestUrl(),
-  {      
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(
-      authDiscordRequestBody,)
-  }
-);}
-  
-
 
 
 export const getAuthDiscordRequestMutationOptions = <TError = ErrorType<ValidationExceptionResponse>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authDiscordRequest>>, TError,{data: AuthDiscordRequestBody}, TContext>, }
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authDiscordRequest>>, TError,{data: AuthDiscordRequestBody}, TContext>, request?: SecondParameter<typeof axiosInstance>}
 ): UseMutationOptions<Awaited<ReturnType<typeof authDiscordRequest>>, TError,{data: AuthDiscordRequestBody}, TContext> => {
 
 const mutationKey = ['authDiscordRequest'];
-const {mutation: mutationOptions} = options ?
+const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
       : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
+      : {mutation: { mutationKey, }, request: undefined};
 
       
 
@@ -97,7 +73,7 @@ const {mutation: mutationOptions} = options ?
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof authDiscordRequest>>, {data: AuthDiscordRequestBody}> = (props) => {
           const {data} = props ?? {};
 
-          return  authDiscordRequest(data,)
+          return  authDiscordRequest(data,requestOptions)
         }
 
 
@@ -112,7 +88,7 @@ const {mutation: mutationOptions} = options ?
     export type AuthDiscordRequestMutationError = ErrorType<ValidationExceptionResponse>
 
     export const useAuthDiscordRequest = <TError = ErrorType<ValidationExceptionResponse>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authDiscordRequest>>, TError,{data: AuthDiscordRequestBody}, TContext>, }
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authDiscordRequest>>, TError,{data: AuthDiscordRequestBody}, TContext>, request?: SecondParameter<typeof axiosInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof authDiscordRequest>>,
         TError,
@@ -121,57 +97,19 @@ const {mutation: mutationOptions} = options ?
       > => {
       return useMutation(getAuthDiscordRequestMutationOptions(options), queryClient);
     }
-    export type authDiscordVerifyResponse200 = {
-  data: AuthDiscordVerify200
-  status: 200
-}
-
-export type authDiscordVerifyResponse401 = {
-  data: AuthDiscordVerify401
-  status: 401
-}
-
-export type authDiscordVerifyResponse422 = {
-  data: ValidationExceptionResponse
-  status: 422
-}
-
-export type authDiscordVerifyResponseSuccess = (authDiscordVerifyResponse200) & {
-  headers: Headers;
-};
-export type authDiscordVerifyResponseError = (authDiscordVerifyResponse401 | authDiscordVerifyResponse422) & {
-  headers: Headers;
-};
-
-export type authDiscordVerifyResponse = (authDiscordVerifyResponseSuccess | authDiscordVerifyResponseError)
-
-export const getAuthDiscordVerifyUrl = (params: AuthDiscordVerifyParams,) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-    
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    export const authDiscordVerify = (
+    params: AuthDiscordVerifyParams,
+ options?: SecondParameter<typeof axiosInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return axiosInstance<AuthDiscordVerify200>(
+      {url: `/auth/discord/verify`, method: 'GET',
+        params, signal
+    },
+      options);
     }
-  });
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0 ? `/auth/discord/verify?${stringifiedParams}` : `/auth/discord/verify`
-}
-
-export const authDiscordVerify = async (params: AuthDiscordVerifyParams, options?: RequestInit): Promise<authDiscordVerifyResponse> => {
   
-  return customInstance<authDiscordVerifyResponse>(getAuthDiscordVerifyUrl(params),
-  {      
-    ...options,
-    method: 'GET'
-    
-    
-  }
-);}
-  
-
 
 
 
@@ -182,16 +120,16 @@ export const getAuthDiscordVerifyQueryKey = (params?: AuthDiscordVerifyParams,) 
     }
 
     
-export const getAuthDiscordVerifyQueryOptions = <TData = Awaited<ReturnType<typeof authDiscordVerify>>, TError = ErrorType<AuthDiscordVerify401 | ValidationExceptionResponse>>(params: AuthDiscordVerifyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authDiscordVerify>>, TError, TData>>, }
+export const getAuthDiscordVerifyQueryOptions = <TData = Awaited<ReturnType<typeof authDiscordVerify>>, TError = ErrorType<AuthDiscordVerify401 | ValidationExceptionResponse>>(params: AuthDiscordVerifyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authDiscordVerify>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
 ) => {
 
-const {query: queryOptions} = options ?? {};
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
   const queryKey =  queryOptions?.queryKey ?? getAuthDiscordVerifyQueryKey(params);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof authDiscordVerify>>> = ({ signal }) => authDiscordVerify(params, { signal });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof authDiscordVerify>>> = ({ signal }) => authDiscordVerify(params, requestOptions, signal);
 
       
 
@@ -211,7 +149,7 @@ export function useAuthDiscordVerify<TData = Awaited<ReturnType<typeof authDisco
           TError,
           Awaited<ReturnType<typeof authDiscordVerify>>
         > , 'initialData'
-      >, }
+      >, request?: SecondParameter<typeof axiosInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useAuthDiscordVerify<TData = Awaited<ReturnType<typeof authDiscordVerify>>, TError = ErrorType<AuthDiscordVerify401 | ValidationExceptionResponse>>(
@@ -221,16 +159,16 @@ export function useAuthDiscordVerify<TData = Awaited<ReturnType<typeof authDisco
           TError,
           Awaited<ReturnType<typeof authDiscordVerify>>
         > , 'initialData'
-      >, }
+      >, request?: SecondParameter<typeof axiosInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useAuthDiscordVerify<TData = Awaited<ReturnType<typeof authDiscordVerify>>, TError = ErrorType<AuthDiscordVerify401 | ValidationExceptionResponse>>(
- params: AuthDiscordVerifyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authDiscordVerify>>, TError, TData>>, }
+ params: AuthDiscordVerifyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authDiscordVerify>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useAuthDiscordVerify<TData = Awaited<ReturnType<typeof authDiscordVerify>>, TError = ErrorType<AuthDiscordVerify401 | ValidationExceptionResponse>>(
- params: AuthDiscordVerifyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authDiscordVerify>>, TError, TData>>, }
+ params: AuthDiscordVerifyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authDiscordVerify>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 

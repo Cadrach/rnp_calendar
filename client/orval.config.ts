@@ -12,10 +12,11 @@ export default defineConfig({
       target: "./src/api/generated",
       schemas: "./src/api/generated/model",
       client: "react-query",
+      httpClient: "axios",
       override: {
         mutator: {
           path: "./src/api/axios-instance.ts",
-          name: "customInstance",
+          name: "axiosInstance",
         },
       },
     },

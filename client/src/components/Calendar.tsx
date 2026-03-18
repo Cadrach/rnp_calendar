@@ -42,7 +42,7 @@ export function Calendar() {
   };
 
   return (
-    <div style={{ height: "100vh", padding: "1rem" }}>
+    <div style={{ height: "calc(100vh - 56px)", padding: "1rem" }}>
       <BigCalendar
         localizer={localizer}
         events={[]}
