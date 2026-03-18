@@ -7,11 +7,15 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "generate": "orval --config orval.config.ts"
   },
   "dependencies": {
     "@mantine/core": "8.3.16",
     "@mantine/hooks": "8.3.16",
+    "@tanstack/react-query": "^5.91.0",
+    "@tanstack/react-query-devtools": "^5.91.3",
+    "axios": "^1.13.6",
     "date-fns": "^4.1.0",
     "react": "^19.2.4",
     "react-big-calendar": "^1.19.4",
@@ -22,6 +26,7 @@
     "@types/react-big-calendar": "^1.16.3",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
+    "orval": "^8.5.3",
     "postcss": "^8.5.8",
     "postcss-preset-mantine": "1.18.0",
     "postcss-simple-vars": "^7.0.1",
