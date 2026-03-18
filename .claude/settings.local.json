@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(composer remove:*)"
+      "Bash(composer remove:*)",
+      "Bash(yarn typecheck:*)"
     ]
   }
 }
