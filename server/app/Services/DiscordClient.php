@@ -31,6 +31,17 @@ class DiscordClient
         return $response->json();
     }
 
+    private function post(string $endpoint, array $body = []): array
+    {
+        $response = $this->http()->post(self::BASE_URL . $endpoint, $body);
+
+        if ($response->failed()) {
+            throw new DiscordApiException($response->json(), $response->status());
+        }
+
+        return $response->json();
+    }
+
     public function getMe(): array
     {
         return $this->get('/users/@me');
@@ -54,6 +65,21 @@ class DiscordClient
     public function getGuildRoles(): array
     {
         return $this->get("/guilds/{$this->guildId}/roles");
+    }
+
+    public function searchMembers(string $query, int $limit = 10): array
+    {
+        return $this->get("/guilds/{$this->guildId}/members/search", ['query' => $query, 'limit' => $limit]);
+    }
+
+    public function createDmChannel(string $userId): array
+    {
+        return $this->post('/users/@me/channels', ['recipient_id' => $userId]);
+    }
+
+    public function sendMessage(string $channelId, string $content): array
+    {
+        return $this->post("/channels/{$channelId}/messages", ['content' => $content]);
     }
 
     public function getThreads(string $channelId): array

@@ -19,7 +19,7 @@ class DiscordController extends Controller
         return response()->json($this->discord->getChannels());
     }
 
-    public function members(): JsonResponse
+    public function members(): JsonResponseok
     {
         return response()->json($this->discord->getMembers());
     }
