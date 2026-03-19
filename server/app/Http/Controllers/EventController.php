@@ -19,7 +19,6 @@ class EventController extends Controller
     public function store(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'title'          => ['required', 'string'],
             'datetime_start' => ['required', 'date'],
             'datetime_end'   => ['required', 'date', 'after:datetime_start'],
             'mj_user_id'     => ['required', 'exists:users,id'],
@@ -56,7 +55,6 @@ class EventController extends Controller
         $this->authorizeEventMutation($request, $event);
 
         $data = $request->validate([
-            'title'          => ['sometimes', 'string'],
             'datetime_start' => ['sometimes', 'date'],
             'datetime_end'   => ['sometimes', 'date', 'after:datetime_start'],
             'mj_user_id'     => ['sometimes', 'exists:users,id'],

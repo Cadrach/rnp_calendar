@@ -7,6 +7,7 @@ import { fr } from "date-fns/locale/fr";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { useEventsIndex } from "../api/generated/event/event";
 import { CreateEventModal } from "./CreateEventModal";
+import { useDictionary } from "../contexts/DictionaryContext";
 
 const localizer = dateFnsLocalizer({
   format,
@@ -37,10 +38,12 @@ export function Calendar() {
   const [slot, setSlot] = useState<{ start: Date; end: Date } | null>(null);
   const [opened, { open, close }] = useDisclosure(false);
 
+  const { games } = useDictionary();
   const { data: events } = useEventsIndex();
 
   const calendarEvents = (events ?? []).map((e) => ({
     ...e,
+    title: games.find((g) => g.id === e.game_id)?.name ?? String(e.game_id),
     start: new Date(e.datetime_start),
     end:   new Date(e.datetime_end),
   }));

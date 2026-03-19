@@ -10,7 +10,6 @@ class Event extends Model
 {
     use SoftDeletes;
     protected $fillable = [
-        'title',
         'datetime_start',
         'datetime_end',
         'mj_user_id',

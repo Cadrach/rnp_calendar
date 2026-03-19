@@ -7,7 +7,6 @@
 
 export interface Event {
   id: number;
-  title: string;
   datetime_start: string;
   datetime_end: string;
   mj_user_id: number;

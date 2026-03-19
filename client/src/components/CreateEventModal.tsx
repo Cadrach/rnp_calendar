@@ -1,4 +1,4 @@
-import { Button, NumberInput, Select, Stack, Text, TextInput } from "@mantine/core";
+import { Button, NumberInput, Select, Stack, Text } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
@@ -23,7 +23,6 @@ export function CreateEventModal({ start, end, onClose, event }: Props) {
 
   const form = useForm({
     initialValues: {
-      title:       event?.title       ?? "",
       room_id:     event?.room_id     ? String(event.room_id)     : null as string | null,
       game_id:     event?.game_id     ? String(event.game_id)     : null as string | null,
       scenario_id: event?.scenario_id ? String(event.scenario_id) : null as string | null,
@@ -32,7 +31,6 @@ export function CreateEventModal({ start, end, onClose, event }: Props) {
       player_ids:  (event?.player_ids as string[] | null) ?? [],
     },
     validate: {
-      title:       (v) => v.trim().length === 0 ? "Le titre est requis" : null,
       room_id:     (v) => !v ? "La salle est requise" : null,
       game_id:     (v) => !v ? "Le jeu est requis" : null,
       max_players: (v, values) =>
@@ -61,7 +59,6 @@ export function CreateEventModal({ start, end, onClose, event }: Props) {
 
   const handleSubmit = form.onSubmit((values) => {
     const payload = {
-      title:          values.title,
       datetime_start: start.toISOString(),
       datetime_end:   end.toISOString(),
       mj_user_id:     mjUserId,
@@ -86,13 +83,6 @@ export function CreateEventModal({ start, end, onClose, event }: Props) {
         <Text size="sm" c="dimmed">
           {format(start, "PPPp", { locale: fr })} → {format(end, "PPPp", { locale: fr })}
         </Text>
-
-        <TextInput
-          label="Titre"
-          placeholder="Nom de la session"
-          required
-          {...form.getInputProps("title")}
-        />
 
         <Select
           label="Salle"
