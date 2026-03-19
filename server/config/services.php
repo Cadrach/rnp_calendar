@@ -32,6 +32,7 @@ return [
         'token'                   => env('DISCORD_BOT_TOKEN'),
         'guild_id'                => env('DISCORD_GUILD_ID'),
         'propositions_channel_id' => env('DISCORD_CHANNEL_ID_PROPOSITIONS'),
+        'role_id_mj'              => env('DISCORD_ROLE_ID_MJ'),
     ],
 
     'slack' => [

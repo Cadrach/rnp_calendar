@@ -4,9 +4,5 @@
  * Laravel
  * OpenAPI spec version: 0.0.1
  */
-import type { User } from './user';
 
-export type AuthDiscordVerify200 = {
-  message: 'Authenticated.';
-  user: User;
-};
+export type AuthDiscordVerify200 = { [key: string]: unknown };

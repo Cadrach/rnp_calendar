@@ -35,5 +35,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/propositions', 'propositions');
         Route::get('/permissions', 'permissions');
         Route::get('/members', 'members');
+        Route::get('/roles', 'roles');
     });
 });

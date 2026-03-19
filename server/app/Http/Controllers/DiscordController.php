@@ -19,7 +19,7 @@ class DiscordController extends Controller
         return response()->json($this->discord->getChannels());
     }
 
-    public function members(): JsonResponseok
+    public function members(): JsonResponse
     {
         return response()->json($this->discord->getMembers());
     }
@@ -32,6 +32,11 @@ class DiscordController extends Controller
     public function propositions(): JsonResponse
     {
         return response()->json($this->discord->getThreads(config('services.discord.propositions_channel_id')));
+    }
+
+    public function roles(): JsonResponse
+    {
+        return response()->json($this->discord->getGuildRoles());
     }
 
     public function permissions(): JsonResponse

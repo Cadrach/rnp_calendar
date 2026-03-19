@@ -1,4 +1,4 @@
-import { Avatar, Group, Skeleton, Text } from "@mantine/core";
+import { Avatar, Badge, Group, Skeleton, Text } from "@mantine/core";
 import { useGetUser } from "../api/generated/default/default";
 
 export function UserBadge() {
@@ -20,6 +20,11 @@ export function UserBadge() {
       <Text size="sm" fw={500}>
         {user.name}
       </Text>
+      {user.is_mj && (
+        <Badge variant="light" color="violet">
+          MJ
+        </Badge>
+      )}
     </Group>
   );
 }

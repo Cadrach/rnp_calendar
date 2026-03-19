@@ -27,7 +27,6 @@ import type {
   AuthDiscordRequest200,
   AuthDiscordRequestBody,
   AuthDiscordVerify200,
-  AuthDiscordVerify401,
   AuthDiscordVerifyParams,
   ValidationExceptionResponse
 } from '../model';
@@ -120,7 +119,7 @@ export const getAuthDiscordVerifyQueryKey = (params?: AuthDiscordVerifyParams,) 
     }
 
     
-export const getAuthDiscordVerifyQueryOptions = <TData = Awaited<ReturnType<typeof authDiscordVerify>>, TError = ErrorType<AuthDiscordVerify401 | ValidationExceptionResponse>>(params: AuthDiscordVerifyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authDiscordVerify>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+export const getAuthDiscordVerifyQueryOptions = <TData = Awaited<ReturnType<typeof authDiscordVerify>>, TError = ErrorType<ValidationExceptionResponse>>(params: AuthDiscordVerifyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authDiscordVerify>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -139,10 +138,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type AuthDiscordVerifyQueryResult = NonNullable<Awaited<ReturnType<typeof authDiscordVerify>>>
-export type AuthDiscordVerifyQueryError = ErrorType<AuthDiscordVerify401 | ValidationExceptionResponse>
+export type AuthDiscordVerifyQueryError = ErrorType<ValidationExceptionResponse>
 
 
-export function useAuthDiscordVerify<TData = Awaited<ReturnType<typeof authDiscordVerify>>, TError = ErrorType<AuthDiscordVerify401 | ValidationExceptionResponse>>(
+export function useAuthDiscordVerify<TData = Awaited<ReturnType<typeof authDiscordVerify>>, TError = ErrorType<ValidationExceptionResponse>>(
  params: AuthDiscordVerifyParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof authDiscordVerify>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof authDiscordVerify>>,
@@ -152,7 +151,7 @@ export function useAuthDiscordVerify<TData = Awaited<ReturnType<typeof authDisco
       >, request?: SecondParameter<typeof axiosInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAuthDiscordVerify<TData = Awaited<ReturnType<typeof authDiscordVerify>>, TError = ErrorType<AuthDiscordVerify401 | ValidationExceptionResponse>>(
+export function useAuthDiscordVerify<TData = Awaited<ReturnType<typeof authDiscordVerify>>, TError = ErrorType<ValidationExceptionResponse>>(
  params: AuthDiscordVerifyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authDiscordVerify>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof authDiscordVerify>>,
@@ -162,12 +161,12 @@ export function useAuthDiscordVerify<TData = Awaited<ReturnType<typeof authDisco
       >, request?: SecondParameter<typeof axiosInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAuthDiscordVerify<TData = Awaited<ReturnType<typeof authDiscordVerify>>, TError = ErrorType<AuthDiscordVerify401 | ValidationExceptionResponse>>(
+export function useAuthDiscordVerify<TData = Awaited<ReturnType<typeof authDiscordVerify>>, TError = ErrorType<ValidationExceptionResponse>>(
  params: AuthDiscordVerifyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authDiscordVerify>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useAuthDiscordVerify<TData = Awaited<ReturnType<typeof authDiscordVerify>>, TError = ErrorType<AuthDiscordVerify401 | ValidationExceptionResponse>>(
+export function useAuthDiscordVerify<TData = Awaited<ReturnType<typeof authDiscordVerify>>, TError = ErrorType<ValidationExceptionResponse>>(
  params: AuthDiscordVerifyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authDiscordVerify>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {

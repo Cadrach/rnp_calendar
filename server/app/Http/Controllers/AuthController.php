@@ -61,6 +61,11 @@ class AuthController extends Controller
             ['name' => $discordUser['global_name'] ?? $discordUser['username']],
         );
 
+        $user->update([
+            'name'  => $discordUser['global_name'] ?? $discordUser['username'],
+            'roles' => array_map('intval', $member['roles'] ?? []),
+        ]);
+
         Auth::login($user);
         $request->session()->regenerate();
 

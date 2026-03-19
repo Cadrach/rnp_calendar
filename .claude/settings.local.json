@@ -4,6 +4,7 @@
       "Bash(composer remove:*)",
       "Bash(yarn typecheck:*)",
       "Bash(yarn generate:*)"
+      "Bash(php artisan:migrate)"
     ]
   }
 }

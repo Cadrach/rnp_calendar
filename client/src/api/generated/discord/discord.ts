@@ -453,3 +453,87 @@ export function useDiscordMembers<TData = Awaited<ReturnType<typeof discordMembe
 
 
 
+export const discordRoles = (
+    
+ options?: SecondParameter<typeof axiosInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return axiosInstance<unknown[]>(
+      {url: `/discord/roles`, method: 'GET', signal
+    },
+      options);
+    }
+  
+
+
+
+export const getDiscordRolesQueryKey = () => {
+    return [
+    `/discord/roles`
+    ] as const;
+    }
+
+    
+export const getDiscordRolesQueryOptions = <TData = Awaited<ReturnType<typeof discordRoles>>, TError = ErrorType<AuthenticationExceptionResponse>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof discordRoles>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDiscordRolesQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof discordRoles>>> = ({ signal }) => discordRoles(requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof discordRoles>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type DiscordRolesQueryResult = NonNullable<Awaited<ReturnType<typeof discordRoles>>>
+export type DiscordRolesQueryError = ErrorType<AuthenticationExceptionResponse>
+
+
+export function useDiscordRoles<TData = Awaited<ReturnType<typeof discordRoles>>, TError = ErrorType<AuthenticationExceptionResponse>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof discordRoles>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof discordRoles>>,
+          TError,
+          Awaited<ReturnType<typeof discordRoles>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDiscordRoles<TData = Awaited<ReturnType<typeof discordRoles>>, TError = ErrorType<AuthenticationExceptionResponse>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof discordRoles>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof discordRoles>>,
+          TError,
+          Awaited<ReturnType<typeof discordRoles>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDiscordRoles<TData = Awaited<ReturnType<typeof discordRoles>>, TError = ErrorType<AuthenticationExceptionResponse>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof discordRoles>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useDiscordRoles<TData = Awaited<ReturnType<typeof discordRoles>>, TError = ErrorType<AuthenticationExceptionResponse>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof discordRoles>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getDiscordRolesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+

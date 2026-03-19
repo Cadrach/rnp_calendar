@@ -14,4 +14,7 @@ export interface User {
   updated_at: string | null;
   /** @nullable */
   discord_id: string | null;
+  /** @nullable */
+  roles: unknown[] | null;
+  is_mj: string;
 }
