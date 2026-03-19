@@ -2,8 +2,10 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DiscordController;
+use App\Http\Controllers\EventController;
 use App\Models\Game;
 use App\Models\Room;
+use App\Models\Scenario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -29,11 +31,14 @@ Route::prefix('auth')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('/dictionary', function (Request $request) {
         return response()->json([
-            'user'  => $request->user(),
-            'games' => Game::all(),
-            'rooms' => Room::all(),
+            'user'      => $request->user(),
+            'games'     => Game::all(),
+            'rooms'     => Room::all(),
+            'scenarios' => Scenario::where('mj_user_id', $request->user()->id)->get(),
         ]);
     });
+
+    Route::apiResource('events', EventController::class);
 
     Route::prefix('discord')->controller(DiscordController::class)->group(function () {
         Route::get('/test', 'test');

@@ -6,10 +6,12 @@
  */
 import type { Game } from './game';
 import type { Room } from './room';
+import type { Scenario } from './scenario';
 import type { User } from './user';
 
 export type GetDictionary200 = {
   user: User;
   games: Game[];
   rooms: Room[];
+  scenarios: Scenario[];
 };
