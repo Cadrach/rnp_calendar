@@ -6,5 +6,5 @@
  */
 
 export type AuthDiscordRequest200 = {
-  message: 'If that username exists in the server, a login link has been sent via DM.';
+  message: "If that username exists in the server, a login link has been sent via DM.";
 };

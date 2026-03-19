@@ -4,7 +4,12 @@ import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale/fr";
 import type { Event } from "../api/generated/model";
-import { getEventsIndexQueryKey, getEventsShowQueryKey, useEventsStore, useEventsUpdate } from "../api/generated/event/event";
+import {
+  getEventsIndexQueryKey,
+  getEventsShowQueryKey,
+  useEventsStore,
+  useEventsUpdate,
+} from "../api/generated/event/event";
 import { useDictionary } from "../contexts/DictionaryContext";
 import { MembersSelect } from "./MembersSelect";
 
@@ -23,16 +28,16 @@ export function CreateEventModal({ start, end, onClose, event }: Props) {
 
   const form = useForm({
     initialValues: {
-      room_id:     event?.room_id     ? String(event.room_id)     : null as string | null,
-      game_id:     event?.game_id     ? String(event.game_id)     : null as string | null,
-      scenario_id: event?.scenario_id ? String(event.scenario_id) : null as string | null,
-      min_players: event?.min_players ?? null as number | null,
-      max_players: event?.max_players ?? null as number | null,
-      player_ids:  (event?.player_ids as string[] | null) ?? [],
+      room_id: event?.room_id ? String(event.room_id) : (null as string | null),
+      game_id: event?.game_id ? String(event.game_id) : (null as string | null),
+      scenario_id: event?.scenario_id ? String(event.scenario_id) : (null as string | null),
+      min_players: event?.min_players ?? (null as number | null),
+      max_players: event?.max_players ?? (null as number | null),
+      player_ids: (event?.player_ids as string[] | null) ?? [],
     },
     validate: {
-      room_id:     (v) => !v ? "La salle est requise" : null,
-      game_id:     (v) => !v ? "Le jeu est requis" : null,
+      room_id: (v) => (!v ? "La salle est requise" : null),
+      game_id: (v) => (!v ? "Le jeu est requis" : null),
       max_players: (v, values) =>
         v && values.min_players && v < values.min_players ? "Doit être ≥ au minimum" : null,
     },
@@ -50,7 +55,7 @@ export function CreateEventModal({ start, end, onClose, event }: Props) {
     onClose();
   };
 
-  const store  = useEventsStore({ mutation: { onSuccess } });
+  const store = useEventsStore({ mutation: { onSuccess } });
   const update = useEventsUpdate({ mutation: { onSuccess } });
 
   const isPending = store.isPending || update.isPending;
@@ -63,14 +68,14 @@ export function CreateEventModal({ start, end, onClose, event }: Props) {
   const handleSubmit = form.onSubmit((values) => {
     const payload = {
       datetime_start: start.toISOString(),
-      datetime_end:   end.toISOString(),
-      mj_user_id:     mjUserId,
-      room_id:        Number(values.room_id),
-      game_id:        Number(values.game_id),
-      scenario_id:    values.scenario_id ? Number(values.scenario_id) : null,
-      min_players:    values.min_players ?? null,
-      max_players:    values.max_players ?? null,
-      player_ids:     values.player_ids.length > 0 ? values.player_ids : null,
+      datetime_end: end.toISOString(),
+      mj_user_id: mjUserId,
+      room_id: Number(values.room_id),
+      game_id: Number(values.game_id),
+      scenario_id: values.scenario_id ? Number(values.scenario_id) : null,
+      min_players: values.min_players ?? null,
+      max_players: values.max_players ?? null,
+      player_ids: values.player_ids.length > 0 ? values.player_ids : null,
     };
 
     if (event) {

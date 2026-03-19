@@ -6,5 +6,5 @@
  */
 
 export type DiscordTest200 = {
-  message: 'Hello World';
+  message: "Hello World";
 };

@@ -35,7 +35,15 @@ export function DictionaryProvider({ children }: { children: React.ReactNode }) 
   }
 
   return (
-    <DictionaryContext.Provider value={{ user: data.user, games: data.games, rooms: data.rooms, scenarios: data.scenarios, members: (data.members ?? []) as DiscordMember[] }}>
+    <DictionaryContext.Provider
+      value={{
+        user: data.user,
+        games: data.games,
+        rooms: data.rooms,
+        scenarios: data.scenarios,
+        members: (data.members ?? []) as DiscordMember[],
+      }}
+    >
       {children}
     </DictionaryContext.Provider>
   );

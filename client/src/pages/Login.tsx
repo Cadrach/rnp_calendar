@@ -25,8 +25,7 @@ export function Login() {
 
           {isSuccess ? (
             <Text ta="center" c="dimmed" size="sm">
-              Si ce pseudo existe sur le serveur, un lien de connexion t'a été
-              envoyé en DM Discord.
+              Si ce pseudo existe sur le serveur, un lien de connexion t'a été envoyé en DM Discord.
             </Text>
           ) : (
             <form onSubmit={handleSubmit}>

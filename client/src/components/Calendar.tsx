@@ -1,7 +1,13 @@
 import { useState } from "react";
 import { Modal } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { Calendar as BigCalendar, dateFnsLocalizer, View, NavigateAction, SlotInfo } from "react-big-calendar";
+import {
+  Calendar as BigCalendar,
+  dateFnsLocalizer,
+  View,
+  NavigateAction,
+  SlotInfo,
+} from "react-big-calendar";
 import { format, parse, startOfWeek, getDay } from "date-fns";
 import { fr } from "date-fns/locale/fr";
 import "react-big-calendar/lib/css/react-big-calendar.css";
@@ -51,7 +57,7 @@ export function Calendar() {
     ...e,
     title: games.find((g) => g.id === e.game_id)?.name ?? String(e.game_id),
     start: new Date(e.datetime_start),
-    end:   new Date(e.datetime_end),
+    end: new Date(e.datetime_end),
   }));
 
   const handleNavigate = (newDate: Date, _view: View, _action: NavigateAction) => {
@@ -97,7 +103,10 @@ export function Calendar() {
       <Modal
         opened={!!showEventId}
         onClose={handleCloseShow}
-        title={games.find((g) => g.id === events?.find((e) => String(e.id) === showEventId)?.game_id)?.name ?? "Séance"}
+        title={
+          games.find((g) => g.id === events?.find((e) => String(e.id) === showEventId)?.game_id)
+            ?.name ?? "Séance"
+        }
       >
         {showEventId && <EventShowModal eventId={showEventId} onClose={handleCloseShow} />}
       </Modal>

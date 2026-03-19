@@ -20,13 +20,18 @@ export function EventShowModal({ eventId, onClose }: Props) {
   const [editing, setEditing] = useState(false);
   const queryClient = useQueryClient();
 
-  const invalidateShow = () => queryClient.invalidateQueries({ queryKey: getEventsShowQueryKey(Number(eventId)) });
+  const invalidateShow = () =>
+    queryClient.invalidateQueries({ queryKey: getEventsShowQueryKey(Number(eventId)) });
 
-  const registerMutation   = useEventsRegister({ mutation: { onSuccess: invalidateShow } });
+  const registerMutation = useEventsRegister({ mutation: { onSuccess: invalidateShow } });
   const unregisterMutation = useEventsUnregister({ mutation: { onSuccess: invalidateShow } });
 
   if (isLoading) {
-    return <Center py="xl"><Loader /></Center>;
+    return (
+      <Center py="xl">
+        <Loader />
+      </Center>
+    );
   }
 
   if (!event) return null;
@@ -42,30 +47,35 @@ export function EventShowModal({ eventId, onClose }: Props) {
     );
   }
 
-  const game     = games.find((g) => g.id === event.game_id);
-  const room     = rooms.find((r) => r.id === event.room_id);
+  const game = games.find((g) => g.id === event.game_id);
+  const room = rooms.find((r) => r.id === event.room_id);
   const scenario = event.scenario_id ? scenarios.find((s) => s.id === event.scenario_id) : null;
 
   const start = new Date(event.datetime_start);
-  const end   = new Date(event.datetime_end);
+  const end = new Date(event.datetime_end);
 
-  const playerIds       = (event.player_ids as string[] | null) ?? [];
+  const playerIds = (event.player_ids as string[] | null) ?? [];
   const registeredCount = playerIds.length;
-  const isFull          = event.max_players != null && registeredCount >= event.max_players;
-  const isRegistered    = !!user.discord_id && playerIds.includes(user.discord_id);
+  const isFull = event.max_players != null && registeredCount >= event.max_players;
+  const isRegistered = !!user.discord_id && playerIds.includes(user.discord_id);
 
   const canEdit = user.is_admin || user.id === event.mj_user_id;
 
-  const roomLabel = room?.url
-    ? <Anchor href={room.url} target="_blank" rel="noopener noreferrer">{room.name}</Anchor>
-    : <Text span>{room?.name ?? "—"}</Text>;
+  const roomLabel = room?.url ? (
+    <Anchor href={room.url} target="_blank" rel="noopener noreferrer">
+      {room.name}
+    </Anchor>
+  ) : (
+    <Text span>{room?.name ?? "—"}</Text>
+  );
 
   return (
     <Stack>
       <Stack gap={4}>
         <Row label="Date">
           <Text size="sm">
-            {format(start, "PPP", { locale: fr })}, {format(start, "HH'h'mm")} → {format(end, "HH'h'mm")}
+            {format(start, "PPP", { locale: fr })}, {format(start, "HH'h'mm")} →{" "}
+            {format(end, "HH'h'mm")}
           </Text>
         </Row>
 
@@ -94,9 +104,13 @@ export function EventShowModal({ eventId, onClose }: Props) {
             <Stack gap={4}>
               {playerIds.map((id) => {
                 const member = members.find((m) => m.id === id);
-                return member
-                  ? <MemberAvatar key={id} member={member} />
-                  : <Text key={id} size="sm">{id}</Text>;
+                return member ? (
+                  <MemberAvatar key={id} member={member} />
+                ) : (
+                  <Text key={id} size="sm">
+                    {id}
+                  </Text>
+                );
               })}
             </Stack>
           </Row>
@@ -114,7 +128,9 @@ export function EventShowModal({ eventId, onClose }: Props) {
             variant="filled"
             color="orange"
             loading={unregisterMutation.isPending}
-            onClick={() => unregisterMutation.mutate({ event: Number(eventId), data: { user_id: user.id } })}
+            onClick={() =>
+              unregisterMutation.mutate({ event: Number(eventId), data: { user_id: user.id } })
+            }
           >
             Se désinscrire
           </Button>
@@ -122,7 +138,9 @@ export function EventShowModal({ eventId, onClose }: Props) {
           <Button
             disabled={isFull}
             loading={registerMutation.isPending}
-            onClick={() => registerMutation.mutate({ event: Number(eventId), data: { user_id: user.id } })}
+            onClick={() =>
+              registerMutation.mutate({ event: Number(eventId), data: { user_id: user.id } })
+            }
           >
             {isFull ? "Complet" : "S'inscrire"}
           </Button>
@@ -135,7 +153,9 @@ export function EventShowModal({ eventId, onClose }: Props) {
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <Group justify="space-between" wrap="nowrap" align="flex-start">
-      <Text size="sm" c="dimmed" w={80} style={{ flexShrink: 0 }}>{label}</Text>
+      <Text size="sm" c="dimmed" w={80} style={{ flexShrink: 0 }}>
+        {label}
+      </Text>
       {children}
     </Group>
   );

@@ -4,11 +4,11 @@
  * Laravel
  * OpenAPI spec version: 0.0.1
  */
-import type { Dictionary200MembersItem } from './dictionary200MembersItem';
-import type { Game } from './game';
-import type { Room } from './room';
-import type { Scenario } from './scenario';
-import type { User } from './user';
+import type { Dictionary200MembersItem } from "./dictionary200MembersItem";
+import type { Game } from "./game";
+import type { Room } from "./room";
+import type { Scenario } from "./scenario";
+import type { User } from "./user";
 
 export type Dictionary200 = {
   user: User;

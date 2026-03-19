@@ -9,11 +9,7 @@ interface Props {
 export function MemberAvatar({ member, size = "sm" }: Props) {
   return (
     <Group gap="xs" wrap="nowrap">
-      <Avatar
-        src={member.avatar}
-        size={size === "sm" ? 24 : 32}
-        radius="xl"
-      >
+      <Avatar src={member.avatar} size={size === "sm" ? 24 : 32} radius="xl">
         {member.username[0].toUpperCase()}
       </Avatar>
       <Text size={size === "sm" ? "sm" : "md"} style={{ whiteSpace: "nowrap" }}>

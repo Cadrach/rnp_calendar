@@ -6,5 +6,5 @@
  */
 
 export type AuthDiscordVerifyParams = {
-token: string;
+  token: string;
 };

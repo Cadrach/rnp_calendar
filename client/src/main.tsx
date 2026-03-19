@@ -15,5 +15,5 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </BrowserRouter>
-  </React.StrictMode>
+  </React.StrictMode>,
 );
