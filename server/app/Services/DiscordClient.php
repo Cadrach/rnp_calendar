@@ -31,6 +31,17 @@ class DiscordClient
         return $response->json();
     }
 
+    private function patch(string $endpoint, array $body = []): array
+    {
+        $response = $this->http()->patch(self::BASE_URL . $endpoint, $body);
+
+        if ($response->failed()) {
+            throw new DiscordApiException($response->json(), $response->status());
+        }
+
+        return $response->json();
+    }
+
     private function post(string $endpoint, array $body = []): array
     {
         $response = $this->http()->post(self::BASE_URL . $endpoint, $body);
@@ -75,6 +86,25 @@ class DiscordClient
     public function searchMembers(string $query, int $limit = 10): array
     {
         return $this->get("/guilds/{$this->guildId}/members/search", ['query' => $query, 'limit' => $limit]);
+    }
+
+    public function createForumThread(string $channelId, string $name, string $content): array
+    {
+        return $this->post("/channels/{$channelId}/threads", [
+            'name'                  => $name,
+            'auto_archive_duration' => 10080, // 7 days
+            'message'               => ['content' => $content],
+        ]);
+    }
+
+    public function editThread(string $threadId, string $name): array
+    {
+        return $this->patch("/channels/{$threadId}", ['name' => $name]);
+    }
+
+    public function editMessage(string $channelId, string $messageId, string $content): array
+    {
+        return $this->patch("/channels/{$channelId}/messages/{$messageId}", ['content' => $content]);
     }
 
     public function createRole(array $data): array

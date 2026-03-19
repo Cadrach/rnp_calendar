@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Services\EventDiscordSync;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class EventController extends Controller
 {
+    public function __construct(private readonly EventDiscordSync $discordSync) {}
+
     public function index(): JsonResponse
     {
         return response()->json(Event::all());
@@ -30,6 +33,8 @@ class EventController extends Controller
         ]);
 
         $event = Event::create($data);
+
+        $this->discordSync->sync($event);
 
         return response()->json($event, 201);
     }
@@ -65,6 +70,8 @@ class EventController extends Controller
         ]);
 
         $event->update($data);
+
+        $this->discordSync->sync($event);
 
         return response()->json($event);
     }
