@@ -1,8 +1,11 @@
 import { useState } from "react";
-import { Calendar as BigCalendar, dateFnsLocalizer, View, NavigateAction } from "react-big-calendar";
+import { Modal } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import { Calendar as BigCalendar, dateFnsLocalizer, View, NavigateAction, SlotInfo } from "react-big-calendar";
 import { format, parse, startOfWeek, getDay } from "date-fns";
 import { fr } from "date-fns/locale/fr";
 import "react-big-calendar/lib/css/react-big-calendar.css";
+import { CreateEventModal } from "./CreateEventModal";
 
 const localizer = dateFnsLocalizer({
   format,
@@ -30,30 +33,43 @@ const messages = {
 export function Calendar() {
   const [date, setDate] = useState(new Date());
   const [view, setView] = useState<View>("month");
+  const [slot, setSlot] = useState<{ start: Date; end: Date } | null>(null);
+  const [opened, { open, close }] = useDisclosure(false);
 
   const handleNavigate = (newDate: Date, _view: View, action: NavigateAction) => {
-    console.log("navigate", action, newDate);
     setDate(newDate);
   };
 
   const handleViewChange = (newView: View) => {
-    console.log("view change", newView);
     setView(newView);
   };
 
+  const handleSelectSlot = (slotInfo: SlotInfo) => {
+    setSlot({ start: slotInfo.start, end: slotInfo.end });
+    open();
+  };
+
   return (
-    <div style={{ height: "calc(100vh - 56px)", padding: "1rem" }}>
-      <BigCalendar
-        localizer={localizer}
-        events={[]}
-        style={{ height: "100%" }}
-        date={date}
-        view={view}
-        onNavigate={handleNavigate}
-        onView={handleViewChange}
-        culture="fr"
-        messages={messages}
-      />
-    </div>
+    <>
+      <div style={{ height: "calc(100vh - 56px)", padding: "1rem" }}>
+        <BigCalendar
+          localizer={localizer}
+          events={[]}
+          style={{ height: "100%" }}
+          date={date}
+          view={view}
+          onNavigate={handleNavigate}
+          onView={handleViewChange}
+          onSelectSlot={handleSelectSlot}
+          selectable
+          culture="fr"
+          messages={messages}
+        />
+      </div>
+
+      <Modal opened={opened} onClose={close} title="Nouvel événement">
+        {slot && <CreateEventModal start={slot.start} end={slot.end} />}
+      </Modal>
+    </>
   );
 }
