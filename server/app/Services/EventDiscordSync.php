@@ -30,7 +30,7 @@ class EventDiscordSync
     private function buildTitle(Event $event): string
     {
         $date  = Carbon::parse($event->datetime_start)->format('d/m/y');
-        $title = "[{$event->room->name}][{$date}] {$event->game->name}";
+        $title = "[{$event->room->code}][{$date}] {$event->game->name}";
 
         if ($event->scenario) {
             $title .= " - {$event->scenario->name}";
@@ -52,7 +52,7 @@ class EventDiscordSync
             "## {$this->buildTitle($event)}",
             '',
             "📅 **Date :** {$date}, {$timeFrom} → {$timeTo}",
-            "🏠 **Salle :** {$event->room->name}",
+            "🏠 **Salle :** {$this->roomLabel($event->room)}",
             "🎲 **Jeu :** {$event->game->name}",
         ];
 
@@ -86,5 +86,12 @@ class EventDiscordSync
         }
 
         return implode("\n", $lines);
+    }
+
+    private function roomLabel(\App\Models\Room $room): string
+    {
+        return $room->url
+            ? "[{$room->name}]({$room->url})"
+            : $room->name;
     }
 }

@@ -93,7 +93,7 @@ class DiscordClient
         return $this->post("/channels/{$channelId}/threads", [
             'name'                  => $name,
             'auto_archive_duration' => 10080, // 7 days
-            'message'               => ['content' => $content],
+            'message'               => ['content' => $content, 'flags' => 4],
         ]);
     }
 
@@ -104,7 +104,7 @@ class DiscordClient
 
     public function editMessage(string $channelId, string $messageId, string $content): array
     {
-        return $this->patch("/channels/{$channelId}/messages/{$messageId}", ['content' => $content]);
+        return $this->patch("/channels/{$channelId}/messages/{$messageId}", ['content' => $content, 'flags' => 4]);
     }
 
     public function createRole(array $data): array
