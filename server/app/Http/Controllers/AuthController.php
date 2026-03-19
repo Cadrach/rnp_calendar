@@ -43,7 +43,7 @@ class AuthController extends Controller
         return response()->json(['message' => 'If that username exists in the server, a login link has been sent via DM.']);
     }
 
-    public function discordVerify(Request $request): JsonResponse
+    public function discordVerify(Request $request): JsonResponse|\Illuminate\Http\RedirectResponse
     {
         $request->validate(['token' => ['required', 'string']]);
 
@@ -64,6 +64,6 @@ class AuthController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
 
-        return response()->json(['message' => 'Authenticated.', 'user' => $user]);
+        return redirect(config('app.frontend_url'));
     }
 }

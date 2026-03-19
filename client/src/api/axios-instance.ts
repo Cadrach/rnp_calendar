@@ -9,6 +9,16 @@ const client = axios.create({
   },
 });
 
+client.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error?.response?.status === 401 && window.location.pathname !== "/login") {
+      window.location.replace("/login");
+    }
+    return Promise.reject(error);
+  },
+);
+
 export type ErrorType<T> = T & { status: number };
 
 export const axiosInstance = <T>(
