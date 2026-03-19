@@ -85,6 +85,15 @@ class EventDiscordSync
             $lines[]  = "🎭 **Inscrits :** {$mentions}";
         }
 
+        $registeredCount = count($playerIds);
+        $isFull          = $event->max_players !== null && $registeredCount >= $event->max_players;
+
+        if (! $isFull) {
+            $url     = rtrim(config('app.frontend_url'), '/') . '/register/' . $event->id;
+            $lines[] = '';
+            $lines[] = "👉 [S'inscrire à cette séance]({$url})";
+        }
+
         return implode("\n", $lines);
     }
 

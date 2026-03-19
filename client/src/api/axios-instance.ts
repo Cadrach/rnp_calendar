@@ -13,7 +13,8 @@ client.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error?.response?.status === 401 && window.location.pathname !== "/login") {
-      window.location.replace("/login");
+      const redirect = window.location.pathname + window.location.search;
+      window.location.replace(`/login?redirect=${encodeURIComponent(redirect)}`);
     }
     return Promise.reject(error);
   },

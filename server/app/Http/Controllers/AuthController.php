@@ -16,7 +16,10 @@ class AuthController extends Controller
 
     public function discordRequest(Request $request): JsonResponse
     {
-        $request->validate(['username' => ['required', 'string']]);
+        $request->validate([
+            'username' => ['required', 'string'],
+            'redirect' => ['nullable', 'string'],
+        ]);
 
         $members = $this->discord->searchMembers($request->username);
 
@@ -31,7 +34,10 @@ class AuthController extends Controller
         if ($member) {
             $token = Str::random(64);
 
-            Cache::put("discord_auth:{$token}", $member['user']['id'], now()->addMinutes(15));
+            Cache::put("discord_auth:{$token}", [
+                'user_id'  => $member['user']['id'],
+                'redirect' => $request->redirect,
+            ], now()->addMinutes(15));
 
             $link = url("/api/auth/discord/verify?token={$token}");
 
@@ -47,11 +53,14 @@ class AuthController extends Controller
     {
         $request->validate(['token' => ['required', 'string']]);
 
-        $discordUserId = Cache::pull("discord_auth:{$request->token}");
+        $cached = Cache::pull("discord_auth:{$request->token}");
 
-        if (! $discordUserId) {
+        if (! $cached) {
             return response()->json(['message' => 'Invalid or expired token.'], 401);
         }
+
+        $discordUserId = $cached['user_id'];
+        $redirect      = $cached['redirect'];
 
         $member      = $this->discord->getGuildMember($discordUserId);
         $discordUser = $member['user'];
@@ -74,6 +83,11 @@ class AuthController extends Controller
         Auth::login($user);
         $request->session()->regenerate();
 
-        return redirect(config('app.frontend_url'));
+        $destination = rtrim(config('app.frontend_url'), '/');
+        if ($redirect) {
+            $destination .= '/' . ltrim($redirect, '/');
+        }
+
+        return redirect($destination);
     }
 }

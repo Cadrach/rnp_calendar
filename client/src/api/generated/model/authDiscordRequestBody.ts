@@ -7,4 +7,6 @@
 
 export type AuthDiscordRequestBody = {
   username: string;
+  /** @nullable */
+  redirect?: string | null;
 };

@@ -1,15 +1,18 @@
 import { useState } from "react";
 import { Button, Center, Paper, Stack, Text, TextInput, Title } from "@mantine/core";
+import { useSearchParams } from "react-router";
 import { useAuthDiscordRequest } from "../api/generated/auth/auth";
 
 export function Login() {
   const [username, setUsername] = useState("");
+  const [searchParams] = useSearchParams();
+  const redirect = searchParams.get("redirect");
 
   const { mutate, isPending, isSuccess } = useAuthDiscordRequest();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    mutate({ data: { username } });
+    mutate({ data: { username, redirect } });
   };
 
   return (
