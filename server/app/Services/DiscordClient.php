@@ -47,6 +47,11 @@ class DiscordClient
         return $this->get('/users/@me');
     }
 
+    public function getGuild(): array
+    {
+        return $this->get("/guilds/{$this->guildId}");
+    }
+
     public function getChannels(): array
     {
         return $this->get("/guilds/{$this->guildId}/channels");
@@ -70,6 +75,16 @@ class DiscordClient
     public function searchMembers(string $query, int $limit = 10): array
     {
         return $this->get("/guilds/{$this->guildId}/members/search", ['query' => $query, 'limit' => $limit]);
+    }
+
+    public function createRole(array $data): array
+    {
+        return $this->post("/guilds/{$this->guildId}/roles", $data);
+    }
+
+    public function createChannel(array $data): array
+    {
+        return $this->post("/guilds/{$this->guildId}/channels", $data);
     }
 
     public function createDmChannel(string $userId): array

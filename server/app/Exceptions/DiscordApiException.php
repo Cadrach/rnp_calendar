@@ -8,7 +8,7 @@ class DiscordApiException extends RuntimeException
 {
     public function __construct(private readonly array $error, int $status)
     {
-        parent::__construct('Discord API error', $status);
+        parent::__construct('Discord API error: ' . json_encode($error), $status);
     }
 
     public function getError(): array
