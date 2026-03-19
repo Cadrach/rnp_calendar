@@ -34,7 +34,7 @@ Route::middleware('auth')->group(function () {
             'user'      => $request->user(),
             'games'     => Game::all(),
             'rooms'     => Room::all(),
-            'scenarios' => Scenario::where('mj_user_id', $request->user()->id)->get(),
+            'scenarios' => Scenario::all(),
         ]);
     });
 

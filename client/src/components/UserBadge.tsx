@@ -17,6 +17,11 @@ export function UserBadge() {
           MJ
         </Badge>
       )}
+      {user.is_admin && (
+        <Badge variant="light" color="red">
+          ADM
+        </Badge>
+      )}
     </Group>
   );
 }

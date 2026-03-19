@@ -37,8 +37,17 @@ class EventController extends Controller
         return response()->json($event);
     }
 
+    private function authorizeEventMutation(Request $request, Event $event): void
+    {
+        if (! $request->user()->is_admin && $request->user()->id !== $event->mj_user_id) {
+            abort(403);
+        }
+    }
+
     public function update(Request $request, Event $event): JsonResponse
     {
+        $this->authorizeEventMutation($request, $event);
+
         $data = $request->validate([
             'title'          => ['sometimes', 'string'],
             'datetime_start' => ['sometimes', 'date'],
@@ -56,8 +65,10 @@ class EventController extends Controller
         return response()->json($event);
     }
 
-    public function destroy(Event $event): JsonResponse
+    public function destroy(Request $request, Event $event): JsonResponse
     {
+        $this->authorizeEventMutation($request, $event);
+
         $event->delete();
 
         return response()->json(null, 204);

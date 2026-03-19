@@ -21,13 +21,21 @@ class User extends Authenticatable
         'roles' => 'array',
     ];
 
-    protected $appends = ['is_mj'];
+    protected $appends = ['is_mj', 'is_admin'];
 
     protected function isMj(): Attribute
     {
         return Attribute::get(function () {
             $mjRoleId = (int) config('services.discord.role_id_mj');
             return in_array($mjRoleId, $this->roles ?? [], strict: true);
+        });
+    }
+
+    protected function isAdmin(): Attribute
+    {
+        return Attribute::get(function () {
+            $adminRoleId = (int) config('services.discord.role_id_admin');
+            return in_array($adminRoleId, $this->roles ?? [], strict: true);
         });
     }
 }

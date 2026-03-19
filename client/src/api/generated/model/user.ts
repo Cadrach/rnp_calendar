@@ -17,4 +17,5 @@ export interface User {
   /** @nullable */
   roles: unknown[] | null;
   is_mj: string;
+  is_admin: string;
 }
