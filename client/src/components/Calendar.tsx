@@ -5,6 +5,7 @@ import { Calendar as BigCalendar, dateFnsLocalizer, View, NavigateAction, SlotIn
 import { format, parse, startOfWeek, getDay } from "date-fns";
 import { fr } from "date-fns/locale/fr";
 import "react-big-calendar/lib/css/react-big-calendar.css";
+import { useEventsIndex } from "../api/generated/event/event";
 import { CreateEventModal } from "./CreateEventModal";
 
 const localizer = dateFnsLocalizer({
@@ -36,6 +37,14 @@ export function Calendar() {
   const [slot, setSlot] = useState<{ start: Date; end: Date } | null>(null);
   const [opened, { open, close }] = useDisclosure(false);
 
+  const { data: events } = useEventsIndex();
+
+  const calendarEvents = (events ?? []).map((e) => ({
+    ...e,
+    start: new Date(e.datetime_start),
+    end:   new Date(e.datetime_end),
+  }));
+
   const handleNavigate = (newDate: Date, _view: View, action: NavigateAction) => {
     setDate(newDate);
   };
@@ -54,7 +63,7 @@ export function Calendar() {
       <div style={{ height: "calc(100vh - 56px)", padding: "1rem" }}>
         <BigCalendar
           localizer={localizer}
-          events={[]}
+          events={calendarEvents}
           style={{ height: "100%" }}
           date={date}
           view={view}
