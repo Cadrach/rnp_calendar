@@ -14,6 +14,11 @@ class AuthController extends Controller
 {
     public function __construct(private readonly DiscordClient $discord) {}
 
+    /**
+     * This method sends a dm to the user with a link to login. Stores redirect in cache
+     * @param Request $request
+     * @return JsonResponse
+     */
     public function discordRequest(Request $request): JsonResponse
     {
         $request->validate([
@@ -49,6 +54,11 @@ class AuthController extends Controller
         return response()->json(['message' => 'If that username exists in the server, a login link has been sent via DM.']);
     }
 
+    /**
+     * This route verifies the token received and logs the user
+     * @param Request $request
+     * @return JsonResponse|\Illuminate\Http\RedirectResponse
+     */
     public function discordVerify(Request $request): JsonResponse|\Illuminate\Http\RedirectResponse
     {
         $request->validate(['token' => ['required', 'string']]);

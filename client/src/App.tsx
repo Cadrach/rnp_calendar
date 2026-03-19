@@ -26,6 +26,7 @@ export default function App() {
                 <AppShell.Main>
                   <Routes>
                     <Route path="/" element={<Calendar />} />
+                    <Route path="/show/:id" element={<Calendar />} />
                   </Routes>
                 </AppShell.Main>
               </AppShell>

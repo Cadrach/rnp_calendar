@@ -10,4 +10,6 @@ export interface Room {
   code: string;
   name: string;
   unlimited: boolean;
+  /** @nullable */
+  url: string | null;
 }

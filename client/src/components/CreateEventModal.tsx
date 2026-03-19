@@ -4,7 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale/fr";
 import type { Event } from "../api/generated/model";
-import { getEventsIndexQueryKey, useEventsStore, useEventsUpdate } from "../api/generated/event/event";
+import { getEventsIndexQueryKey, getEventsShowQueryKey, useEventsStore, useEventsUpdate } from "../api/generated/event/event";
 import { useDictionary } from "../contexts/DictionaryContext";
 import { MembersSelect } from "./MembersSelect";
 
@@ -44,6 +44,9 @@ export function CreateEventModal({ start, end, onClose, event }: Props) {
 
   const onSuccess = () => {
     queryClient.invalidateQueries({ queryKey: getEventsIndexQueryKey() });
+    if (event) {
+      queryClient.invalidateQueries({ queryKey: getEventsShowQueryKey(event.id) });
+    }
     onClose();
   };
 
@@ -71,7 +74,7 @@ export function CreateEventModal({ start, end, onClose, event }: Props) {
     };
 
     if (event) {
-      update.mutate({ eventId: String(event.id), data: payload });
+      update.mutate({ event: event.id, data: payload });
     } else {
       store.mutate({ data: payload });
     }

@@ -5,8 +5,11 @@ import { Calendar as BigCalendar, dateFnsLocalizer, View, NavigateAction, SlotIn
 import { format, parse, startOfWeek, getDay } from "date-fns";
 import { fr } from "date-fns/locale/fr";
 import "react-big-calendar/lib/css/react-big-calendar.css";
+import { useNavigate, useParams } from "react-router";
 import { useEventsIndex } from "../api/generated/event/event";
+import type { Event } from "../api/generated/model";
 import { CreateEventModal } from "./CreateEventModal";
+import { EventShowModal } from "./EventShowModal";
 import { useDictionary } from "../contexts/DictionaryContext";
 
 const localizer = dateFnsLocalizer({
@@ -33,10 +36,13 @@ const messages = {
 };
 
 export function Calendar() {
+  const navigate = useNavigate();
+  const { id: showEventId } = useParams<{ id?: string }>();
+
   const [date, setDate] = useState(new Date());
   const [view, setView] = useState<View>("month");
   const [slot, setSlot] = useState<{ start: Date; end: Date } | null>(null);
-  const [opened, { open, close }] = useDisclosure(false);
+  const [createOpened, { open: openCreate, close: closeCreate }] = useDisclosure(false);
 
   const { games } = useDictionary();
   const { data: events } = useEventsIndex();
@@ -48,17 +54,21 @@ export function Calendar() {
     end:   new Date(e.datetime_end),
   }));
 
-  const handleNavigate = (newDate: Date, _view: View, action: NavigateAction) => {
+  const handleNavigate = (newDate: Date, _view: View, _action: NavigateAction) => {
     setDate(newDate);
-  };
-
-  const handleViewChange = (newView: View) => {
-    setView(newView);
   };
 
   const handleSelectSlot = (slotInfo: SlotInfo) => {
     setSlot({ start: slotInfo.start, end: slotInfo.end });
-    open();
+    openCreate();
+  };
+
+  const handleSelectEvent = (event: Event & { start: Date; end: Date; title: string }) => {
+    navigate(`/show/${event.id}`);
+  };
+
+  const handleCloseShow = () => {
+    navigate("/");
   };
 
   return (
@@ -71,16 +81,25 @@ export function Calendar() {
           date={date}
           view={view}
           onNavigate={handleNavigate}
-          onView={handleViewChange}
+          onView={(v) => setView(v)}
           onSelectSlot={handleSelectSlot}
+          onSelectEvent={handleSelectEvent}
           selectable
           culture="fr"
           messages={messages}
         />
       </div>
 
-      <Modal opened={opened} onClose={close} title="Nouvel événement">
-        {slot && <CreateEventModal start={slot.start} end={slot.end} onClose={close} />}
+      <Modal opened={createOpened} onClose={closeCreate} title="Nouvel événement">
+        {slot && <CreateEventModal start={slot.start} end={slot.end} onClose={closeCreate} />}
+      </Modal>
+
+      <Modal
+        opened={!!showEventId}
+        onClose={handleCloseShow}
+        title={games.find((g) => g.id === events?.find((e) => String(e.id) === showEventId)?.game_id)?.name ?? "Séance"}
+      >
+        {showEventId && <EventShowModal eventId={showEventId} onClose={handleCloseShow} />}
       </Modal>
     </>
   );

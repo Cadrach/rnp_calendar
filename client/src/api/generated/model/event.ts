@@ -26,4 +26,6 @@ export interface Event {
   deleted_at: string | null;
   /** @nullable */
   player_ids: unknown[] | null;
+  /** @nullable */
+  discord_thread_id: string | null;
 }

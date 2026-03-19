@@ -30,6 +30,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/dictionary', DictionaryController::class);
 
     Route::apiResource('events', EventController::class);
+    Route::post('events/{event}/register', [EventController::class, 'register']);
+    Route::post('events/{event}/unregister', [EventController::class, 'unregister']);
 
     Route::prefix('discord')->controller(DiscordController::class)->group(function () {
         Route::get('/test', 'test');

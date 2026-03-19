@@ -26,6 +26,8 @@ import type {
 import type {
   AuthenticationExceptionResponse,
   Event,
+  EventRegister403,
+  EventRegisterBody,
   EventsStoreBody,
   EventsUpdateBody,
   ModelNotFoundExceptionResponse,
@@ -377,5 +379,63 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getEventsDestroyMutationOptions(options), queryClient);
+    }
+    export const eventRegister = (
+    event: number,
+    eventRegisterBody: EventRegisterBody,
+ options?: SecondParameter<typeof axiosInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return axiosInstance<Event>(
+      {url: `/events/${event}/register`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: eventRegisterBody, signal
+    },
+      options);
+    }
+  
+
+
+export const getEventRegisterMutationOptions = <TError = ErrorType<AuthenticationExceptionResponse | EventRegister403 | ModelNotFoundExceptionResponse | ValidationExceptionResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof eventRegister>>, TError,{event: number;data: EventRegisterBody}, TContext>, request?: SecondParameter<typeof axiosInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof eventRegister>>, TError,{event: number;data: EventRegisterBody}, TContext> => {
+
+const mutationKey = ['eventRegister'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof eventRegister>>, {event: number;data: EventRegisterBody}> = (props) => {
+          const {event,data} = props ?? {};
+
+          return  eventRegister(event,data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type EventRegisterMutationResult = NonNullable<Awaited<ReturnType<typeof eventRegister>>>
+    export type EventRegisterMutationBody = EventRegisterBody
+    export type EventRegisterMutationError = ErrorType<AuthenticationExceptionResponse | EventRegister403 | ModelNotFoundExceptionResponse | ValidationExceptionResponse>
+
+    export const useEventRegister = <TError = ErrorType<AuthenticationExceptionResponse | EventRegister403 | ModelNotFoundExceptionResponse | ValidationExceptionResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof eventRegister>>, TError,{event: number;data: EventRegisterBody}, TContext>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof eventRegister>>,
+        TError,
+        {event: number;data: EventRegisterBody},
+        TContext
+      > => {
+      return useMutation(getEventRegisterMutationOptions(options), queryClient);
     }
     

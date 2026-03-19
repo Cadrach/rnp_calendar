@@ -39,6 +39,9 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
+/**
+ * @summary This method sends a dm to the user with a link to login. Stores redirect in cache
+ */
 export const authDiscordRequest = (
     authDiscordRequestBody: AuthDiscordRequestBody,
  options?: SecondParameter<typeof axiosInstance>,signal?: AbortSignal
@@ -86,7 +89,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type AuthDiscordRequestMutationBody = AuthDiscordRequestBody
     export type AuthDiscordRequestMutationError = ErrorType<ValidationExceptionResponse>
 
-    export const useAuthDiscordRequest = <TError = ErrorType<ValidationExceptionResponse>,
+    /**
+ * @summary This method sends a dm to the user with a link to login. Stores redirect in cache
+ */
+export const useAuthDiscordRequest = <TError = ErrorType<ValidationExceptionResponse>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authDiscordRequest>>, TError,{data: AuthDiscordRequestBody}, TContext>, request?: SecondParameter<typeof axiosInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof authDiscordRequest>>,
@@ -96,7 +102,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getAuthDiscordRequestMutationOptions(options), queryClient);
     }
-    export const authDiscordVerify = (
+    /**
+ * @summary This route verifies the token received and logs the user
+ */
+export const authDiscordVerify = (
     params: AuthDiscordVerifyParams,
  options?: SecondParameter<typeof axiosInstance>,signal?: AbortSignal
 ) => {
@@ -165,6 +174,9 @@ export function useAuthDiscordVerify<TData = Awaited<ReturnType<typeof authDisco
  params: AuthDiscordVerifyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authDiscordVerify>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary This route verifies the token received and logs the user
+ */
 
 export function useAuthDiscordVerify<TData = Awaited<ReturnType<typeof authDiscordVerify>>, TError = ErrorType<ValidationExceptionResponse>>(
  params: AuthDiscordVerifyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authDiscordVerify>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}

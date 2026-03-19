@@ -74,6 +74,68 @@ class EventController extends Controller
         return response()->json($event);
     }
 
+    public function register(Request $request, Event $event): JsonResponse
+    {
+        $request->validate([
+            'user_id' => ['required', 'integer', 'exists:users,id'],
+        ]);
+
+        if ($request->user()->id !== (int) $request->user_id) {
+            abort(403);
+        }
+
+        $discordId = $request->user()->discord_id;
+
+        if (! $discordId) {
+            return response()->json(['message' => 'No Discord account linked to this user.'], 422);
+        }
+
+        $playerIds = $event->player_ids ?? [];
+
+        if (in_array($discordId, $playerIds)) {
+            return response()->json(['message' => 'Already registered.'], 422);
+        }
+
+        if ($event->max_players !== null && count($playerIds) >= $event->max_players) {
+            return response()->json(['message' => 'Event is full.'], 422);
+        }
+
+        $event->update(['player_ids' => [...$playerIds, $discordId]]);
+
+        $this->discordSync->sync($event);
+
+        return response()->json($event);
+    }
+
+    public function unregister(Request $request, Event $event): JsonResponse
+    {
+        $request->validate([
+            'user_id' => ['required', 'integer', 'exists:users,id'],
+        ]);
+
+        if ($request->user()->id !== (int) $request->user_id) {
+            abort(403);
+        }
+
+        $discordId = $request->user()->discord_id;
+
+        if (! $discordId) {
+            return response()->json(['message' => 'No Discord account linked to this user.'], 422);
+        }
+
+        $playerIds = $event->player_ids ?? [];
+
+        if (! in_array($discordId, $playerIds)) {
+            return response()->json(['message' => 'Not registered.'], 422);
+        }
+
+        $event->update(['player_ids' => array_values(array_filter($playerIds, fn($id) => $id !== $discordId))]);
+
+        $this->discordSync->sync($event);
+
+        return response()->json($event);
+    }
+
     public function destroy(Request $request, Event $event): JsonResponse
     {
         $this->authorizeEventMutation($request, $event);
