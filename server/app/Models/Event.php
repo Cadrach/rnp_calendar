@@ -18,10 +18,12 @@ class Event extends Model
         'scenario_id',
         'min_players',
         'max_players',
+        'player_ids',
     ];
 
     protected $casts = [
         'datetime_start' => 'datetime',
         'datetime_end'   => 'datetime',
+        'player_ids'     => 'array',
     ];
 }

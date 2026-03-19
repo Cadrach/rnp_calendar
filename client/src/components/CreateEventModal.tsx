@@ -6,6 +6,7 @@ import { fr } from "date-fns/locale/fr";
 import type { Event } from "../api/generated/model";
 import { getEventsIndexQueryKey, useEventsStore, useEventsUpdate } from "../api/generated/event/event";
 import { useDictionary } from "../contexts/DictionaryContext";
+import { MembersSelect } from "./MembersSelect";
 
 interface Props {
   start: Date;
@@ -15,7 +16,7 @@ interface Props {
 }
 
 export function CreateEventModal({ start, end, onClose, event }: Props) {
-  const { user, games, rooms, scenarios } = useDictionary();
+  const { user, games, rooms, scenarios, members } = useDictionary();
   const queryClient = useQueryClient();
 
   const mjUserId = event ? event.mj_user_id : user.id;
@@ -28,6 +29,7 @@ export function CreateEventModal({ start, end, onClose, event }: Props) {
       scenario_id: event?.scenario_id ? String(event.scenario_id) : null as string | null,
       min_players: event?.min_players ?? null as number | null,
       max_players: event?.max_players ?? null as number | null,
+      player_ids:  (event?.player_ids as string[] | null) ?? [],
     },
     validate: {
       title:       (v) => v.trim().length === 0 ? "Le titre est requis" : null,
@@ -68,6 +70,7 @@ export function CreateEventModal({ start, end, onClose, event }: Props) {
       scenario_id:    values.scenario_id ? Number(values.scenario_id) : null,
       min_players:    values.min_players ?? null,
       max_players:    values.max_players ?? null,
+      player_ids:     values.player_ids.length > 0 ? values.player_ids : null,
     };
 
     if (event) {
@@ -131,6 +134,14 @@ export function CreateEventModal({ start, end, onClose, event }: Props) {
           placeholder="6"
           min={1}
           {...form.getInputProps("max_players")}
+        />
+
+        <MembersSelect
+          label="Joueurs"
+          members={members}
+          value={form.values.player_ids}
+          onChange={(ids) => form.setFieldValue("player_ids", ids)}
+          maxValues={form.values.max_players ?? undefined}
         />
 
         <Button type="submit" loading={isPending}>

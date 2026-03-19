@@ -25,6 +25,8 @@ class EventController extends Controller
             'scenario_id'    => ['nullable', 'exists:scenarios,id'],
             'min_players'    => ['nullable', 'integer', 'min:1'],
             'max_players'    => ['nullable', 'integer', 'min:1', 'gte:min_players'],
+            'player_ids'     => ['nullable', 'array'],
+            'player_ids.*'   => ['string'],
         ]);
 
         $event = Event::create($data);
@@ -58,6 +60,8 @@ class EventController extends Controller
             'scenario_id'    => ['nullable', 'exists:scenarios,id'],
             'min_players'    => ['nullable', 'integer', 'min:1'],
             'max_players'    => ['nullable', 'integer', 'min:1', 'gte:min_players'],
+            'player_ids'     => ['nullable', 'array'],
+            'player_ids.*'   => ['string'],
         ]);
 
         $event->update($data);

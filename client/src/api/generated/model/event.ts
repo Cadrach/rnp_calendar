@@ -25,4 +25,6 @@ export interface Event {
   updated_at: string | null;
   /** @nullable */
   deleted_at: string | null;
+  /** @nullable */
+  player_ids: unknown[] | null;
 }

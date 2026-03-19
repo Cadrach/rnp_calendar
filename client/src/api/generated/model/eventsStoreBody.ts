@@ -24,4 +24,6 @@ export type EventsStoreBody = {
    * @nullable
    */
   max_players?: number | null;
+  /** @nullable */
+  player_ids?: string[] | null;
 };

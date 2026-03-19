@@ -31,7 +31,9 @@ class DictionaryController extends Controller
     {
         return Cache::remember('discord_members', now()->addHour(), function () {
             return collect($this->discord->getMembers(limit: 1000))
+                ->filter(fn($m) => empty($m['user']['bot']))
                 ->map(fn($m) => DiscordMember::fromApiResponse($m))
+                ->sortBy('username', SORT_NATURAL | SORT_FLAG_CASE)
                 ->values()
                 ->all();
         });
