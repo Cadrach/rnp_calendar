@@ -1,16 +1,8 @@
-import { Avatar, Badge, Group, Skeleton, Text } from "@mantine/core";
-import { useGetUser } from "../api/generated/default/default";
+import { Avatar, Badge, Group, Text } from "@mantine/core";
+import { useDictionary } from "../contexts/DictionaryContext";
 
 export function UserBadge() {
-  const { data: user, isLoading } = useGetUser();
-
-  if (isLoading) {
-    return <Skeleton height={32} width={120} radius="xl" />;
-  }
-
-  if (!user) {
-    return null;
-  }
+  const { user } = useDictionary();
 
   return (
     <Group gap="xs">

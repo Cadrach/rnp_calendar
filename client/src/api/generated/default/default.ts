@@ -25,8 +25,8 @@ import type {
 
 import type {
   AuthenticationExceptionResponse,
-  PostAuthLogout200,
-  User
+  GetDictionary200,
+  PostAuthLogout200
 } from '../model';
 
 import { axiosInstance } from '../../axios-instance';
@@ -92,14 +92,14 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getPostAuthLogoutMutationOptions(options), queryClient);
     }
-    export const getUser = (
+    export const getDictionary = (
     
  options?: SecondParameter<typeof axiosInstance>,signal?: AbortSignal
 ) => {
       
       
-      return axiosInstance<User>(
-      {url: `/user`, method: 'GET', signal
+      return axiosInstance<GetDictionary200>(
+      {url: `/dictionary`, method: 'GET', signal
     },
       options);
     }
@@ -107,66 +107,66 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-export const getGetUserQueryKey = () => {
+export const getGetDictionaryQueryKey = () => {
     return [
-    `/user`
+    `/dictionary`
     ] as const;
     }
 
     
-export const getGetUserQueryOptions = <TData = Awaited<ReturnType<typeof getUser>>, TError = ErrorType<AuthenticationExceptionResponse>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+export const getGetDictionaryQueryOptions = <TData = Awaited<ReturnType<typeof getDictionary>>, TError = ErrorType<AuthenticationExceptionResponse>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDictionary>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetUserQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getGetDictionaryQueryKey();
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getUser>>> = ({ signal }) => getUser(requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getDictionary>>> = ({ signal }) => getDictionary(requestOptions, signal);
 
       
 
       
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getDictionary>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type GetUserQueryResult = NonNullable<Awaited<ReturnType<typeof getUser>>>
-export type GetUserQueryError = ErrorType<AuthenticationExceptionResponse>
+export type GetDictionaryQueryResult = NonNullable<Awaited<ReturnType<typeof getDictionary>>>
+export type GetDictionaryQueryError = ErrorType<AuthenticationExceptionResponse>
 
 
-export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError = ErrorType<AuthenticationExceptionResponse>>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>> & Pick<
+export function useGetDictionary<TData = Awaited<ReturnType<typeof getDictionary>>, TError = ErrorType<AuthenticationExceptionResponse>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDictionary>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getUser>>,
+          Awaited<ReturnType<typeof getDictionary>>,
           TError,
-          Awaited<ReturnType<typeof getUser>>
+          Awaited<ReturnType<typeof getDictionary>>
         > , 'initialData'
       >, request?: SecondParameter<typeof axiosInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError = ErrorType<AuthenticationExceptionResponse>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>> & Pick<
+export function useGetDictionary<TData = Awaited<ReturnType<typeof getDictionary>>, TError = ErrorType<AuthenticationExceptionResponse>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDictionary>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getUser>>,
+          Awaited<ReturnType<typeof getDictionary>>,
           TError,
-          Awaited<ReturnType<typeof getUser>>
+          Awaited<ReturnType<typeof getDictionary>>
         > , 'initialData'
       >, request?: SecondParameter<typeof axiosInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError = ErrorType<AuthenticationExceptionResponse>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+export function useGetDictionary<TData = Awaited<ReturnType<typeof getDictionary>>, TError = ErrorType<AuthenticationExceptionResponse>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDictionary>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError = ErrorType<AuthenticationExceptionResponse>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+export function useGetDictionary<TData = Awaited<ReturnType<typeof getDictionary>>, TError = ErrorType<AuthenticationExceptionResponse>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDictionary>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getGetUserQueryOptions(options)
+  const queryOptions = getGetDictionaryQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

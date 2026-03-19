@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DiscordController;
+use App\Models\Game;
+use App\Models\Room;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -25,8 +27,12 @@ Route::prefix('auth')->group(function () {
 
 // Protected routes go here
 Route::middleware('auth')->group(function () {
-    Route::get('/user', function (Request $request) {
-        return $request->user();
+    Route::get('/dictionary', function (Request $request) {
+        return response()->json([
+            'user'  => $request->user(),
+            'games' => Game::all(),
+            'rooms' => Room::all(),
+        ]);
     });
 
     Route::prefix('discord')->controller(DiscordController::class)->group(function () {
