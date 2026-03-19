@@ -7,7 +7,9 @@ use Carbon\Carbon;
 
 class EventDiscordSync
 {
-    public function __construct(private readonly DiscordClient $discord) {}
+    public function __construct(private readonly DiscordClient $discord)
+    {
+    }
 
     public function sync(Event $event): void
     {
@@ -67,6 +69,7 @@ class EventDiscordSync
         $lines[] = "👑 **MJ :** {$mjMention}";
 
         $playerCount = '';
+
         if ($event->min_players && $event->max_players) {
             $playerCount = "{$event->min_players} – {$event->max_players}";
         } elseif ($event->max_players) {
@@ -80,8 +83,9 @@ class EventDiscordSync
         }
 
         $playerIds = $event->player_ids ?? [];
+
         if (! empty($playerIds)) {
-            $mentions = implode(', ', array_map(fn($id) => "<@{$id}>", $playerIds));
+            $mentions = implode(', ', array_map(fn ($id) => "<@{$id}>", $playerIds));
             $lines[]  = "🎭 **Inscrits :** {$mentions}";
         }
 

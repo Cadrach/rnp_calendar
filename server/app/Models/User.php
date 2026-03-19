@@ -27,6 +27,7 @@ class User extends Authenticatable
     {
         return Attribute::get(function () {
             $mjRoleId = (int) config('services.discord.role_id_mj');
+
             return in_array($mjRoleId, $this->roles ?? [], strict: true);
         });
     }
@@ -35,6 +36,7 @@ class User extends Authenticatable
     {
         return Attribute::get(function () {
             $adminRoleId = (int) config('services.discord.role_id_admin');
+
             return in_array($adminRoleId, $this->roles ?? [], strict: true);
         });
     }

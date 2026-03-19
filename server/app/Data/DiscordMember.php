@@ -8,7 +8,8 @@ class DiscordMember
         public readonly string $id,
         public readonly string $username,
         public readonly ?string $avatar,
-    ) {}
+    ) {
+    }
 
     public static function fromApiResponse(array $member): self
     {

@@ -12,7 +12,9 @@ use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
-    public function __construct(private readonly DiscordClient $discord) {}
+    public function __construct(private readonly DiscordClient $discord)
+    {
+    }
 
     /**
      * This method sends a dm to the user with a link to login. Stores redirect in cache
@@ -32,7 +34,8 @@ class AuthController extends Controller
 
         $member = collect($members)->first(function ($m) use ($search) {
             $user = $m['user'];
-            return strtolower($user['username']) === $search
+
+            return strtolower($user['username'])          === $search
                 || strtolower($user['global_name'] ?? '') === $search;
         });
 
@@ -94,6 +97,7 @@ class AuthController extends Controller
         $request->session()->regenerate();
 
         $destination = rtrim(config('app.frontend_url'), '/');
+
         if ($redirect) {
             $destination .= '/' . ltrim($redirect, '/');
         }

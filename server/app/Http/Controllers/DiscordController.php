@@ -7,7 +7,9 @@ use Illuminate\Http\JsonResponse;
 
 class DiscordController extends Controller
 {
-    public function __construct(private readonly DiscordClient $discord) {}
+    public function __construct(private readonly DiscordClient $discord)
+    {
+    }
 
     public function test(): JsonResponse
     {

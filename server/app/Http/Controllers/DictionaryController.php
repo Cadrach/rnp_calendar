@@ -13,7 +13,9 @@ use Illuminate\Support\Facades\Cache;
 
 class DictionaryController extends Controller
 {
-    public function __construct(private readonly DiscordClient $discord) {}
+    public function __construct(private readonly DiscordClient $discord)
+    {
+    }
 
     public function __invoke(Request $request): JsonResponse
     {
@@ -31,8 +33,8 @@ class DictionaryController extends Controller
     {
         return Cache::remember('discord_members', now()->addHour(), function () {
             return collect($this->discord->getMembers(limit: 1000))
-                ->filter(fn($m) => empty($m['user']['bot']))
-                ->map(fn($m) => DiscordMember::fromApiResponse($m))
+                ->filter(fn ($m) => empty($m['user']['bot']))
+                ->map(fn ($m) => DiscordMember::fromApiResponse($m))
                 ->sortBy('username', SORT_NATURAL | SORT_FLAG_CASE)
                 ->values()
                 ->all();

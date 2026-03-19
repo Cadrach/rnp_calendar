@@ -39,6 +39,7 @@ class SetupDiscordServer extends Command
 
         if (! $this->confirm('Proceed with setup on this server?')) {
             $this->info('Aborted.');
+
             return self::SUCCESS;
         }
 
@@ -57,11 +58,11 @@ class SetupDiscordServer extends Command
         $this->info('--- Channels ---');
 
         $existing = collect($this->discord->getChannels())
-            ->keyBy(fn($c) => strtolower($c['name']));
+            ->keyBy(fn ($c) => strtolower($c['name']));
 
         foreach (self::CHANNELS as $envKey => $name) {
             $match = $existing->first(
-                fn($c) => strtolower($c['name']) === strtolower($name)
+                fn ($c) => strtolower($c['name']) === strtolower($name)
             );
 
             if ($match) {
@@ -84,11 +85,11 @@ class SetupDiscordServer extends Command
         $this->info('--- Roles ---');
 
         $existing = collect($this->discord->getGuildRoles())
-            ->keyBy(fn($r) => strtolower($r['name']));
+            ->keyBy(fn ($r) => strtolower($r['name']));
 
         foreach (self::ROLES as $envKey => $name) {
             $match = $existing->first(
-                fn($r) => strtolower($r['name']) === strtolower($name)
+                fn ($r) => strtolower($r['name']) === strtolower($name)
             );
 
             if ($match) {

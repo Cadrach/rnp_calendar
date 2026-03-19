@@ -13,7 +13,8 @@ class DiscordClient
     public function __construct(
         private readonly string $token,
         private readonly string $guildId,
-    ) {}
+    ) {
+    }
 
     private function http(): PendingRequest
     {
@@ -129,7 +130,7 @@ class DiscordClient
 
     public function getThreads(string $channelId): array
     {
-        $responses = Http::pool(fn($pool) => [
+        $responses = Http::pool(fn ($pool) => [
             $pool->as('active')
                 ->withHeaders(['Authorization' => "Bot {$this->token}"])
                 ->get(self::BASE_URL . "/guilds/{$this->guildId}/threads/active"),
@@ -141,11 +142,12 @@ class DiscordClient
         if ($responses['active']->failed()) {
             throw new DiscordApiException($responses['active']->json(), $responses['active']->status());
         }
+
         if ($responses['archived']->failed()) {
             throw new DiscordApiException($responses['archived']->json(), $responses['archived']->status());
         }
 
-        $active   = collect($responses['active']->json('threads'))->filter(fn($t) => $t['parent_id'] === $channelId);
+        $active   = collect($responses['active']->json('threads'))->filter(fn ($t) => $t['parent_id'] === $channelId);
         $archived = collect($responses['archived']->json('threads'));
 
         return $active->merge($archived)->values()->all();
@@ -155,7 +157,7 @@ class DiscordClient
     {
         $botId = $this->getMe()['id'];
 
-        $responses = Http::pool(fn($pool) => [
+        $responses = Http::pool(fn ($pool) => [
             $pool->as('member')
                 ->withHeaders(['Authorization' => "Bot {$this->token}"])
                 ->get(self::BASE_URL . "/guilds/{$this->guildId}/members/{$botId}"),
@@ -167,6 +169,7 @@ class DiscordClient
         if ($responses['member']->failed()) {
             throw new DiscordApiException($responses['member']->json(), $responses['member']->status());
         }
+
         if ($responses['roles']->failed()) {
             throw new DiscordApiException($responses['roles']->json(), $responses['roles']->status());
         }
@@ -175,6 +178,7 @@ class DiscordClient
         $allRoles   = $responses['roles']->json();
 
         $permissions = 0;
+
         foreach ($allRoles as $role) {
             if ($role['id'] === $this->guildId || in_array($role['id'], $botRoleIds)) {
                 $permissions |= (int) $role['permissions'];
@@ -241,6 +245,6 @@ class DiscordClient
             'USE_EXTERNAL_APPS'                   => 1 << 50,
         ];
 
-        return array_keys(array_filter($flags, fn($flag) => ($permissions & $flag) !== 0));
+        return array_keys(array_filter($flags, fn ($flag) => ($permissions & $flag) !== 0));
     }
 }

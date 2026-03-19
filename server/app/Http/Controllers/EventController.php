@@ -9,7 +9,9 @@ use Illuminate\Http\Request;
 
 class EventController extends Controller
 {
-    public function __construct(private readonly EventDiscordSync $discordSync) {}
+    public function __construct(private readonly EventDiscordSync $discordSync)
+    {
+    }
 
     public function index(): JsonResponse
     {
@@ -45,7 +47,7 @@ class EventController extends Controller
 
     private function authorizeEventMutation(Request $request, Event $event): void
     {
-        if (! $request->user()->is_admin && $request->user()->id !== $event->mj_user_id) {
+        if (!$request->user()->is_admin && $request->user()->id !== $event->mj_user_id) {
             abort(403);
         }
     }
@@ -86,7 +88,7 @@ class EventController extends Controller
 
         $discordId = $request->user()->discord_id;
 
-        if (! $discordId) {
+        if (!$discordId) {
             return response()->json(['message' => 'No Discord account linked to this user.'], 422);
         }
 
@@ -119,17 +121,17 @@ class EventController extends Controller
 
         $discordId = $request->user()->discord_id;
 
-        if (! $discordId) {
+        if (!$discordId) {
             return response()->json(['message' => 'No Discord account linked to this user.'], 422);
         }
 
         $playerIds = $event->player_ids ?? [];
 
-        if (! in_array($discordId, $playerIds)) {
+        if (!in_array($discordId, $playerIds)) {
             return response()->json(['message' => 'Not registered.'], 422);
         }
 
-        $event->update(['player_ids' => array_values(array_filter($playerIds, fn($id) => $id !== $discordId))]);
+        $event->update(['player_ids' => array_values(array_filter($playerIds, fn ($id) => $id !== $discordId))]);
 
         $this->discordSync->sync($event);
 
