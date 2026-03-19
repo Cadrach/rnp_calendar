@@ -1,11 +1,9 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DictionaryController;
 use App\Http\Controllers\DiscordController;
 use App\Http\Controllers\EventController;
-use App\Models\Game;
-use App\Models\Room;
-use App\Models\Scenario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -29,14 +27,7 @@ Route::prefix('auth')->group(function () {
 
 // Protected routes go here
 Route::middleware('auth')->group(function () {
-    Route::get('/dictionary', function (Request $request) {
-        return response()->json([
-            'user'      => $request->user(),
-            'games'     => Game::all(),
-            'rooms'     => Room::all(),
-            'scenarios' => Scenario::all(),
-        ]);
-    });
+    Route::get('/dictionary', DictionaryController::class);
 
     Route::apiResource('events', EventController::class);
 

@@ -11,6 +11,8 @@ export * from './authDiscordVerify200';
 export * from './authDiscordVerify401';
 export * from './authDiscordVerifyParams';
 export * from './authenticationExceptionResponse';
+export * from './dictionary200';
+export * from './dictionary200MembersItem';
 export * from './discordPermissions200';
 export * from './discordTest200';
 export * from './event';

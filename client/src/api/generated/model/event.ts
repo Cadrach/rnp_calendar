@@ -23,4 +23,6 @@ export interface Event {
   created_at: string | null;
   /** @nullable */
   updated_at: string | null;
+  /** @nullable */
+  deleted_at: string | null;
 }

@@ -61,6 +61,11 @@ class AuthController extends Controller
             ['name' => $discordUser['global_name'] ?? $discordUser['username']],
         );
 
+        // Clear members cache if this is a new member, so that it gets pulled next time
+        if ($user->wasRecentlyCreated) {
+            Cache::forget('discord_members');
+        }
+
         $user->update([
             'name'  => $discordUser['global_name'] ?? $discordUser['username'],
             'roles' => array_map('intval', $member['roles'] ?? []),
