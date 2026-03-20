@@ -30,6 +30,7 @@ import type {
   EventRegisterBody,
   EventUnregister403,
   EventUnregisterBody,
+  EventsIndexParams,
   EventsStoreBody,
   EventsUpdateBody,
   ModelNotFoundExceptionResponse,
@@ -45,13 +46,14 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 export const eventsIndex = (
-    
+    params?: EventsIndexParams,
  options?: SecondParameter<typeof axiosInstance>,signal?: AbortSignal
 ) => {
       
       
       return axiosInstance<Event[]>(
-      {url: `/events`, method: 'GET', signal
+      {url: `/events`, method: 'GET',
+        params, signal
     },
       options);
     }
@@ -59,23 +61,23 @@ export const eventsIndex = (
 
 
 
-export const getEventsIndexQueryKey = () => {
+export const getEventsIndexQueryKey = (params?: EventsIndexParams,) => {
     return [
-    `/events`
+    `/events`, ...(params ? [params] : [])
     ] as const;
     }
 
     
-export const getEventsIndexQueryOptions = <TData = Awaited<ReturnType<typeof eventsIndex>>, TError = ErrorType<AuthenticationExceptionResponse>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventsIndex>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+export const getEventsIndexQueryOptions = <TData = Awaited<ReturnType<typeof eventsIndex>>, TError = ErrorType<AuthenticationExceptionResponse | ValidationExceptionResponse>>(params?: EventsIndexParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventsIndex>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getEventsIndexQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getEventsIndexQueryKey(params);
 
   
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof eventsIndex>>> = ({ signal }) => eventsIndex(requestOptions, signal);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof eventsIndex>>> = ({ signal }) => eventsIndex(params, requestOptions, signal);
 
       
 
@@ -85,11 +87,11 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type EventsIndexQueryResult = NonNullable<Awaited<ReturnType<typeof eventsIndex>>>
-export type EventsIndexQueryError = ErrorType<AuthenticationExceptionResponse>
+export type EventsIndexQueryError = ErrorType<AuthenticationExceptionResponse | ValidationExceptionResponse>
 
 
-export function useEventsIndex<TData = Awaited<ReturnType<typeof eventsIndex>>, TError = ErrorType<AuthenticationExceptionResponse>>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventsIndex>>, TError, TData>> & Pick<
+export function useEventsIndex<TData = Awaited<ReturnType<typeof eventsIndex>>, TError = ErrorType<AuthenticationExceptionResponse | ValidationExceptionResponse>>(
+ params: undefined |  EventsIndexParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventsIndex>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof eventsIndex>>,
           TError,
@@ -98,8 +100,8 @@ export function useEventsIndex<TData = Awaited<ReturnType<typeof eventsIndex>>, 
       >, request?: SecondParameter<typeof axiosInstance>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useEventsIndex<TData = Awaited<ReturnType<typeof eventsIndex>>, TError = ErrorType<AuthenticationExceptionResponse>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventsIndex>>, TError, TData>> & Pick<
+export function useEventsIndex<TData = Awaited<ReturnType<typeof eventsIndex>>, TError = ErrorType<AuthenticationExceptionResponse | ValidationExceptionResponse>>(
+ params?: EventsIndexParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventsIndex>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof eventsIndex>>,
           TError,
@@ -108,17 +110,17 @@ export function useEventsIndex<TData = Awaited<ReturnType<typeof eventsIndex>>, 
       >, request?: SecondParameter<typeof axiosInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useEventsIndex<TData = Awaited<ReturnType<typeof eventsIndex>>, TError = ErrorType<AuthenticationExceptionResponse>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventsIndex>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+export function useEventsIndex<TData = Awaited<ReturnType<typeof eventsIndex>>, TError = ErrorType<AuthenticationExceptionResponse | ValidationExceptionResponse>>(
+ params?: EventsIndexParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventsIndex>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useEventsIndex<TData = Awaited<ReturnType<typeof eventsIndex>>, TError = ErrorType<AuthenticationExceptionResponse>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventsIndex>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+export function useEventsIndex<TData = Awaited<ReturnType<typeof eventsIndex>>, TError = ErrorType<AuthenticationExceptionResponse | ValidationExceptionResponse>>(
+ params?: EventsIndexParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventsIndex>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
  , queryClient?: QueryClient 
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getEventsIndexQueryOptions(options)
+  const queryOptions = getEventsIndexQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

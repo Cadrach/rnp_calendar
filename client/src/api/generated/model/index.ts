@@ -20,6 +20,7 @@ export * from './discordTest200';
 export * from './event';
 export * from './eventRegister403';
 export * from './eventRegisterBody';
+export * from './eventsIndexParams';
 export * from './eventsStoreBody';
 export * from './eventsUpdateBody';
 export * from './eventUnregister403';

@@ -3,7 +3,8 @@ import { Anchor, Button, Group, Stack, Text } from "@mantine/core";
 import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale/fr";
-import { getEventsIndexQueryKey, useEventsIndex } from "../api/generated/event/event";
+import { getEventsIndexQueryKey } from "../api/generated/event/event";
+import type { Event } from "../api/generated/model";
 import { useDictionary } from "../contexts/DictionaryContext";
 import { useEventsRegister, useEventsUnregister } from "../api/event-register";
 import { MemberAvatar } from "./MemberAvatar";
@@ -15,10 +16,14 @@ interface Props {
 
 export function EventShowModal({ eventId }: Props) {
   const { games, rooms, scenarios, members, user } = useDictionary();
-  const { data: events } = useEventsIndex();
-  const event = events?.find((e) => e.id === Number(eventId));
-  const [editing, setEditing] = useState(false);
   const queryClient = useQueryClient();
+  // Search all cached events index queries (the Calendar uses a parameterized one)
+  // without triggering any new request.
+  const allCachedEvents = queryClient
+    .getQueriesData<Event[]>({ queryKey: getEventsIndexQueryKey() })
+    .flatMap(([, data]) => data ?? []);
+  const event = allCachedEvents.find((e) => e.id === Number(eventId));
+  const [editing, setEditing] = useState(false);
 
   const invalidateShow = () =>
     queryClient.invalidateQueries({ queryKey: getEventsIndexQueryKey() });

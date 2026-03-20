@@ -21,9 +21,23 @@ class EventController extends Controller
     ) {
     }
 
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        return response()->json(Event::with('mj')->get());
+        $request->validate([
+            'start' => ['sometimes', 'date'],
+            'end'   => ['sometimes', 'date', 'after:start'],
+        ]);
+
+        $query = Event::with('mj');
+
+        if ($request->has('start') && $request->has('end')) {
+            $start = Carbon::parse($request->input('start'));
+            $end   = Carbon::parse($request->input('end'));
+            $query->where('datetime_start', '<', $end)
+                  ->where('datetime_end', '>', $start);
+        }
+
+        return response()->json($query->get());
     }
 
     public function store(Request $request): JsonResponse
