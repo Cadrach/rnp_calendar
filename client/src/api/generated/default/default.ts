@@ -4,67 +4,82 @@
  * Laravel
  * OpenAPI spec version: 0.0.1
  */
-import { useMutation } from "@tanstack/react-query";
+import {
+  useMutation
+} from '@tanstack/react-query';
 import type {
   MutationFunction,
   QueryClient,
   UseMutationOptions,
-  UseMutationResult,
-} from "@tanstack/react-query";
+  UseMutationResult
+} from '@tanstack/react-query';
 
-import type { AuthenticationExceptionResponse, PostAuthLogout200 } from "../model";
+import type {
+  AuthenticationExceptionResponse,
+  PostAuthLogout200
+} from '../model';
 
-import { axiosInstance } from "../../axios-instance";
-import type { ErrorType } from "../../axios-instance";
+import { axiosInstance } from '../../axios-instance';
+import type { ErrorType } from '../../axios-instance';
+
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
+
+
 export const postAuthLogout = (
-  options?: SecondParameter<typeof axiosInstance>,
-  signal?: AbortSignal,
+    
+ options?: SecondParameter<typeof axiosInstance>,signal?: AbortSignal
 ) => {
-  return axiosInstance<PostAuthLogout200>({ url: `/auth/logout`, method: "POST", signal }, options);
-};
+      
+      
+      return axiosInstance<PostAuthLogout200>(
+      {url: `/auth/logout`, method: 'POST', signal
+    },
+      options);
+    }
+  
 
-export const getPostAuthLogoutMutationOptions = <
-  TError = ErrorType<AuthenticationExceptionResponse>,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<Awaited<ReturnType<typeof postAuthLogout>>, TError, void, TContext>;
-  request?: SecondParameter<typeof axiosInstance>;
-}): UseMutationOptions<Awaited<ReturnType<typeof postAuthLogout>>, TError, void, TContext> => {
-  const mutationKey = ["postAuthLogout"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
 
-  const mutationFn: MutationFunction<Awaited<ReturnType<typeof postAuthLogout>>, void> = () => {
-    return postAuthLogout(requestOptions);
-  };
+export const getPostAuthLogoutMutationOptions = <TError = ErrorType<AuthenticationExceptionResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postAuthLogout>>, TError,void, TContext>, request?: SecondParameter<typeof axiosInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof postAuthLogout>>, TError,void, TContext> => {
 
-  return { mutationFn, ...mutationOptions };
-};
+const mutationKey = ['postAuthLogout'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
 
-export type PostAuthLogoutMutationResult = NonNullable<Awaited<ReturnType<typeof postAuthLogout>>>;
+      
 
-export type PostAuthLogoutMutationError = ErrorType<AuthenticationExceptionResponse>;
 
-export const usePostAuthLogout = <
-  TError = ErrorType<AuthenticationExceptionResponse>,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof postAuthLogout>>,
-      TError,
-      void,
-      TContext
-    >;
-    request?: SecondParameter<typeof axiosInstance>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<Awaited<ReturnType<typeof postAuthLogout>>, TError, void, TContext> => {
-  return useMutation(getPostAuthLogoutMutationOptions(options), queryClient);
-};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postAuthLogout>>, void> = () => {
+          
+
+          return  postAuthLogout(requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostAuthLogoutMutationResult = NonNullable<Awaited<ReturnType<typeof postAuthLogout>>>
+    
+    export type PostAuthLogoutMutationError = ErrorType<AuthenticationExceptionResponse>
+
+    export const usePostAuthLogout = <TError = ErrorType<AuthenticationExceptionResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postAuthLogout>>, TError,void, TContext>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postAuthLogout>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getPostAuthLogoutMutationOptions(options), queryClient);
+    }
+    

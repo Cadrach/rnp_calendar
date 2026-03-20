@@ -4,7 +4,10 @@
  * Laravel
  * OpenAPI spec version: 0.0.1
  */
-import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery
+} from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -17,568 +20,482 @@ import type {
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
-  UseQueryResult,
-} from "@tanstack/react-query";
+  UseQueryResult
+} from '@tanstack/react-query';
 
 import type {
   AuthenticationExceptionResponse,
   Event,
   EventRegister403,
   EventRegisterBody,
+  EventUnregister403,
+  EventUnregisterBody,
   EventsStoreBody,
   EventsUpdateBody,
   ModelNotFoundExceptionResponse,
-  ValidationExceptionResponse,
-} from "../model";
+  ValidationExceptionResponse
+} from '../model';
 
-import { axiosInstance } from "../../axios-instance";
-import type { ErrorType } from "../../axios-instance";
+import { axiosInstance } from '../../axios-instance';
+import type { ErrorType } from '../../axios-instance';
+
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
+
+
 export const eventsIndex = (
-  options?: SecondParameter<typeof axiosInstance>,
-  signal?: AbortSignal,
+    
+ options?: SecondParameter<typeof axiosInstance>,signal?: AbortSignal
 ) => {
-  return axiosInstance<Event[]>({ url: `/events`, method: "GET", signal }, options);
-};
+      
+      
+      return axiosInstance<Event[]>(
+      {url: `/events`, method: 'GET', signal
+    },
+      options);
+    }
+  
+
+
 
 export const getEventsIndexQueryKey = () => {
-  return [`/events`] as const;
-};
+    return [
+    `/events`
+    ] as const;
+    }
 
-export const getEventsIndexQueryOptions = <
-  TData = Awaited<ReturnType<typeof eventsIndex>>,
-  TError = ErrorType<AuthenticationExceptionResponse>,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof eventsIndex>>, TError, TData>>;
-  request?: SecondParameter<typeof axiosInstance>;
-}) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
+    
+export const getEventsIndexQueryOptions = <TData = Awaited<ReturnType<typeof eventsIndex>>, TError = ErrorType<AuthenticationExceptionResponse>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventsIndex>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+) => {
 
-  const queryKey = queryOptions?.queryKey ?? getEventsIndexQueryKey();
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof eventsIndex>>> = ({ signal }) =>
-    eventsIndex(requestOptions, signal);
+  const queryKey =  queryOptions?.queryKey ?? getEventsIndexQueryKey();
 
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof eventsIndex>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
+  
 
-export type EventsIndexQueryResult = NonNullable<Awaited<ReturnType<typeof eventsIndex>>>;
-export type EventsIndexQueryError = ErrorType<AuthenticationExceptionResponse>;
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof eventsIndex>>> = ({ signal }) => eventsIndex(requestOptions, signal);
 
-export function useEventsIndex<
-  TData = Awaited<ReturnType<typeof eventsIndex>>,
-  TError = ErrorType<AuthenticationExceptionResponse>,
->(
-  options: {
-    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof eventsIndex>>, TError, TData>> &
-      Pick<
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof eventsIndex>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type EventsIndexQueryResult = NonNullable<Awaited<ReturnType<typeof eventsIndex>>>
+export type EventsIndexQueryError = ErrorType<AuthenticationExceptionResponse>
+
+
+export function useEventsIndex<TData = Awaited<ReturnType<typeof eventsIndex>>, TError = ErrorType<AuthenticationExceptionResponse>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventsIndex>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof eventsIndex>>,
           TError,
           Awaited<ReturnType<typeof eventsIndex>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof axiosInstance>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useEventsIndex<
-  TData = Awaited<ReturnType<typeof eventsIndex>>,
-  TError = ErrorType<AuthenticationExceptionResponse>,
->(
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof eventsIndex>>, TError, TData>> &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useEventsIndex<TData = Awaited<ReturnType<typeof eventsIndex>>, TError = ErrorType<AuthenticationExceptionResponse>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventsIndex>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof eventsIndex>>,
           TError,
           Awaited<ReturnType<typeof eventsIndex>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof axiosInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useEventsIndex<
-  TData = Awaited<ReturnType<typeof eventsIndex>>,
-  TError = ErrorType<AuthenticationExceptionResponse>,
->(
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof eventsIndex>>, TError, TData>>;
-    request?: SecondParameter<typeof axiosInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useEventsIndex<TData = Awaited<ReturnType<typeof eventsIndex>>, TError = ErrorType<AuthenticationExceptionResponse>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventsIndex>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useEventsIndex<
-  TData = Awaited<ReturnType<typeof eventsIndex>>,
-  TError = ErrorType<AuthenticationExceptionResponse>,
->(
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof eventsIndex>>, TError, TData>>;
-    request?: SecondParameter<typeof axiosInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-  const queryOptions = getEventsIndexQueryOptions(options);
+export function useEventsIndex<TData = Awaited<ReturnType<typeof eventsIndex>>, TError = ErrorType<AuthenticationExceptionResponse>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventsIndex>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-  };
+  const queryOptions = getEventsIndexQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+
+
 
 export const eventsStore = (
-  eventsStoreBody: EventsStoreBody,
-  options?: SecondParameter<typeof axiosInstance>,
-  signal?: AbortSignal,
+    eventsStoreBody: EventsStoreBody,
+ options?: SecondParameter<typeof axiosInstance>,signal?: AbortSignal
 ) => {
-  return axiosInstance<Event>(
-    {
-      url: `/events`,
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      data: eventsStoreBody,
-      signal,
+      
+      
+      return axiosInstance<Event>(
+      {url: `/events`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: eventsStoreBody, signal
     },
-    options,
-  );
-};
+      options);
+    }
+  
 
-export const getEventsStoreMutationOptions = <
-  TError = ErrorType<AuthenticationExceptionResponse | ValidationExceptionResponse>,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof eventsStore>>,
-    TError,
-    { data: EventsStoreBody },
-    TContext
-  >;
-  request?: SecondParameter<typeof axiosInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof eventsStore>>,
-  TError,
-  { data: EventsStoreBody },
-  TContext
-> => {
-  const mutationKey = ["eventsStore"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof eventsStore>>,
-    { data: EventsStoreBody }
-  > = (props) => {
-    const { data } = props ?? {};
+export const getEventsStoreMutationOptions = <TError = ErrorType<AuthenticationExceptionResponse | ValidationExceptionResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof eventsStore>>, TError,{data: EventsStoreBody}, TContext>, request?: SecondParameter<typeof axiosInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof eventsStore>>, TError,{data: EventsStoreBody}, TContext> => {
 
-    return eventsStore(data, requestOptions);
-  };
+const mutationKey = ['eventsStore'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
 
-  return { mutationFn, ...mutationOptions };
-};
+      
 
-export type EventsStoreMutationResult = NonNullable<Awaited<ReturnType<typeof eventsStore>>>;
-export type EventsStoreMutationBody = EventsStoreBody;
-export type EventsStoreMutationError = ErrorType<
-  AuthenticationExceptionResponse | ValidationExceptionResponse
->;
 
-export const useEventsStore = <
-  TError = ErrorType<AuthenticationExceptionResponse | ValidationExceptionResponse>,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof eventsStore>>,
-      TError,
-      { data: EventsStoreBody },
-      TContext
-    >;
-    request?: SecondParameter<typeof axiosInstance>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof eventsStore>>,
-  TError,
-  { data: EventsStoreBody },
-  TContext
-> => {
-  return useMutation(getEventsStoreMutationOptions(options), queryClient);
-};
-export const eventsShow = (
-  event: number,
-  options?: SecondParameter<typeof axiosInstance>,
-  signal?: AbortSignal,
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof eventsStore>>, {data: EventsStoreBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  eventsStore(data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type EventsStoreMutationResult = NonNullable<Awaited<ReturnType<typeof eventsStore>>>
+    export type EventsStoreMutationBody = EventsStoreBody
+    export type EventsStoreMutationError = ErrorType<AuthenticationExceptionResponse | ValidationExceptionResponse>
+
+    export const useEventsStore = <TError = ErrorType<AuthenticationExceptionResponse | ValidationExceptionResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof eventsStore>>, TError,{data: EventsStoreBody}, TContext>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof eventsStore>>,
+        TError,
+        {data: EventsStoreBody},
+        TContext
+      > => {
+      return useMutation(getEventsStoreMutationOptions(options), queryClient);
+    }
+    export const eventsShow = (
+    event: number,
+ options?: SecondParameter<typeof axiosInstance>,signal?: AbortSignal
 ) => {
-  return axiosInstance<Event>({ url: `/events/${event}`, method: "GET", signal }, options);
-};
+      
+      
+      return axiosInstance<Event>(
+      {url: `/events/${event}`, method: 'GET', signal
+    },
+      options);
+    }
+  
 
-export const getEventsShowQueryKey = (event: number) => {
-  return [`/events/${event}`] as const;
-};
 
-export const getEventsShowQueryOptions = <
-  TData = Awaited<ReturnType<typeof eventsShow>>,
-  TError = ErrorType<AuthenticationExceptionResponse | ModelNotFoundExceptionResponse>,
->(
-  event: number,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof eventsShow>>, TError, TData>>;
-    request?: SecondParameter<typeof axiosInstance>;
-  },
+
+export const getEventsShowQueryKey = (event: number,) => {
+    return [
+    `/events/${event}`
+    ] as const;
+    }
+
+    
+export const getEventsShowQueryOptions = <TData = Awaited<ReturnType<typeof eventsShow>>, TError = ErrorType<AuthenticationExceptionResponse | ModelNotFoundExceptionResponse>>(event: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventsShow>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
 ) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getEventsShowQueryKey(event);
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof eventsShow>>> = ({ signal }) =>
-    eventsShow(event, requestOptions, signal);
+  const queryKey =  queryOptions?.queryKey ?? getEventsShowQueryKey(event);
 
-  return { queryKey, queryFn, enabled: !!event, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof eventsShow>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
+  
 
-export type EventsShowQueryResult = NonNullable<Awaited<ReturnType<typeof eventsShow>>>;
-export type EventsShowQueryError = ErrorType<
-  AuthenticationExceptionResponse | ModelNotFoundExceptionResponse
->;
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof eventsShow>>> = ({ signal }) => eventsShow(event, requestOptions, signal);
 
-export function useEventsShow<
-  TData = Awaited<ReturnType<typeof eventsShow>>,
-  TError = ErrorType<AuthenticationExceptionResponse | ModelNotFoundExceptionResponse>,
->(
-  event: number,
-  options: {
-    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof eventsShow>>, TError, TData>> &
-      Pick<
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(event), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof eventsShow>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type EventsShowQueryResult = NonNullable<Awaited<ReturnType<typeof eventsShow>>>
+export type EventsShowQueryError = ErrorType<AuthenticationExceptionResponse | ModelNotFoundExceptionResponse>
+
+
+export function useEventsShow<TData = Awaited<ReturnType<typeof eventsShow>>, TError = ErrorType<AuthenticationExceptionResponse | ModelNotFoundExceptionResponse>>(
+ event: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventsShow>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof eventsShow>>,
           TError,
           Awaited<ReturnType<typeof eventsShow>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof axiosInstance>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useEventsShow<
-  TData = Awaited<ReturnType<typeof eventsShow>>,
-  TError = ErrorType<AuthenticationExceptionResponse | ModelNotFoundExceptionResponse>,
->(
-  event: number,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof eventsShow>>, TError, TData>> &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useEventsShow<TData = Awaited<ReturnType<typeof eventsShow>>, TError = ErrorType<AuthenticationExceptionResponse | ModelNotFoundExceptionResponse>>(
+ event: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventsShow>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof eventsShow>>,
           TError,
           Awaited<ReturnType<typeof eventsShow>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof axiosInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useEventsShow<
-  TData = Awaited<ReturnType<typeof eventsShow>>,
-  TError = ErrorType<AuthenticationExceptionResponse | ModelNotFoundExceptionResponse>,
->(
-  event: number,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof eventsShow>>, TError, TData>>;
-    request?: SecondParameter<typeof axiosInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useEventsShow<TData = Awaited<ReturnType<typeof eventsShow>>, TError = ErrorType<AuthenticationExceptionResponse | ModelNotFoundExceptionResponse>>(
+ event: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventsShow>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useEventsShow<
-  TData = Awaited<ReturnType<typeof eventsShow>>,
-  TError = ErrorType<AuthenticationExceptionResponse | ModelNotFoundExceptionResponse>,
->(
-  event: number,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof eventsShow>>, TError, TData>>;
-    request?: SecondParameter<typeof axiosInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-  const queryOptions = getEventsShowQueryOptions(event, options);
+export function useEventsShow<TData = Awaited<ReturnType<typeof eventsShow>>, TError = ErrorType<AuthenticationExceptionResponse | ModelNotFoundExceptionResponse>>(
+ event: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventsShow>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-  };
+  const queryOptions = getEventsShowQueryOptions(event,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
 
+
+
+
 export const eventsUpdate = (
-  event: number,
-  eventsUpdateBody: EventsUpdateBody,
-  options?: SecondParameter<typeof axiosInstance>,
-  signal?: AbortSignal,
+    event: number,
+    eventsUpdateBody: EventsUpdateBody,
+ options?: SecondParameter<typeof axiosInstance>,signal?: AbortSignal
 ) => {
-  return axiosInstance<Event>(
-    {
-      url: `/events/${event}`,
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      data: eventsUpdateBody,
-      signal,
+      
+      
+      return axiosInstance<Event>(
+      {url: `/events/${event}`, method: 'PUT',
+      headers: {'Content-Type': 'application/json', },
+      data: eventsUpdateBody, signal
     },
-    options,
-  );
-};
+      options);
+    }
+  
 
-export const getEventsUpdateMutationOptions = <
-  TError = ErrorType<
-    AuthenticationExceptionResponse | ModelNotFoundExceptionResponse | ValidationExceptionResponse
-  >,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof eventsUpdate>>,
-    TError,
-    { event: number; data: EventsUpdateBody },
-    TContext
-  >;
-  request?: SecondParameter<typeof axiosInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof eventsUpdate>>,
-  TError,
-  { event: number; data: EventsUpdateBody },
-  TContext
-> => {
-  const mutationKey = ["eventsUpdate"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof eventsUpdate>>,
-    { event: number; data: EventsUpdateBody }
-  > = (props) => {
-    const { event, data } = props ?? {};
+export const getEventsUpdateMutationOptions = <TError = ErrorType<AuthenticationExceptionResponse | ModelNotFoundExceptionResponse | ValidationExceptionResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof eventsUpdate>>, TError,{event: number;data: EventsUpdateBody}, TContext>, request?: SecondParameter<typeof axiosInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof eventsUpdate>>, TError,{event: number;data: EventsUpdateBody}, TContext> => {
 
-    return eventsUpdate(event, data, requestOptions);
-  };
+const mutationKey = ['eventsUpdate'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
 
-  return { mutationFn, ...mutationOptions };
-};
+      
 
-export type EventsUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof eventsUpdate>>>;
-export type EventsUpdateMutationBody = EventsUpdateBody;
-export type EventsUpdateMutationError = ErrorType<
-  AuthenticationExceptionResponse | ModelNotFoundExceptionResponse | ValidationExceptionResponse
->;
 
-export const useEventsUpdate = <
-  TError = ErrorType<
-    AuthenticationExceptionResponse | ModelNotFoundExceptionResponse | ValidationExceptionResponse
-  >,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof eventsUpdate>>,
-      TError,
-      { event: number; data: EventsUpdateBody },
-      TContext
-    >;
-    request?: SecondParameter<typeof axiosInstance>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof eventsUpdate>>,
-  TError,
-  { event: number; data: EventsUpdateBody },
-  TContext
-> => {
-  return useMutation(getEventsUpdateMutationOptions(options), queryClient);
-};
-export const eventsDestroy = (
-  event: number,
-  options?: SecondParameter<typeof axiosInstance>,
-  signal?: AbortSignal,
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof eventsUpdate>>, {event: number;data: EventsUpdateBody}> = (props) => {
+          const {event,data} = props ?? {};
+
+          return  eventsUpdate(event,data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type EventsUpdateMutationResult = NonNullable<Awaited<ReturnType<typeof eventsUpdate>>>
+    export type EventsUpdateMutationBody = EventsUpdateBody
+    export type EventsUpdateMutationError = ErrorType<AuthenticationExceptionResponse | ModelNotFoundExceptionResponse | ValidationExceptionResponse>
+
+    export const useEventsUpdate = <TError = ErrorType<AuthenticationExceptionResponse | ModelNotFoundExceptionResponse | ValidationExceptionResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof eventsUpdate>>, TError,{event: number;data: EventsUpdateBody}, TContext>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof eventsUpdate>>,
+        TError,
+        {event: number;data: EventsUpdateBody},
+        TContext
+      > => {
+      return useMutation(getEventsUpdateMutationOptions(options), queryClient);
+    }
+    export const eventsDestroy = (
+    event: number,
+ options?: SecondParameter<typeof axiosInstance>,signal?: AbortSignal
 ) => {
-  return axiosInstance<void>({ url: `/events/${event}`, method: "DELETE", signal }, options);
-};
-
-export const getEventsDestroyMutationOptions = <
-  TError = ErrorType<AuthenticationExceptionResponse | ModelNotFoundExceptionResponse>,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof eventsDestroy>>,
-    TError,
-    { event: number },
-    TContext
-  >;
-  request?: SecondParameter<typeof axiosInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof eventsDestroy>>,
-  TError,
-  { event: number },
-  TContext
-> => {
-  const mutationKey = ["eventsDestroy"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof eventsDestroy>>,
-    { event: number }
-  > = (props) => {
-    const { event } = props ?? {};
-
-    return eventsDestroy(event, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type EventsDestroyMutationResult = NonNullable<Awaited<ReturnType<typeof eventsDestroy>>>;
-
-export type EventsDestroyMutationError = ErrorType<
-  AuthenticationExceptionResponse | ModelNotFoundExceptionResponse
->;
-
-export const useEventsDestroy = <
-  TError = ErrorType<AuthenticationExceptionResponse | ModelNotFoundExceptionResponse>,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof eventsDestroy>>,
-      TError,
-      { event: number },
-      TContext
-    >;
-    request?: SecondParameter<typeof axiosInstance>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof eventsDestroy>>,
-  TError,
-  { event: number },
-  TContext
-> => {
-  return useMutation(getEventsDestroyMutationOptions(options), queryClient);
-};
-export const eventRegister = (
-  event: number,
-  eventRegisterBody: EventRegisterBody,
-  options?: SecondParameter<typeof axiosInstance>,
-  signal?: AbortSignal,
-) => {
-  return axiosInstance<Event>(
-    {
-      url: `/events/${event}/register`,
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      data: eventRegisterBody,
-      signal,
+      
+      
+      return axiosInstance<void>(
+      {url: `/events/${event}`, method: 'DELETE', signal
     },
-    options,
-  );
-};
+      options);
+    }
+  
 
-export const getEventRegisterMutationOptions = <
-  TError = ErrorType<
-    | AuthenticationExceptionResponse
-    | EventRegister403
-    | ModelNotFoundExceptionResponse
-    | ValidationExceptionResponse
-  >,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof eventRegister>>,
-    TError,
-    { event: number; data: EventRegisterBody },
-    TContext
-  >;
-  request?: SecondParameter<typeof axiosInstance>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof eventRegister>>,
-  TError,
-  { event: number; data: EventRegisterBody },
-  TContext
-> => {
-  const mutationKey = ["eventRegister"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation && "mutationKey" in options.mutation && options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
 
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof eventRegister>>,
-    { event: number; data: EventRegisterBody }
-  > = (props) => {
-    const { event, data } = props ?? {};
+export const getEventsDestroyMutationOptions = <TError = ErrorType<AuthenticationExceptionResponse | ModelNotFoundExceptionResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof eventsDestroy>>, TError,{event: number}, TContext>, request?: SecondParameter<typeof axiosInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof eventsDestroy>>, TError,{event: number}, TContext> => {
 
-    return eventRegister(event, data, requestOptions);
-  };
+const mutationKey = ['eventsDestroy'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
 
-  return { mutationFn, ...mutationOptions };
-};
+      
 
-export type EventRegisterMutationResult = NonNullable<Awaited<ReturnType<typeof eventRegister>>>;
-export type EventRegisterMutationBody = EventRegisterBody;
-export type EventRegisterMutationError = ErrorType<
-  | AuthenticationExceptionResponse
-  | EventRegister403
-  | ModelNotFoundExceptionResponse
-  | ValidationExceptionResponse
->;
 
-export const useEventRegister = <
-  TError = ErrorType<
-    | AuthenticationExceptionResponse
-    | EventRegister403
-    | ModelNotFoundExceptionResponse
-    | ValidationExceptionResponse
-  >,
-  TContext = unknown,
->(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof eventRegister>>,
-      TError,
-      { event: number; data: EventRegisterBody },
-      TContext
-    >;
-    request?: SecondParameter<typeof axiosInstance>;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof eventRegister>>,
-  TError,
-  { event: number; data: EventRegisterBody },
-  TContext
-> => {
-  return useMutation(getEventRegisterMutationOptions(options), queryClient);
-};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof eventsDestroy>>, {event: number}> = (props) => {
+          const {event} = props ?? {};
+
+          return  eventsDestroy(event,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type EventsDestroyMutationResult = NonNullable<Awaited<ReturnType<typeof eventsDestroy>>>
+    
+    export type EventsDestroyMutationError = ErrorType<AuthenticationExceptionResponse | ModelNotFoundExceptionResponse>
+
+    export const useEventsDestroy = <TError = ErrorType<AuthenticationExceptionResponse | ModelNotFoundExceptionResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof eventsDestroy>>, TError,{event: number}, TContext>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof eventsDestroy>>,
+        TError,
+        {event: number},
+        TContext
+      > => {
+      return useMutation(getEventsDestroyMutationOptions(options), queryClient);
+    }
+    export const eventRegister = (
+    event: number,
+    eventRegisterBody: EventRegisterBody,
+ options?: SecondParameter<typeof axiosInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return axiosInstance<Event>(
+      {url: `/events/${event}/register`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: eventRegisterBody, signal
+    },
+      options);
+    }
+  
+
+
+export const getEventRegisterMutationOptions = <TError = ErrorType<AuthenticationExceptionResponse | EventRegister403 | ModelNotFoundExceptionResponse | ValidationExceptionResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof eventRegister>>, TError,{event: number;data: EventRegisterBody}, TContext>, request?: SecondParameter<typeof axiosInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof eventRegister>>, TError,{event: number;data: EventRegisterBody}, TContext> => {
+
+const mutationKey = ['eventRegister'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof eventRegister>>, {event: number;data: EventRegisterBody}> = (props) => {
+          const {event,data} = props ?? {};
+
+          return  eventRegister(event,data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type EventRegisterMutationResult = NonNullable<Awaited<ReturnType<typeof eventRegister>>>
+    export type EventRegisterMutationBody = EventRegisterBody
+    export type EventRegisterMutationError = ErrorType<AuthenticationExceptionResponse | EventRegister403 | ModelNotFoundExceptionResponse | ValidationExceptionResponse>
+
+    export const useEventRegister = <TError = ErrorType<AuthenticationExceptionResponse | EventRegister403 | ModelNotFoundExceptionResponse | ValidationExceptionResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof eventRegister>>, TError,{event: number;data: EventRegisterBody}, TContext>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof eventRegister>>,
+        TError,
+        {event: number;data: EventRegisterBody},
+        TContext
+      > => {
+      return useMutation(getEventRegisterMutationOptions(options), queryClient);
+    }
+    export const eventUnregister = (
+    event: number,
+    eventUnregisterBody: EventUnregisterBody,
+ options?: SecondParameter<typeof axiosInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return axiosInstance<Event>(
+      {url: `/events/${event}/unregister`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: eventUnregisterBody, signal
+    },
+      options);
+    }
+  
+
+
+export const getEventUnregisterMutationOptions = <TError = ErrorType<AuthenticationExceptionResponse | EventUnregister403 | ModelNotFoundExceptionResponse | ValidationExceptionResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof eventUnregister>>, TError,{event: number;data: EventUnregisterBody}, TContext>, request?: SecondParameter<typeof axiosInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof eventUnregister>>, TError,{event: number;data: EventUnregisterBody}, TContext> => {
+
+const mutationKey = ['eventUnregister'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof eventUnregister>>, {event: number;data: EventUnregisterBody}> = (props) => {
+          const {event,data} = props ?? {};
+
+          return  eventUnregister(event,data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type EventUnregisterMutationResult = NonNullable<Awaited<ReturnType<typeof eventUnregister>>>
+    export type EventUnregisterMutationBody = EventUnregisterBody
+    export type EventUnregisterMutationError = ErrorType<AuthenticationExceptionResponse | EventUnregister403 | ModelNotFoundExceptionResponse | ValidationExceptionResponse>
+
+    export const useEventUnregister = <TError = ErrorType<AuthenticationExceptionResponse | EventUnregister403 | ModelNotFoundExceptionResponse | ValidationExceptionResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof eventUnregister>>, TError,{event: number;data: EventUnregisterBody}, TContext>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof eventUnregister>>,
+        TError,
+        {event: number;data: EventUnregisterBody},
+        TContext
+      > => {
+      return useMutation(getEventUnregisterMutationOptions(options), queryClient);
+    }
+    

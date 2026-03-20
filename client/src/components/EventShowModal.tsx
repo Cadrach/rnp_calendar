@@ -11,10 +11,9 @@ import { CreateEventModal } from "./CreateEventModal";
 
 interface Props {
   eventId: string;
-  onClose: () => void;
 }
 
-export function EventShowModal({ eventId, onClose }: Props) {
+export function EventShowModal({ eventId }: Props) {
   const { games, rooms, scenarios, members, user } = useDictionary();
   const { data: event, isLoading } = useEventsShow(Number(eventId));
   const [editing, setEditing] = useState(false);

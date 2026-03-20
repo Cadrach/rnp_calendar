@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Data\DiscordMember;
+use App\Data\ScenarioItem;
 use App\Models\Game;
 use App\Models\Room;
 use App\Models\Scenario;
@@ -28,40 +29,37 @@ class DictionaryController extends Controller
         ]);
     }
 
-    public function scenarii(Request $request): JsonResponse
+    /**
+     * @response array{key: string, id: int|null, mj_user_id: int, game_id: int|null, name: string, description: string|null, discord_thread_id: string|null, created_at: string|null, updated_at: string|null, mj: array{id: int, name: string}|null}[]
+     */
+    public function scenarii(Request $request): array
     {
-        $scenarii = Scenario::whereHas('mj')->with('mj')->get();
+        $dbScenarii = Scenario::whereHas('mj')->with('mj')->get();
+
+        $existingThreadIds = $dbScenarii->pluck('discord_thread_id')->filter()->all();
+
+        $scenarii = $dbScenarii->map(fn($s) => ScenarioItem::fromScenario($s));
 
         $discordId = $request->user()->discord_id;
 
         $channelId = config('services.discord.propositions_channel_id');
         $proposals = collect();
 
+        // Merge in the list of propositions which have not been created as scenario yet
         if ($channelId && $discordId) {
             $threads = collect($this->discord->getThreads($channelId))
                 ->filter(fn($t) => $t['owner_id'] === $discordId)
+                ->filter(fn($t) => !in_array($t['id'], $existingThreadIds, true))
                 ->values();
 
-            $proposals = $threads->map(function ($thread) use ($request) {
-                $message = $this->discord->getMessage($thread['id'], $thread['id']);
-
-                return [
-                    'id' => null,
-                    'mj_user_id' => $request->user()->id,
-                    'game_id' => null,
-                    'name' => $thread['name'],
-                    'description' => $message['content'] ?? null,
-                    'discord_thread_id' => $thread['id'],
-                    'created_at' => null,
-                    'updated_at' => null,
-                    'mj' => null,
-                ];
-            });
+            $proposals = $threads->map(fn($thread) => ScenarioItem::fromDiscordThread(
+                $thread,
+                $request->user()->id,
+                null
+            ));
         }
 
-        $merged = $scenarii->toBase()->merge($proposals)->sortBy('name')->values();
-
-        return response()->json($merged);
+        return $scenarii->toBase()->merge($proposals)->sortBy('name')->values()->all();
     }
 
     /** @return DiscordMember[] */

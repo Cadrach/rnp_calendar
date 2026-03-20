@@ -16,4 +16,6 @@ export interface Scenario {
   created_at: string | null;
   /** @nullable */
   updated_at: string | null;
+  /** @nullable */
+  discord_thread_id: string | null;
 }

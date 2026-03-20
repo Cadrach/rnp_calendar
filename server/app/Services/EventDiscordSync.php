@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Models\Event;
+use App\Models\Room;
+use App\Models\Scenario;
 use Carbon\Carbon;
 
 class EventDiscordSync
@@ -31,7 +33,7 @@ class EventDiscordSync
 
     private function buildTitle(Event $event): string
     {
-        $date  = Carbon::parse($event->datetime_start)->format('d/m/y');
+        $date  = Carbon::parse($event->datetime_start)->timezone('Europe/Paris')->format('d/m/y');
         $title = "[{$event->room->code}][{$date}] {$event->game->name}";
 
         if ($event->scenario) {
@@ -43,8 +45,8 @@ class EventDiscordSync
 
     private function buildContent(Event $event): string
     {
-        $start = Carbon::parse($event->datetime_start)->locale('fr');
-        $end   = Carbon::parse($event->datetime_end)->locale('fr');
+        $start = Carbon::parse($event->datetime_start)->timezone('Europe/Paris')->locale('fr');
+        $end   = Carbon::parse($event->datetime_end)->timezone('Europe/Paris')->locale('fr');
 
         $date     = $start->isoFormat('dddd D MMMM YYYY');
         $timeFrom = $start->format('H\hi');
@@ -59,7 +61,7 @@ class EventDiscordSync
         ];
 
         if ($event->scenario) {
-            $lines[] = "📖 **Scénario :** {$event->scenario->name}";
+            $lines[] = "📖 **Scénario :** {$this->scenarioLabel($event->scenario)}";
         }
 
         $mjMention = $event->mj?->discord_id
@@ -101,10 +103,21 @@ class EventDiscordSync
         return implode("\n", $lines);
     }
 
-    private function roomLabel(\App\Models\Room $room): string
+    private function roomLabel(Room $room): string
     {
         return $room->url
             ? "[{$room->name}]({$room->url})"
             : $room->name;
+    }
+
+    private function scenarioLabel(Scenario $scenario): string
+    {
+        if ($scenario->discord_thread_id) {
+            $guildId = config('services.discord.guild_id');
+            $url = "https://discord.com/channels/{$guildId}/{$scenario->discord_thread_id}";
+            return "[{$scenario->name}]({$url})";
+        }
+
+        return $scenario->name;
     }
 }

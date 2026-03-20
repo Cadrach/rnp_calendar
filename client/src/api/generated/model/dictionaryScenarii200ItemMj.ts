@@ -5,6 +5,10 @@
  * OpenAPI spec version: 0.0.1
  */
 
-export type AuthDiscordVerifyParams = {
-token: string;
-};
+/**
+ * @nullable
+ */
+export type DictionaryScenarii200ItemMj = {
+  id: number;
+  name: string;
+} | null;

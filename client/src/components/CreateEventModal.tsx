@@ -4,6 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale/fr";
 import type { Event } from "../api/generated/model";
+import { getDictionaryQueryKey } from "../api/generated/dictionary/dictionary";
 import {
   getEventsIndexQueryKey,
   getEventsShowQueryKey,
@@ -12,6 +13,7 @@ import {
 } from "../api/generated/event/event";
 import { useDictionary } from "../contexts/DictionaryContext";
 import { MembersSelect } from "./MembersSelect";
+import { ScenarioSelect } from "./ScenarioSelect";
 
 interface Props {
   start: Date;
@@ -21,7 +23,7 @@ interface Props {
 }
 
 export function CreateEventModal({ start, end, onClose, event }: Props) {
-  const { user, games, rooms, scenarios, members } = useDictionary();
+  const { user, games, rooms, members } = useDictionary();
   const queryClient = useQueryClient();
 
   const mjUserId = event ? event.mj_user_id : user.id;
@@ -30,7 +32,7 @@ export function CreateEventModal({ start, end, onClose, event }: Props) {
     initialValues: {
       room_id: event?.room_id ? String(event.room_id) : (null as string | null),
       game_id: event?.game_id ? String(event.game_id) : (null as string | null),
-      scenario_id: event?.scenario_id ? String(event.scenario_id) : (null as string | null),
+      scenario_key: event?.scenario_id ? `id:${event.scenario_id}` : (null as string | null),
       min_players: event?.min_players ?? (null as number | null),
       max_players: event?.max_players ?? (null as number | null),
       player_ids: (event?.player_ids as string[] | null) ?? [],
@@ -43,12 +45,9 @@ export function CreateEventModal({ start, end, onClose, event }: Props) {
     },
   });
 
-  const filteredScenarios = scenarios.filter(
-    (s) => s.mj_user_id === mjUserId && String(s.game_id) === form.values.game_id,
-  );
-
   const onSuccess = () => {
     queryClient.invalidateQueries({ queryKey: getEventsIndexQueryKey() });
+    queryClient.invalidateQueries({ queryKey: getDictionaryQueryKey() });
     if (event) {
       queryClient.invalidateQueries({ queryKey: getEventsShowQueryKey(event.id) });
     }
@@ -62,7 +61,7 @@ export function CreateEventModal({ start, end, onClose, event }: Props) {
 
   const handleGameChange = (value: string | null) => {
     form.setFieldValue("game_id", value);
-    form.setFieldValue("scenario_id", null);
+    form.setFieldValue("scenario_key", null);
   };
 
   const handleSubmit = form.onSubmit((values) => {
@@ -72,7 +71,7 @@ export function CreateEventModal({ start, end, onClose, event }: Props) {
       mj_user_id: mjUserId,
       room_id: Number(values.room_id),
       game_id: Number(values.game_id),
-      scenario_id: values.scenario_id ? Number(values.scenario_id) : null,
+      scenario_key: values.scenario_key,
       min_players: values.min_players ?? null,
       max_players: values.max_players ?? null,
       player_ids: values.player_ids.length > 0 ? values.player_ids : null,
@@ -111,13 +110,10 @@ export function CreateEventModal({ start, end, onClose, event }: Props) {
           error={form.errors.game_id}
         />
 
-        <Select
-          label="Scénario"
-          placeholder={form.values.game_id ? "Choisir un scénario" : "Sélectionner un jeu d'abord"}
-          disabled={!form.values.game_id}
-          clearable
-          data={filteredScenarios.map((s) => ({ value: String(s.id), label: s.name }))}
-          {...form.getInputProps("scenario_id")}
+        <ScenarioSelect
+          gameId={form.values.game_id}
+          value={form.values.scenario_key}
+          onChange={(s) => form.setFieldValue("scenario_key", s?.key ?? null)}
         />
 
         <NumberInput

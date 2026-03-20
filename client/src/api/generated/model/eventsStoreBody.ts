@@ -12,7 +12,7 @@ export type EventsStoreBody = {
   room_id: number;
   game_id: number;
   /** @nullable */
-  scenario_id?: number | null;
+  scenario_key?: string | null;
   /**
    * @minimum 1
    * @nullable

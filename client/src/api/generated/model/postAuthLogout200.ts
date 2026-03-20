@@ -6,5 +6,5 @@
  */
 
 export type PostAuthLogout200 = {
-  message: "Logged out.";
+  message: 'Logged out.';
 };

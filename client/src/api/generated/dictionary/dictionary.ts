@@ -4,7 +4,9 @@
  * Laravel
  * OpenAPI spec version: 0.0.1
  */
-import { useQuery } from "@tanstack/react-query";
+import {
+  useQuery
+} from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -14,113 +16,188 @@ import type {
   QueryKey,
   UndefinedInitialDataOptions,
   UseQueryOptions,
-  UseQueryResult,
-} from "@tanstack/react-query";
+  UseQueryResult
+} from '@tanstack/react-query';
 
-import type { AuthenticationExceptionResponse, Dictionary200 } from "../model";
+import type {
+  AuthenticationExceptionResponse,
+  Dictionary200,
+  DictionaryScenarii200Item
+} from '../model';
 
-import { axiosInstance } from "../../axios-instance";
-import type { ErrorType } from "../../axios-instance";
+import { axiosInstance } from '../../axios-instance';
+import type { ErrorType } from '../../axios-instance';
+
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
+
+
 export const dictionary = (
-  options?: SecondParameter<typeof axiosInstance>,
-  signal?: AbortSignal,
+    
+ options?: SecondParameter<typeof axiosInstance>,signal?: AbortSignal
 ) => {
-  return axiosInstance<Dictionary200>({ url: `/dictionary`, method: "GET", signal }, options);
-};
+      
+      
+      return axiosInstance<Dictionary200>(
+      {url: `/dictionary`, method: 'GET', signal
+    },
+      options);
+    }
+  
+
+
 
 export const getDictionaryQueryKey = () => {
-  return [`/dictionary`] as const;
-};
+    return [
+    `/dictionary`
+    ] as const;
+    }
 
-export const getDictionaryQueryOptions = <
-  TData = Awaited<ReturnType<typeof dictionary>>,
-  TError = ErrorType<AuthenticationExceptionResponse>,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof dictionary>>, TError, TData>>;
-  request?: SecondParameter<typeof axiosInstance>;
-}) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
+    
+export const getDictionaryQueryOptions = <TData = Awaited<ReturnType<typeof dictionary>>, TError = ErrorType<AuthenticationExceptionResponse>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof dictionary>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+) => {
 
-  const queryKey = queryOptions?.queryKey ?? getDictionaryQueryKey();
+const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof dictionary>>> = ({ signal }) =>
-    dictionary(requestOptions, signal);
+  const queryKey =  queryOptions?.queryKey ?? getDictionaryQueryKey();
 
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof dictionary>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
+  
 
-export type DictionaryQueryResult = NonNullable<Awaited<ReturnType<typeof dictionary>>>;
-export type DictionaryQueryError = ErrorType<AuthenticationExceptionResponse>;
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof dictionary>>> = ({ signal }) => dictionary(requestOptions, signal);
 
-export function useDictionary<
-  TData = Awaited<ReturnType<typeof dictionary>>,
-  TError = ErrorType<AuthenticationExceptionResponse>,
->(
-  options: {
-    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof dictionary>>, TError, TData>> &
-      Pick<
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof dictionary>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type DictionaryQueryResult = NonNullable<Awaited<ReturnType<typeof dictionary>>>
+export type DictionaryQueryError = ErrorType<AuthenticationExceptionResponse>
+
+
+export function useDictionary<TData = Awaited<ReturnType<typeof dictionary>>, TError = ErrorType<AuthenticationExceptionResponse>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof dictionary>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof dictionary>>,
           TError,
           Awaited<ReturnType<typeof dictionary>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof axiosInstance>;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useDictionary<
-  TData = Awaited<ReturnType<typeof dictionary>>,
-  TError = ErrorType<AuthenticationExceptionResponse>,
->(
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof dictionary>>, TError, TData>> &
-      Pick<
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDictionary<TData = Awaited<ReturnType<typeof dictionary>>, TError = ErrorType<AuthenticationExceptionResponse>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof dictionary>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof dictionary>>,
           TError,
           Awaited<ReturnType<typeof dictionary>>
-        >,
-        "initialData"
-      >;
-    request?: SecondParameter<typeof axiosInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useDictionary<
-  TData = Awaited<ReturnType<typeof dictionary>>,
-  TError = ErrorType<AuthenticationExceptionResponse>,
->(
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof dictionary>>, TError, TData>>;
-    request?: SecondParameter<typeof axiosInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDictionary<TData = Awaited<ReturnType<typeof dictionary>>, TError = ErrorType<AuthenticationExceptionResponse>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof dictionary>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useDictionary<
-  TData = Awaited<ReturnType<typeof dictionary>>,
-  TError = ErrorType<AuthenticationExceptionResponse>,
->(
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof dictionary>>, TError, TData>>;
-    request?: SecondParameter<typeof axiosInstance>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-  const queryOptions = getDictionaryQueryOptions(options);
+export function useDictionary<TData = Awaited<ReturnType<typeof dictionary>>, TError = ErrorType<AuthenticationExceptionResponse>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof dictionary>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-  };
+  const queryOptions = getDictionaryQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+
+
+
+export const dictionaryScenarii = (
+    
+ options?: SecondParameter<typeof axiosInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return axiosInstance<DictionaryScenarii200Item[]>(
+      {url: `/dictionary/scenarii`, method: 'GET', signal
+    },
+      options);
+    }
+  
+
+
+
+export const getDictionaryScenariiQueryKey = () => {
+    return [
+    `/dictionary/scenarii`
+    ] as const;
+    }
+
+    
+export const getDictionaryScenariiQueryOptions = <TData = Awaited<ReturnType<typeof dictionaryScenarii>>, TError = ErrorType<AuthenticationExceptionResponse>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof dictionaryScenarii>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getDictionaryScenariiQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof dictionaryScenarii>>> = ({ signal }) => dictionaryScenarii(requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof dictionaryScenarii>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type DictionaryScenariiQueryResult = NonNullable<Awaited<ReturnType<typeof dictionaryScenarii>>>
+export type DictionaryScenariiQueryError = ErrorType<AuthenticationExceptionResponse>
+
+
+export function useDictionaryScenarii<TData = Awaited<ReturnType<typeof dictionaryScenarii>>, TError = ErrorType<AuthenticationExceptionResponse>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof dictionaryScenarii>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof dictionaryScenarii>>,
+          TError,
+          Awaited<ReturnType<typeof dictionaryScenarii>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDictionaryScenarii<TData = Awaited<ReturnType<typeof dictionaryScenarii>>, TError = ErrorType<AuthenticationExceptionResponse>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof dictionaryScenarii>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof dictionaryScenarii>>,
+          TError,
+          Awaited<ReturnType<typeof dictionaryScenarii>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useDictionaryScenarii<TData = Awaited<ReturnType<typeof dictionaryScenarii>>, TError = ErrorType<AuthenticationExceptionResponse>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof dictionaryScenarii>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useDictionaryScenarii<TData = Awaited<ReturnType<typeof dictionaryScenarii>>, TError = ErrorType<AuthenticationExceptionResponse>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof dictionaryScenarii>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getDictionaryScenariiQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+

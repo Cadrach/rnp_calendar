@@ -5,6 +5,7 @@
  * OpenAPI spec version: 0.0.1
  */
 
-export type AuthDiscordVerifyParams = {
-token: string;
+export type EventUnregister403 = {
+  /** Error overview. */
+  message: string;
 };

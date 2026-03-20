@@ -4,7 +4,10 @@
       "Bash(composer remove:*)",
       "Bash(yarn typecheck:*)",
       "Bash(yarn generate:*)",
-      "Bash(php artisan migrate)"
+      "Bash(php artisan migrate)",
+      "Bash(php artisan scramble:export:*)",
+      "Bash(yarn orval)",
+      "Bash(yarn tsc:*)"
     ]
   }
 }

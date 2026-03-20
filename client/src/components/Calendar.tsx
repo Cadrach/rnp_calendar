@@ -108,7 +108,7 @@ export function Calendar() {
             ?.name ?? "Séance"
         }
       >
-        {showEventId && <EventShowModal eventId={showEventId} onClose={handleCloseShow} />}
+        {showEventId && <EventShowModal eventId={showEventId} />}
       </Modal>
     </>
   );
