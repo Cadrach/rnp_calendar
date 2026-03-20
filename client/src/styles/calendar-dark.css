@@ -90,7 +90,7 @@
 
 .rbc-event {
     background-color: var(--mantine-color-blue-filled);
-    border: none;
+    border: 1px solid rgba(0, 0, 0, .25) !important;
     border-radius: 4px;
     color: white;
     padding: 2px 5px;

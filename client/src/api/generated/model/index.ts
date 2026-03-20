@@ -31,6 +31,7 @@ export * from './postAuthLogout200';
 export * from './room';
 export * from './roomAvailability200';
 export * from './roomAvailabilityParams';
+export * from './roomAvailableRoomsParams';
 export * from './scenario';
 export * from './user';
 export * from './validationExceptionResponse';

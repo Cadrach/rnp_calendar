@@ -22,8 +22,10 @@ import type {
 import type {
   AuthenticationExceptionResponse,
   ModelNotFoundExceptionResponse,
+  Room,
   RoomAvailability200,
   RoomAvailabilityParams,
+  RoomAvailableRoomsParams,
   ValidationExceptionResponse
 } from '../model';
 
@@ -32,6 +34,105 @@ import type { ErrorType } from '../../axios-instance';
 
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+
+
+/**
+ * Query params:
+  - start:    ISO datetime (required) — interval start in UTC
+  - end:      ISO datetime (required) — interval end in UTC, must be after start
+  - event_id: integer (optional)      — existing event to exclude from the overlap check (useful when editing)
+
+A room is considered available if:
+  - the interval is fully within its effective available hours (or the room is unlimited), AND
+  - no existing event overlaps the interval for that room.
+ * @summary Returns all rooms that are available for the given datetime interval
+ */
+export const roomAvailableRooms = (
+    params: RoomAvailableRoomsParams,
+ options?: SecondParameter<typeof axiosInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return axiosInstance<Room[]>(
+      {url: `/rooms/available`, method: 'GET',
+        params, signal
+    },
+      options);
+    }
+  
+
+
+
+export const getRoomAvailableRoomsQueryKey = (params?: RoomAvailableRoomsParams,) => {
+    return [
+    `/rooms/available`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+    
+export const getRoomAvailableRoomsQueryOptions = <TData = Awaited<ReturnType<typeof roomAvailableRooms>>, TError = ErrorType<AuthenticationExceptionResponse | ValidationExceptionResponse>>(params: RoomAvailableRoomsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof roomAvailableRooms>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getRoomAvailableRoomsQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof roomAvailableRooms>>> = ({ signal }) => roomAvailableRooms(params, requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof roomAvailableRooms>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type RoomAvailableRoomsQueryResult = NonNullable<Awaited<ReturnType<typeof roomAvailableRooms>>>
+export type RoomAvailableRoomsQueryError = ErrorType<AuthenticationExceptionResponse | ValidationExceptionResponse>
+
+
+export function useRoomAvailableRooms<TData = Awaited<ReturnType<typeof roomAvailableRooms>>, TError = ErrorType<AuthenticationExceptionResponse | ValidationExceptionResponse>>(
+ params: RoomAvailableRoomsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof roomAvailableRooms>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof roomAvailableRooms>>,
+          TError,
+          Awaited<ReturnType<typeof roomAvailableRooms>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useRoomAvailableRooms<TData = Awaited<ReturnType<typeof roomAvailableRooms>>, TError = ErrorType<AuthenticationExceptionResponse | ValidationExceptionResponse>>(
+ params: RoomAvailableRoomsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof roomAvailableRooms>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof roomAvailableRooms>>,
+          TError,
+          Awaited<ReturnType<typeof roomAvailableRooms>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useRoomAvailableRooms<TData = Awaited<ReturnType<typeof roomAvailableRooms>>, TError = ErrorType<AuthenticationExceptionResponse | ValidationExceptionResponse>>(
+ params: RoomAvailableRoomsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof roomAvailableRooms>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Returns all rooms that are available for the given datetime interval
+ */
+
+export function useRoomAvailableRooms<TData = Awaited<ReturnType<typeof roomAvailableRooms>>, TError = ErrorType<AuthenticationExceptionResponse | ValidationExceptionResponse>>(
+ params: RoomAvailableRoomsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof roomAvailableRooms>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getRoomAvailableRoomsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
 
 
 

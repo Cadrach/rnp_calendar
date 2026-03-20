@@ -31,6 +31,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/dictionary', DictionaryController::class);
     Route::get('/dictionary/scenarii', [DictionaryController::class, 'scenarii']);
 
+    Route::get('rooms/available', [RoomController::class, 'availableRooms']);
     Route::get('rooms/{room}/availability', [RoomController::class, 'availability']);
 
     Route::apiResource('events', EventController::class);

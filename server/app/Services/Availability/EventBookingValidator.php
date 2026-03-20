@@ -34,19 +34,42 @@ class EventBookingValidator
             return;
         }
 
-        $this->checkAvailability($room, $start, $end);
-        $this->checkNoOverlap($room, $start, $end, $excludeEventId);
+        if (! $this->isWithinAvailableHours($room, $start, $end)) {
+            throw ValidationException::withMessages([
+                'datetime_start' => ['The requested time is not within the room\'s available hours.'],
+            ]);
+        }
+
+        if ($this->hasOverlap($room, $start, $end, $excludeEventId)) {
+            throw ValidationException::withMessages([
+                'datetime_start' => ['The room is already booked during the requested period.'],
+            ]);
+        }
+    }
+
+    /**
+     * Returns true if the room is available for the given interval:
+     * within its effective available hours and not already booked.
+     * Unlimited rooms always return true.
+     */
+    public function isAvailable(Room $room, Carbon $start, Carbon $end): bool
+    {
+        if ($room->unlimited) {
+            return true;
+        }
+
+        return $this->isWithinAvailableHours($room, $start, $end)
+            && ! $this->hasOverlap($room, $start, $end, excludeEventId: null);
     }
 
     /**
      * Resolves effective availability for the room and verifies the requested interval is fully
-     * contained within one of the resulting slots. Unlimited rooms bypass this check entirely.
-     * Throws ValidationException if no slot contains the request.
+     * contained within one of the resulting slots.
+     * Converts to club timezone before computing startOfDay so we get the correct local
+     * calendar day, not the UTC day (which may differ near midnight).
      */
-    private function checkAvailability(Room $room, Carbon $start, Carbon $end): void
+    private function isWithinAvailableHours(Room $room, Carbon $start, Carbon $end): bool
     {
-        // Convert to club timezone before computing startOfDay so we get the correct local
-        // calendar day, not the UTC day (which may differ near midnight).
         $tz         = config('app.club_timezone');
         $localStart = $start->copy()->setTimezone($tz);
         $localEnd   = $end->copy()->setTimezone($tz);
@@ -56,33 +79,24 @@ class EventBookingValidator
 
         foreach ($effective as $slot) {
             if ($slot->contains($requested)) {
-                return;
+                return true;
             }
         }
 
-        throw ValidationException::withMessages([
-            'datetime_start' => ['The requested time is not within the room\'s available hours.'],
-        ]);
+        return false;
     }
 
     /**
-     * Queries for any existing event on the same room whose time range overlaps [$start, $end].
+     * Returns true if any existing active event for the same room overlaps [$start, $end].
      * Uses the standard half-open interval overlap test: existing.start < end && existing.end > start.
      * Soft-deleted events are excluded automatically by Eloquent's global scope.
-     * Throws ValidationException if an overlap is found.
      */
-    private function checkNoOverlap(Room $room, Carbon $start, Carbon $end, ?int $excludeEventId): void
+    private function hasOverlap(Room $room, Carbon $start, Carbon $end, ?int $excludeEventId): bool
     {
-        $overlap = Event::where('room_id', $room->id)
+        return Event::where('room_id', $room->id)
             ->when($excludeEventId !== null, fn ($q) => $q->where('id', '!=', $excludeEventId))
             ->where('datetime_start', '<', $end)
             ->where('datetime_end', '>', $start)
             ->exists();
-
-        if ($overlap) {
-            throw ValidationException::withMessages([
-                'datetime_start' => ['The room is already booked during the requested period.'],
-            ]);
-        }
     }
 }
