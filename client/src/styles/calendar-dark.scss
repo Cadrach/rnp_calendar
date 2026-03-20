@@ -1,0 +1,263 @@
+// Diagonal stripe pattern used for unavailable slots
+@mixin unavailable-stripe($opacity: 0.22) {
+    background-image: repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 6px,
+        rgba(0, 0, 0, $opacity) 6px,
+        rgba(0, 0, 0, $opacity) 10px
+    );
+}
+
+// Dark mode styles for react-big-calendar
+
+.rbc-calendar {
+    background-color: var(--mantine-color-dark-7);
+    color: var(--mantine-color-dark-0);
+}
+
+.rbc-toolbar {
+    margin-bottom: 1rem;
+
+    button {
+        color: #c1c2c5 !important;
+        background-color: #25262b !important;
+        border: 1px solid #373a40 !important;
+        transition: background-color 150ms ease, border-color 150ms ease;
+
+        &:hover {
+            background-color: #373a40 !important;
+            border-color: #4a4d54 !important;
+        }
+
+        &:active {
+            transform: translateY(1px);
+        }
+
+        &.rbc-active {
+            background-color: #228be6 !important;
+            border-color: #228be6 !important;
+            color: #fff !important;
+
+            &:hover {
+                background-color: #1c7ed6 !important;
+                border-color: #1c7ed6 !important;
+            }
+        }
+    }
+}
+
+.rbc-header {
+    background-color: var(--mantine-color-dark-6);
+    border-bottom: 1px solid var(--mantine-color-dark-4);
+    padding: 8px;
+    font-weight: 500;
+
+    & + .rbc-header {
+        border-left: 1px solid var(--mantine-color-dark-4);
+    }
+}
+
+.rbc-month-view,
+.rbc-time-view,
+.rbc-agenda-view {
+    border: 1px solid var(--mantine-color-dark-4);
+    background-color: var(--mantine-color-dark-7);
+}
+
+.rbc-month-row {
+    border-bottom: 1px solid var(--mantine-color-dark-4);
+}
+
+.rbc-day-bg {
+    background-color: var(--mantine-color-dark-7);
+
+    & + .rbc-day-bg {
+        border-left: 1px solid var(--mantine-color-dark-4);
+    }
+
+    &.rbc-day-unavailable {
+        @include unavailable-stripe(0.28);
+    }
+}
+
+.rbc-off-range-bg {
+    background-color: var(--mantine-color-dark-8);
+}
+
+.rbc-today {
+    background-color: var(--mantine-color-dark-6);
+}
+
+.rbc-date-cell {
+    padding: 4px 8px;
+    color: var(--mantine-color-dark-1);
+
+    &.rbc-off-range {
+        color: var(--mantine-color-dark-3);
+    }
+
+    &.rbc-now {
+        font-weight: bold;
+        color: var(--mantine-color-blue-4);
+    }
+}
+
+.rbc-event {
+    background-color: var(--mantine-color-blue-filled);
+    border: 1px solid rgba(0, 0, 0, 0.25) !important;
+    border-radius: 4px;
+    color: white;
+    padding: 2px 5px;
+
+    &:focus {
+        outline: 2px solid var(--mantine-color-blue-4);
+        outline-offset: 2px;
+    }
+
+    &.rbc-selected {
+        background-color: var(--mantine-color-blue-filled-hover);
+    }
+
+    // Ensure event text color is inherited in all views
+    &,
+    .rbc-event-content,
+    .rbc-event-label {
+        color: inherit;
+    }
+
+    .rbc-event-label {
+        opacity: 0.9;
+    }
+}
+
+.rbc-show-more {
+    color: var(--mantine-color-blue-4);
+    background-color: transparent;
+
+    &:hover {
+        color: var(--mantine-color-blue-3);
+    }
+}
+
+// Time view
+.rbc-time-header {
+    border-bottom: 1px solid var(--mantine-color-dark-4);
+
+    &-content {
+        border-left: 1px solid var(--mantine-color-dark-4);
+    }
+}
+
+.rbc-time-content {
+    border-top: 1px solid var(--mantine-color-dark-4);
+
+    > * + * > * {
+        border-left: 1px solid var(--mantine-color-dark-4);
+    }
+}
+
+.rbc-timeslot-group {
+    border-bottom: 1px solid var(--mantine-color-dark-5);
+}
+
+.rbc-time-slot {
+    color: var(--mantine-color-dark-2);
+}
+
+.rbc-time-gutter {
+    background-color: var(--mantine-color-dark-6);
+}
+
+.rbc-day-slot {
+    .rbc-time-slot {
+        border-top: 1px solid var(--mantine-color-dark-5);
+    }
+
+    // Unavailable time slots — striped overlay
+    .rbc-background-event {
+        @include unavailable-stripe;
+        background-color: transparent !important;
+        border: none !important;
+        border-radius: 0 !important;
+        // Override inline left/right set by rbc's overlap stacking logic
+        left: 0 !important;
+        right: 0 !important;
+        width: calc(100% + 10px) !important;
+        padding: 0 !important;
+
+        .rbc-event-label {
+            display: none;
+        }
+
+        // Suppress selection/focus feedback on unavailability overlays
+        &.rbc-selected,
+        &:focus {
+            @include unavailable-stripe;
+            outline: none !important;
+            border: none !important;
+        }
+    }
+}
+
+.rbc-current-time-indicator {
+    background-color: var(--mantine-color-red-6);
+}
+
+// Agenda view
+.rbc-agenda-view {
+    table.rbc-agenda-table {
+        border: 1px solid var(--mantine-color-dark-4);
+
+        thead > tr > th {
+            background-color: var(--mantine-color-dark-6);
+            border-bottom: 1px solid var(--mantine-color-dark-4);
+            padding: 8px;
+        }
+
+        tbody > tr > td {
+            border-bottom: 1px solid var(--mantine-color-dark-5);
+            padding: 8px;
+
+            & + td {
+                border-left: 1px solid var(--mantine-color-dark-5);
+            }
+        }
+    }
+}
+
+.rbc-agenda-empty {
+    color: var(--mantine-color-dark-2);
+    text-align: center;
+    padding: 2rem;
+}
+
+.rbc-agenda-event-cell {
+    color: inherit;
+}
+
+.rbc-agenda-date-cell {
+    background: var(--mantine-color-dark-5) !important;
+    color: rgb(255, 255, 255);
+    text-transform: capitalize;
+}
+
+// Selection
+.rbc-slot-selection {
+    background-color: rgba(var(--mantine-color-blue-filled-rgb), 0.3);
+    border: 1px solid var(--mantine-color-blue-filled);
+}
+
+// Popover overlay
+.rbc-overlay {
+    background-color: var(--mantine-color-dark-6);
+    border: 1px solid var(--mantine-color-dark-4);
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+
+    &-header {
+        background-color: var(--mantine-color-dark-5);
+        border-bottom: 1px solid var(--mantine-color-dark-4);
+        padding: 8px;
+    }
+}

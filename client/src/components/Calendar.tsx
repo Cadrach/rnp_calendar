@@ -5,7 +5,7 @@ import { Calendar as BigCalendar, dateFnsLocalizer, SlotInfo } from "react-big-c
 import { format, parse, startOfWeek, getDay } from "date-fns";
 import { fr } from "date-fns/locale/fr";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import "../styles/calendar-dark.css";
+import "../styles/calendar-dark.scss";
 import { useNavigate, useParams } from "react-router";
 import type { Event } from "../api/generated/model";
 import { CalendarEvent } from "./CalendarEvent";

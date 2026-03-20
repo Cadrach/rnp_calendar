@@ -1,17 +1,14 @@
-import { Avatar, Badge, Group, Text } from "@mantine/core";
+import { Badge, Group } from "@mantine/core";
 import { useDictionary } from "../contexts/DictionaryContext";
+import { MemberAvatar } from "./MemberAvatar";
 
 export function UserBadge() {
-  const { user } = useDictionary();
+  const { user, members } = useDictionary();
+  const member = members.find((m) => m.id === user.discord_id);
 
   return (
     <Group gap="xs">
-      <Avatar radius="xl" size="sm" color="blue">
-        {user.name.charAt(0).toUpperCase()}
-      </Avatar>
-      <Text size="sm" fw={500}>
-        {user.name}
-      </Text>
+      {member && <MemberAvatar member={member} />}
       {user.is_mj && (
         <Badge variant="light" color="violet">
           MJ
