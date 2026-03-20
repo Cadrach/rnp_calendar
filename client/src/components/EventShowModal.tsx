@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { Anchor, Button, Group, Loader, Center, Stack, Text } from "@mantine/core";
+import { Anchor, Button, Group, Stack, Text } from "@mantine/core";
 import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale/fr";
-import { getEventsShowQueryKey, useEventsShow } from "../api/generated/event/event";
+import { getEventsIndexQueryKey, useEventsIndex } from "../api/generated/event/event";
 import { useDictionary } from "../contexts/DictionaryContext";
 import { useEventsRegister, useEventsUnregister } from "../api/event-register";
 import { MemberAvatar } from "./MemberAvatar";
@@ -15,23 +15,16 @@ interface Props {
 
 export function EventShowModal({ eventId }: Props) {
   const { games, rooms, scenarios, members, user } = useDictionary();
-  const { data: event, isLoading } = useEventsShow(Number(eventId));
+  const { data: events } = useEventsIndex();
+  const event = events?.find((e) => e.id === Number(eventId));
   const [editing, setEditing] = useState(false);
   const queryClient = useQueryClient();
 
   const invalidateShow = () =>
-    queryClient.invalidateQueries({ queryKey: getEventsShowQueryKey(Number(eventId)) });
+    queryClient.invalidateQueries({ queryKey: getEventsIndexQueryKey() });
 
   const registerMutation = useEventsRegister({ mutation: { onSuccess: invalidateShow } });
   const unregisterMutation = useEventsUnregister({ mutation: { onSuccess: invalidateShow } });
-
-  if (isLoading) {
-    return (
-      <Center py="xl">
-        <Loader />
-      </Center>
-    );
-  }
 
   if (!event) return null;
 
