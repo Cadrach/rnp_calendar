@@ -16,9 +16,12 @@ class EventBookingValidator
     /**
      * Validates that an event can be booked for the given room and time range.
      *
-     * Runs two checks in order:
+     * Unlimited rooms bypass all checks entirely — they accept any booking without
+     * availability or overlap restrictions.
+     *
+     * For non-unlimited rooms, runs two checks in order:
      *   1. Availability — the requested interval must be fully contained within the room's
-     *      effective available hours (skipped for unlimited rooms).
+     *      effective available hours.
      *   2. Overlap — no existing active event for the same room may overlap the requested time.
      *
      * Pass $excludeEventId when updating an existing event to exclude it from the overlap check.
@@ -27,6 +30,10 @@ class EventBookingValidator
      */
     public function validate(Room $room, Carbon $start, Carbon $end, ?int $excludeEventId = null): void
     {
+        if ($room->unlimited) {
+            return;
+        }
+
         $this->checkAvailability($room, $start, $end);
         $this->checkNoOverlap($room, $start, $end, $excludeEventId);
     }
@@ -38,10 +45,6 @@ class EventBookingValidator
      */
     private function checkAvailability(Room $room, Carbon $start, Carbon $end): void
     {
-        if ($room->unlimited) {
-            return;
-        }
-
         $effective = $this->resolver->resolve($room, $start->copy()->startOfDay(), $end->copy()->startOfDay());
         $requested = new TimeInterval($start, $end);
 
