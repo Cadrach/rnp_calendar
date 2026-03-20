@@ -493,6 +493,10 @@ Standard overlap test:
 - `requested_start < existing_end`
 - `requested_end > existing_start`
 
+When updating an existing event, exclude the event itself from the overlap check.
+
+Soft-deleted events are automatically excluded (Eloquent global scope).
+
 #### 6. Return clear error reason
 
 Prefer explicit failures such as:
@@ -848,10 +852,10 @@ When generating code for this project:
 2. ~~create enums or constants for `kind` and `scope`~~ **DONE** (constants in RoomRule model)
 3. ~~create RoomRule model~~ **DONE**
 4. build model validation rules
-5. implement rule matcher
-6. implement interval expansion
-7. implement availability resolution
-8. implement event creation validator
+5. ~~implement rule matcher~~ **DONE** (`App\Services\Availability\AvailabilityRuleMatcher`)
+6. ~~implement interval expansion~~ **DONE** (`App\Services\Availability\AvailabilityIntervalExpander`)
+7. ~~implement availability resolution~~ **DONE** (`App\Services\Availability\AvailabilityResolver`)
+8. ~~implement event creation validator~~ **DONE** (`App\Services\Availability\EventBookingValidator`, wired into `EventController::store()` and `update()`)
 9. expose availability endpoint for visible calendar ranges
 10. wire frontend calendar grey-out/background behavior to backend output
 11. add integration tests for booking validation and calendar availability output

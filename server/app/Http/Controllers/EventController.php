@@ -3,19 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Models\Room;
 use App\Models\Scenario;
+use App\Services\Availability\EventBookingValidator;
 use App\Services\DiscordClient;
 use App\Services\EventDiscordSync;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class EventController extends Controller
 {
     public function __construct(
-        private readonly EventDiscordSync $discordSync,
-        private readonly DiscordClient    $discord,
-    )
-    {
+        private readonly EventDiscordSync   $discordSync,
+        private readonly DiscordClient      $discord,
+        private readonly EventBookingValidator $bookingValidator,
+    ) {
     }
 
     public function index(): JsonResponse
@@ -44,6 +47,13 @@ class EventController extends Controller
             $data['game_id']
         );
         unset($data['scenario_key']);
+
+        $room = Room::findOrFail($data['room_id']);
+        $this->bookingValidator->validate(
+            $room,
+            Carbon::parse($data['datetime_start']),
+            Carbon::parse($data['datetime_end']),
+        );
 
         $event = Event::create($data);
 
@@ -125,10 +135,15 @@ class EventController extends Controller
 
         if (array_key_exists('scenario_key', $data)) {
             $mjUserId = $data['mj_user_id'] ?? $event->mj_user_id;
-            $gameId = $data['game_id'] ?? $event->game_id;
+            $gameId   = $data['game_id'] ?? $event->game_id;
             $data['scenario_id'] = $this->resolveScenarioId($data['scenario_key'], $mjUserId, $gameId);
             unset($data['scenario_key']);
         }
+
+        $room  = Room::findOrFail($data['room_id'] ?? $event->room_id);
+        $start = Carbon::parse($data['datetime_start'] ?? $event->datetime_start);
+        $end   = Carbon::parse($data['datetime_end'] ?? $event->datetime_end);
+        $this->bookingValidator->validate($room, $start, $end, excludeEventId: $event->id);
 
         $event->update($data);
 
