@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DictionaryController;
 use App\Http\Controllers\DiscordController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\RoomController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -29,6 +30,8 @@ Route::prefix('auth')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('/dictionary', DictionaryController::class);
     Route::get('/dictionary/scenarii', [DictionaryController::class, 'scenarii']);
+
+    Route::get('rooms/{room}/availability', [RoomController::class, 'availability']);
 
     Route::apiResource('events', EventController::class);
     Route::post('events/{event}/register', [EventController::class, 'register']);

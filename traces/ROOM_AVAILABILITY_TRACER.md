@@ -584,32 +584,33 @@ Suggested response concept:
 - optionally list of unavailable intervals or greyed-out intervals
 - existing bookings returned separately
 
-Possible backend endpoint idea:
+Endpoint: **`GET /api/rooms/{room}/availability?start=YYYY-MM-DD&end=YYYY-MM-DD`**
 
-- `GET /rooms/{room}/availability?start=...&end=...`
-
-Possible response shape:
+Response shape (implemented):
 
 ```json
 {
   "room_id": 12,
-  "range_start": "2026-04-01T00:00:00",
-  "range_end": "2026-04-07T23:59:59",
-  "available_intervals": [
-    {
-      "start": "2026-04-01T09:00:00",
-      "end": "2026-04-01T10:00:00"
-    },
-    {
-      "start": "2026-04-06T10:00:00",
-      "end": "2026-04-06T13:00:00"
-    }
-  ],
-  "unavailable_intervals": []
+  "start": "2026-04-01",
+  "end": "2026-04-07",
+  "intervals": [
+    { "start": "2026-04-01T14:00:00", "end": "2026-04-01T23:00:00" },
+    { "start": "2026-04-03T14:00:00", "end": "2026-04-03T23:00:00" }
+  ]
 }
 ```
 
-If preferred, the backend may return only effective availability and let the frontend infer that everything else is non-bookable in the visible window.
+`intervals` contains only the effective bookable slots — everything else is implicitly non-bookable.
+
+For unlimited rooms, a single interval spanning the full requested range is returned.
+
+The `start`/`end` keys on each interval match the shape of react-big-calendar events, so the
+frontend can pass `intervals` directly to the `backgroundEvents` prop after mapping each entry
+through `new Date()`:
+
+```ts
+backgroundEvents={intervals.map(i => ({ ...i, start: new Date(i.start), end: new Date(i.end) }))}
+```
 
 ---
 
@@ -856,7 +857,7 @@ When generating code for this project:
 6. ~~implement interval expansion~~ **DONE** (`App\Services\Availability\AvailabilityIntervalExpander`)
 7. ~~implement availability resolution~~ **DONE** (`App\Services\Availability\AvailabilityResolver`)
 8. ~~implement event creation validator~~ **DONE** (`App\Services\Availability\EventBookingValidator`, wired into `EventController::store()` and `update()`)
-9. expose availability endpoint for visible calendar ranges
+9. ~~expose availability endpoint for visible calendar ranges~~ **DONE** (`GET /api/rooms/{room}/availability`)
 10. wire frontend calendar grey-out/background behavior to backend output
 11. add integration tests for booking validation and calendar availability output
 
