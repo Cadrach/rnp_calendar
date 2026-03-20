@@ -20,6 +20,7 @@ extend([a11yPlugin]);
 import { useEventsIndex } from "../api/generated/event/event";
 import type { Event } from "../api/generated/model";
 import { CalendarEvent } from "./CalendarEvent";
+import { CalendarFilter, CalendarFilters, DEFAULT_FILTERS } from "./CalendarFilter";
 import { CreateEventModal } from "./CreateEventModal";
 import { EventShowModal } from "./EventShowModal";
 import { useDictionary } from "../contexts/DictionaryContext";
@@ -61,6 +62,7 @@ export function Calendar() {
   const [date, setDate] = useState(new Date());
   const [view, setView] = useState<View>("month");
   const [slot, setSlot] = useState<{ start: Date; end: Date } | null>(null);
+  const [filters, setFilters] = useState<CalendarFilters>(DEFAULT_FILTERS);
   const [createOpened, { open: openCreate, close: closeCreate }] = useDisclosure(false);
 
   const { games, rooms, members } = useDictionary();
@@ -68,7 +70,9 @@ export function Calendar() {
 
   const calendarEvents = useMemo(
     () =>
-      (events ?? []).map((e) => {
+      (events ?? [])
+      .filter((e) => filters.roomId === null || e.room_id === filters.roomId)
+      .map((e) => {
         const mj = members.find((m) => m.id === e.mj_discord_id);
         const room = rooms.find((r) => r.id === e.room_id);
         const roomColor = room?.color ?? "#3b82f6";
@@ -85,7 +89,7 @@ export function Calendar() {
           mj,
         };
       }),
-    [events, games, rooms, members]
+    [events, games, rooms, members, filters]
   );
 
   type CalendarEventType = (typeof calendarEvents)[number];
@@ -120,7 +124,8 @@ export function Calendar() {
 
   return (
     <>
-      <div style={{ height: "calc(100vh - 56px)", padding: "1rem" }}>
+      <CalendarFilter filters={filters} onChange={setFilters} />
+      <div style={{ height: "calc(100vh - 56px - 52px)", padding: "1rem" }}>
         <BigCalendar
           localizer={localizer}
           events={calendarEvents}
