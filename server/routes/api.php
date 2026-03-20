@@ -28,6 +28,7 @@ Route::prefix('auth')->group(function () {
 // Protected routes go here
 Route::middleware('auth')->group(function () {
     Route::get('/dictionary', DictionaryController::class);
+    Route::get('/dictionary/scenarii', [DictionaryController::class, 'scenarii']);
 
     Route::apiResource('events', EventController::class);
     Route::post('events/{event}/register', [EventController::class, 'register']);

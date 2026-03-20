@@ -103,6 +103,11 @@ class DiscordClient
         return $this->patch("/channels/{$threadId}", ['name' => $name]);
     }
 
+    public function getMessage(string $channelId, string $messageId): array
+    {
+        return $this->get("/channels/{$channelId}/messages/{$messageId}");
+    }
+
     public function editMessage(string $channelId, string $messageId, string $content): array
     {
         return $this->patch("/channels/{$channelId}/messages/{$messageId}", ['content' => $content, 'flags' => 4]);
