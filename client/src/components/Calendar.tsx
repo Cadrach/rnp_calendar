@@ -11,6 +11,7 @@ import {
 import { format, parse, startOfWeek, getDay } from "date-fns";
 import { fr } from "date-fns/locale/fr";
 import "react-big-calendar/lib/css/react-big-calendar.css";
+import "../styles/calendar-dark.css";
 import { useNavigate, useParams } from "react-router";
 import { useEventsIndex } from "../api/generated/event/event";
 import type { Event } from "../api/generated/model";

@@ -9,7 +9,7 @@ import { DictionaryProvider } from "./contexts/DictionaryContext";
 
 export default function App() {
   return (
-    <MantineProvider theme={theme}>
+    <MantineProvider theme={theme} forceColorScheme="dark">
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route
