@@ -1,4 +1,4 @@
-import { Button, NumberInput, Select, Stack, Text } from "@mantine/core";
+import { Button, Loader, NumberInput, Select, Stack, Text } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
@@ -11,6 +11,7 @@ import {
   useEventsStore,
   useEventsUpdate,
 } from "../api/generated/event/event";
+import { useAvailableRooms } from "../api/rooms";
 import { useDictionary } from "../contexts/DictionaryContext";
 import { MembersSelect } from "./MembersSelect";
 import { ScenarioSelect } from "./ScenarioSelect";
@@ -24,7 +25,8 @@ interface Props {
 }
 
 export function CreateEventModal({ start, end, onClose, event, initialRoomId }: Props) {
-  const { user, games, rooms, members } = useDictionary();
+  const { user, games, members } = useDictionary();
+  const { data: availableRooms, isLoading: isLoadingRooms } = useAvailableRooms(start, end, event?.id);
   const queryClient = useQueryClient();
 
   const mjUserId = event ? event.mj_user_id : user.id;
@@ -96,7 +98,9 @@ export function CreateEventModal({ start, end, onClose, event, initialRoomId }: 
           label="Salle"
           placeholder="Choisir une salle"
           required
-          data={rooms.map((r) => ({ value: String(r.id), label: r.name }))}
+          data={(availableRooms ?? []).map((r) => ({ value: String(r.id), label: r.name }))}
+          disabled={isLoadingRooms}
+          rightSection={isLoadingRooms ? <Loader size="xs" /> : undefined}
           {...form.getInputProps("room_id")}
         />
 
