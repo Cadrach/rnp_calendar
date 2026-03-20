@@ -29,6 +29,8 @@ export * from './getDictionary200';
 export * from './modelNotFoundExceptionResponse';
 export * from './postAuthLogout200';
 export * from './room';
+export * from './roomAvailability200';
+export * from './roomAvailabilityParams';
 export * from './scenario';
 export * from './user';
 export * from './validationExceptionResponse';

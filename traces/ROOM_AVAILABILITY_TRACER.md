@@ -858,7 +858,7 @@ When generating code for this project:
 7. ~~implement availability resolution~~ **DONE** (`App\Services\Availability\AvailabilityResolver`)
 8. ~~implement event creation validator~~ **DONE** (`App\Services\Availability\EventBookingValidator`, wired into `EventController::store()` and `update()`)
 9. ~~expose availability endpoint for visible calendar ranges~~ **DONE** (`GET /api/rooms/{room}/availability`)
-10. wire frontend calendar grey-out/background behavior to backend output
+10. ~~wire frontend calendar grey-out/background behavior to backend output~~ **DONE** (`useRoomAvailability` hook + `backgroundEvents` prop in `Calendar`)
 11. add integration tests for booking validation and calendar availability output
 
 ---
