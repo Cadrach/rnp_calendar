@@ -8,7 +8,7 @@ import {
   NavigateAction,
   SlotInfo,
 } from "react-big-calendar";
-import { format, parse, startOfWeek, getDay, startOfMonth, endOfMonth, startOfDay, endOfDay } from "date-fns";
+import { format, parse, startOfWeek, getDay, startOfMonth, endOfMonth, nextMonday, startOfDay, endOfDay } from "date-fns";
 import { fr } from "date-fns/locale/fr";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "../styles/calendar-dark.css";
@@ -73,10 +73,18 @@ export function Calendar() {
   const { games, rooms, members } = useDictionary();
   const { data: events } = useEventsIndex();
 
+  // Always query availability for the full month containing the current navigation date.
+  // Week and day views then reuse the same cached response instead of triggering new requests.
+  const availabilityRange = useMemo(() => {
+    const som = startOfMonth(visibleRange.start);
+    const eom = endOfMonth(visibleRange.end);
+    return { start: som, end: nextMonday(eom) };
+  }, [visibleRange]);
+
   const { data: availabilityData } = useRoomAvailability(
     filters.roomId,
-    visibleRange.start,
-    visibleRange.end,
+    availabilityRange.start,
+    availabilityRange.end,
     { staleTime: 5 * 60 * 1000 }
   );
 
