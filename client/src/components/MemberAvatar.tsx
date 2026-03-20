@@ -12,7 +12,7 @@ export function MemberAvatar({ member, size = "sm" }: Props) {
       <Avatar src={member.avatar} size={size === "sm" ? 24 : 32} radius="xl">
         {member.username[0].toUpperCase()}
       </Avatar>
-      <Text size={size === "sm" ? "sm" : "md"} style={{ whiteSpace: "nowrap" }}>
+      <Text size={size === "sm" ? "sm" : "md"} inherit style={{ whiteSpace: "nowrap" }}>
         {member.username}
       </Text>
     </Group>

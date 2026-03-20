@@ -12,4 +12,5 @@ export interface Room {
   unlimited: boolean;
   /** @nullable */
   url: string | null;
+  color: string;
 }

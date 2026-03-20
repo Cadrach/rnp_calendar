@@ -196,3 +196,16 @@
   border-bottom: 1px solid var(--mantine-color-dark-4);
   padding: 8px;
 }
+
+/* Ensure event text color is inherited in all views */
+.rbc-event,
+.rbc-event-content,
+.rbc-event-label,
+.rbc-agenda-event-cell {
+  color: inherit;
+}
+
+.rbc-event .rbc-event-label {
+  color: inherit;
+  opacity: 0.9;
+}
