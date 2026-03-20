@@ -20,7 +20,7 @@ class EventController extends Controller
 
     public function index(): JsonResponse
     {
-        return response()->json(Event::all());
+        return response()->json(Event::with('mj')->get());
     }
 
     public function store(Request $request): JsonResponse

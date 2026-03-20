@@ -28,4 +28,5 @@ export interface Event {
   player_ids: unknown[] | null;
   /** @nullable */
   discord_thread_id: string | null;
+  mj_discord_id: string;
 }

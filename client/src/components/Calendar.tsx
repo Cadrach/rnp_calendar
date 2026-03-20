@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Modal } from "@mantine/core";
+import { useState, useMemo, useCallback } from "react";
+import { Modal, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import {
   Calendar as BigCalendar,
@@ -18,6 +18,7 @@ import type { Event } from "../api/generated/model";
 import { CreateEventModal } from "./CreateEventModal";
 import { EventShowModal } from "./EventShowModal";
 import { useDictionary } from "../contexts/DictionaryContext";
+import { MemberAvatar } from "./MemberAvatar";
 
 const localizer = dateFnsLocalizer({
   format,
@@ -51,15 +52,52 @@ export function Calendar() {
   const [slot, setSlot] = useState<{ start: Date; end: Date } | null>(null);
   const [createOpened, { open: openCreate, close: closeCreate }] = useDisclosure(false);
 
-  const { games } = useDictionary();
+  const { games, rooms, scenarios, members } = useDictionary();
   const { data: events } = useEventsIndex();
 
-  const calendarEvents = (events ?? []).map((e) => ({
-    ...e,
-    title: games.find((g) => g.id === e.game_id)?.name ?? String(e.game_id),
-    start: new Date(e.datetime_start),
-    end: new Date(e.datetime_end),
-  }));
+  const calendarEvents = useMemo(
+    () =>
+      (events ?? []).map((e) => {
+        const mj = members.find((m) => m.id === e.mj_discord_id);
+        const scenario = e.scenario_id ? scenarios.find((s) => s.id === e.scenario_id) : null;
+        return {
+          ...e,
+          title: games.find((g) => g.id === e.game_id)?.name ?? String(e.game_id),
+          start: new Date(e.datetime_start),
+          end: new Date(e.datetime_end),
+          gameName: games.find((g) => g.id === e.game_id)?.name ?? String(e.game_id),
+          roomName: rooms.find((r) => r.id === e.room_id)?.name ?? null,
+          mj,
+          scenarioName: scenario?.name ?? null,
+        };
+      }),
+    [events, games, rooms, scenarios, members]
+  );
+
+  type CalendarEvent = (typeof calendarEvents)[number];
+
+  const EventComponent = useCallback(
+    ({ event }: { event: CalendarEvent }) => (
+      <div style={{ fontSize: "0.75rem", lineHeight: 1.4 }}>
+        <Text size="xs" fw={600} truncate>
+          {event.gameName}
+          {event.roomName && (
+            <Text span size="xs" c="blue.3" fw={400}>
+              {" "}
+              · {event.roomName}
+            </Text>
+          )}
+        </Text>
+        {event.mj && <MemberAvatar member={event.mj} size="sm" />}
+        {event.scenarioName && (
+          <Text size="xs" c="gray.5" truncate>
+            {event.scenarioName}
+          </Text>
+        )}
+      </div>
+    ),
+    []
+  );
 
   const handleNavigate = (newDate: Date, _view: View, _action: NavigateAction) => {
     setDate(newDate);
@@ -94,6 +132,9 @@ export function Calendar() {
           selectable
           culture="fr"
           messages={messages}
+          components={{
+            event: EventComponent,
+          }}
         />
       </div>
 

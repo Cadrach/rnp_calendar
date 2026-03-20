@@ -28,6 +28,15 @@ class Event extends Model
         'player_ids'     => 'array',
     ];
 
+    protected $appends = ['mj_discord_id'];
+
+    protected function mjDiscordId(): \Illuminate\Database\Eloquent\Casts\Attribute
+    {
+        return \Illuminate\Database\Eloquent\Casts\Attribute::get(
+            fn() => $this->mj?->discord_id
+        );
+    }
+
     public function mj(): BelongsTo
     {
         return $this->belongsTo(User::class, 'mj_user_id');
