@@ -20,9 +20,10 @@ interface Props {
   end: Date;
   onClose: () => void;
   event?: Event;
+  initialRoomId?: number | null;
 }
 
-export function CreateEventModal({ start, end, onClose, event }: Props) {
+export function CreateEventModal({ start, end, onClose, event, initialRoomId }: Props) {
   const { user, games, rooms, members } = useDictionary();
   const queryClient = useQueryClient();
 
@@ -30,7 +31,7 @@ export function CreateEventModal({ start, end, onClose, event }: Props) {
 
   const form = useForm({
     initialValues: {
-      room_id: event?.room_id ? String(event.room_id) : (null as string | null),
+      room_id: event?.room_id ? String(event.room_id) : initialRoomId ? String(initialRoomId) : (null as string | null),
       game_id: event?.game_id ? String(event.game_id) : (null as string | null),
       scenario_key: event?.scenario_id ? `id:${event.scenario_id}` : (null as string | null),
       min_players: event?.min_players ?? (null as number | null),

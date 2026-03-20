@@ -35,8 +35,10 @@ class RoomController extends Controller
             'end'   => ['required', 'date_format:Y-m-d', 'after_or_equal:start'],
         ]);
 
-        $rangeStart = Carbon::parse($request->input('start'))->startOfDay();
-        $rangeEnd   = Carbon::parse($request->input('end'))->startOfDay();
+        // Parse date strings in the club timezone so that day boundaries match local time.
+        $tz         = config('app.club_timezone');
+        $rangeStart = Carbon::parse($request->input('start'), $tz)->startOfDay();
+        $rangeEnd   = Carbon::parse($request->input('end'), $tz)->startOfDay();
 
         if ($room->unlimited) {
             $intervals = [[

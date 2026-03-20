@@ -45,7 +45,13 @@ class EventBookingValidator
      */
     private function checkAvailability(Room $room, Carbon $start, Carbon $end): void
     {
-        $effective = $this->resolver->resolve($room, $start->copy()->startOfDay(), $end->copy()->startOfDay());
+        // Convert to club timezone before computing startOfDay so we get the correct local
+        // calendar day, not the UTC day (which may differ near midnight).
+        $tz         = config('app.club_timezone');
+        $localStart = $start->copy()->setTimezone($tz);
+        $localEnd   = $end->copy()->setTimezone($tz);
+
+        $effective = $this->resolver->resolve($room, $localStart->startOfDay(), $localEnd->startOfDay());
         $requested = new TimeInterval($start, $end);
 
         foreach ($effective as $slot) {

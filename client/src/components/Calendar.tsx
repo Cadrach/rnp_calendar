@@ -239,7 +239,7 @@ export function Calendar() {
       </div>
 
       <Modal opened={createOpened} onClose={closeCreate} title="Nouvel événement">
-        {slot && <CreateEventModal start={slot.start} end={slot.end} onClose={closeCreate} />}
+        {slot && <CreateEventModal start={slot.start} end={slot.end} onClose={closeCreate} initialRoomId={filters.roomId} />}
       </Modal>
 
       <Modal

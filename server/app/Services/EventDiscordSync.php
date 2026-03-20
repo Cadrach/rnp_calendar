@@ -45,8 +45,9 @@ class EventDiscordSync
 
     private function buildContent(Event $event): string
     {
-        $start = Carbon::parse($event->datetime_start)->timezone('Europe/Paris')->locale('fr');
-        $end   = Carbon::parse($event->datetime_end)->timezone('Europe/Paris')->locale('fr');
+        $tz    = config('app.club_timezone');
+        $start = Carbon::parse($event->datetime_start)->timezone($tz)->locale('fr');
+        $end   = Carbon::parse($event->datetime_end)->timezone($tz)->locale('fr');
 
         $date     = $start->isoFormat('dddd D MMMM YYYY');
         $timeFrom = $start->format('H\hi');

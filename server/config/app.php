@@ -69,6 +69,11 @@ return [
 
     'timezone' => 'UTC',
 
+    // Timezone used for display and room availability rule interpretation.
+    // The server always stores and exchanges datetimes in UTC.
+    // This value should reflect the physical timezone of the club.
+    'club_timezone' => env('CLUB_TIMEZONE', 'Europe/Paris'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Locale Configuration

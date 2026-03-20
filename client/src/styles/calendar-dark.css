@@ -239,3 +239,9 @@
     color: inherit;
     opacity: 0.9;
 }
+
+.rbc-agenda-date-cell {
+    background: var(--mantine-color-dark-5) !important;
+    color: rgb(255, 255, 255);
+    text-transform: capitalize;
+}
