@@ -9,6 +9,7 @@ import { useDictionary } from "../contexts/DictionaryContext";
 import { useEventsRegister, useEventsUnregister } from "../api/event-register";
 import { MemberAvatar } from "./MemberAvatar";
 import { CreateEventModal } from "./CreateEventModal";
+import { DeleteEventButton } from "./DeleteEventButton";
 
 interface Props {
   eventId: string;
@@ -114,7 +115,9 @@ export function EventShowModal({ eventId }: Props) {
         )}
       </Stack>
 
-      <Group mt="sm" grow>
+      <Group mt="sm" align="center">
+        {canEdit && <DeleteEventButton eventId={Number(eventId)} />}
+        <Group grow flex={1}>
         {canEdit && (
           <Button variant="default" onClick={() => setEditing(true)}>
             Modifier
@@ -142,6 +145,7 @@ export function EventShowModal({ eventId }: Props) {
             {isFull ? "Complet" : "S'inscrire"}
           </Button>
         )}
+        </Group>
       </Group>
     </Stack>
   );

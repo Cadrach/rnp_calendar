@@ -969,6 +969,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tabler/icons-react@npm:^3.40.0":
+  version: 3.40.0
+  resolution: "@tabler/icons-react@npm:3.40.0"
+  dependencies:
+    "@tabler/icons": "npm:3.40.0"
+  peerDependencies:
+    react: ">= 16"
+  checksum: 10c0/a6985c9e8d1986c14594f5bc7007d2398b7b1efd2202304a24e23eb1fa6a48a23f9a6aaa3c5626781990cc0f0a46773c0a0cb747b6984dde26f03ba4ebd1d9cf
+  languageName: node
+  linkType: hard
+
+"@tabler/icons@npm:3.40.0":
+  version: 3.40.0
+  resolution: "@tabler/icons@npm:3.40.0"
+  checksum: 10c0/d335323695dff9218b486bb84a79893f86d5c284dc022c86bfdcfc550605c48ddffe72161c93f6fcab47ba6d828311c101fc5e306fb698b5b5104cf6250ed314
+  languageName: node
+  linkType: hard
+
 "@tanstack/query-core@npm:5.91.0":
   version: 5.91.0
   resolution: "@tanstack/query-core@npm:5.91.0"
@@ -3830,6 +3848,7 @@ __metadata:
     "@mantine/core": "npm:8.3.16"
     "@mantine/form": "npm:^8.3.18"
     "@mantine/hooks": "npm:8.3.16"
+    "@tabler/icons-react": "npm:^3.40.0"
     "@tanstack/react-query": "npm:^5.91.0"
     "@tanstack/react-query-devtools": "npm:^5.91.3"
     "@types/react": "npm:^19.2.14"

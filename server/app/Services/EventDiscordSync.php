@@ -31,6 +31,24 @@ class EventDiscordSync
         }
     }
 
+    /**
+     * Marks the Discord thread as cancelled by prepending [ANNULÉ] to the title.
+     * Only acts if the event has an associated thread.
+     */
+    public function cancel(Event $event): void
+    {
+        if (! $event->discord_thread_id) {
+            return;
+        }
+
+        $event->load(['room', 'game', 'scenario']);
+
+        $this->discord->editThread(
+            $event->discord_thread_id,
+            '[ANNULÉ] ' . $this->buildTitle($event),
+        );
+    }
+
     private function buildTitle(Event $event): string
     {
         $date  = Carbon::parse($event->datetime_start)->timezone('Europe/Paris')->format('d/m/y');

@@ -232,6 +232,8 @@ class EventController extends Controller
     {
         $this->authorizeEventMutation($request, $event);
 
+        $this->discordSync->cancel($event);
+
         $event->delete();
 
         return response()->json(null, 204);
