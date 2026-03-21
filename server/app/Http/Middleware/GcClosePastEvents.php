@@ -19,7 +19,11 @@ class GcClosePastEvents
 
         if (Cache::get(self::CACHE_KEY) !== $today) {
             Cache::put(self::CACHE_KEY, $today, now()->endOfDay());
-            $this->closer->closeAll();
+            try {
+                $this->closer->closeAll();
+            } catch (\Throwable) {
+                // non-fatal — never break the request
+            }
         }
 
         return $next($request);

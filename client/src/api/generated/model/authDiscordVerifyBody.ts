@@ -5,6 +5,6 @@
  * OpenAPI spec version: 0.0.1
  */
 
-export type AuthDiscordVerify200 = {
-  redirect: string;
+export type AuthDiscordVerifyBody = {
+  token: string;
 };

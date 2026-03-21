@@ -62,7 +62,7 @@ class AuthController extends Controller
      * @param Request $request
      * @return JsonResponse|\Illuminate\Http\RedirectResponse
      */
-    public function discordVerify(Request $request): JsonResponse|\Illuminate\Http\RedirectResponse
+    public function discordVerify(Request $request): JsonResponse
     {
         $request->validate(['token' => ['required', 'string']]);
 
@@ -83,7 +83,6 @@ class AuthController extends Controller
             ['name' => $discordUser['global_name'] ?? $discordUser['username']],
         );
 
-        // Clear members cache if this is a new member, so that it gets pulled next time
         if ($user->wasRecentlyCreated) {
             Cache::forget('discord_members');
         }
@@ -102,6 +101,6 @@ class AuthController extends Controller
             $destination .= '/' . ltrim($redirect, '/');
         }
 
-        return redirect($destination);
+        return response()->json(['redirect' => $destination]);
     }
 }

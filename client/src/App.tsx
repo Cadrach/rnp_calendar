@@ -23,6 +23,7 @@ import { theme } from "./theme";
 import { Calendar } from "./components/Calendar";
 import { UserBadge } from "./components/UserBadge";
 import { Login } from "./pages/Login";
+import { AuthVerify } from "./pages/AuthVerify";
 import { DictionaryProvider } from "./contexts/DictionaryContext";
 import { useDictionary } from "./contexts/DictionaryContext";
 import { usePostAuthLogout } from "./api/generated/default/default";
@@ -190,6 +191,7 @@ export default function App() {
     <MantineProvider theme={theme} forceColorScheme="dark">
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/auth/verify" element={<AuthVerify />} />
         <Route
           path="/*"
           element={

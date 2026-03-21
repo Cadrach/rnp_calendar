@@ -6,5 +6,5 @@
  */
 
 export type AuthDiscordVerify401 = {
-  message: "Invalid or expired token.";
+  message: 'Invalid or expired token.';
 };

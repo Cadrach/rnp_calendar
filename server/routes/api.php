@@ -10,13 +10,58 @@ use App\Http\Controllers\RoomController;
 use App\Http\Controllers\RoomCrudController;
 use App\Http\Controllers\RoomRuleController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+
+// TODO: remove this route after use — unauthenticated cache/config flush + diagnostics
+Route::get('/artisan-clear', function () {
+    Artisan::call('config:clear');
+    Artisan::call('cache:clear');
+    Artisan::call('route:clear');
+    Artisan::call('view:clear');
+
+    $prefix = \Illuminate\Support\Facades\DB::getTablePrefix();
+
+    // Test cache write/read
+    $cacheOk = false;
+    $cacheError = null;
+    try {
+        \Illuminate\Support\Facades\Cache::put('_diag_test', 'ok', 10);
+        $cacheOk = \Illuminate\Support\Facades\Cache::get('_diag_test') === 'ok';
+    } catch (\Throwable $e) {
+        $cacheError = $e->getMessage();
+    }
+
+    // Check which tables exist
+    $tables = \Illuminate\Support\Facades\DB::select('SHOW TABLES');
+    $tableList = array_map(fn($t) => array_values((array) $t)[0], $tables);
+
+    return response()->json([
+        'message'          => 'Cleared.',
+        'db_prefix_env'    => env('DB_PREFIX'),
+        'db_prefix_config' => config('database.connections.mysql.prefix'),
+        'db_prefix_live'   => $prefix,
+        'cache_write_ok'   => $cacheOk,
+        'cache_error'      => $cacheError,
+        'tables'           => $tableList,
+        'app_url'          => config('app.url'),
+        'verify_link'      => url('/api/auth/discord/verify?token=TEST'),
+    ]);
+});
 
 Route::prefix('auth')->group(function () {
     Route::controller(AuthController::class)->group(function () {
         Route::post('/discord/request', 'discordRequest');
-        Route::get('/discord/verify', 'discordVerify');
+        Route::post('/discord/verify', 'discordVerify');
+    });
+
+    // GET redirect: DM link lands here, bounces to the frontend verify page
+    // (Discord prefetch hits this GET safely — it just gets an HTML redirect, not a token consume)
+    Route::get('/discord/verify', function (Request $request) {
+        $token       = $request->query('token', '');
+        $frontendUrl = rtrim(config('app.frontend_url'), '/');
+        return redirect("{$frontendUrl}/auth/verify?token={$token}");
     });
 
     Route::post('/logout', function (Request $request) {

@@ -5,29 +5,21 @@
  * OpenAPI spec version: 0.0.1
  */
 import {
-  useMutation,
-  useQuery
+  useMutation
 } from '@tanstack/react-query';
 import type {
-  DataTag,
-  DefinedInitialDataOptions,
-  DefinedUseQueryResult,
   MutationFunction,
   QueryClient,
-  QueryFunction,
-  QueryKey,
-  UndefinedInitialDataOptions,
   UseMutationOptions,
-  UseMutationResult,
-  UseQueryOptions,
-  UseQueryResult
+  UseMutationResult
 } from '@tanstack/react-query';
 
 import type {
   AuthDiscordRequest200,
   AuthDiscordRequestBody,
   AuthDiscordVerify200,
-  AuthDiscordVerifyParams,
+  AuthDiscordVerify401,
+  AuthDiscordVerifyBody,
   ValidationExceptionResponse
 } from '../model';
 
@@ -106,90 +98,63 @@ export const useAuthDiscordRequest = <TError = ErrorType<ValidationExceptionResp
  * @summary This route verifies the token received and logs the user
  */
 export const authDiscordVerify = (
-    params: AuthDiscordVerifyParams,
+    authDiscordVerifyBody: AuthDiscordVerifyBody,
  options?: SecondParameter<typeof axiosInstance>,signal?: AbortSignal
 ) => {
       
       
       return axiosInstance<AuthDiscordVerify200>(
-      {url: `/auth/discord/verify`, method: 'GET',
-        params, signal
+      {url: `/auth/discord/verify`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: authDiscordVerifyBody, signal
     },
       options);
     }
   
 
 
+export const getAuthDiscordVerifyMutationOptions = <TError = ErrorType<AuthDiscordVerify401 | ValidationExceptionResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authDiscordVerify>>, TError,{data: AuthDiscordVerifyBody}, TContext>, request?: SecondParameter<typeof axiosInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof authDiscordVerify>>, TError,{data: AuthDiscordVerifyBody}, TContext> => {
 
-export const getAuthDiscordVerifyQueryKey = (params?: AuthDiscordVerifyParams,) => {
-    return [
-    `/auth/discord/verify`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-    
-export const getAuthDiscordVerifyQueryOptions = <TData = Awaited<ReturnType<typeof authDiscordVerify>>, TError = ErrorType<ValidationExceptionResponse>>(params: AuthDiscordVerifyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authDiscordVerify>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getAuthDiscordVerifyQueryKey(params);
-
-  
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof authDiscordVerify>>> = ({ signal }) => authDiscordVerify(params, requestOptions, signal);
+const mutationKey = ['authDiscordVerify'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
 
       
 
-      
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof authDiscordVerify>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof authDiscordVerify>>, {data: AuthDiscordVerifyBody}> = (props) => {
+          const {data} = props ?? {};
 
-export type AuthDiscordVerifyQueryResult = NonNullable<Awaited<ReturnType<typeof authDiscordVerify>>>
-export type AuthDiscordVerifyQueryError = ErrorType<ValidationExceptionResponse>
+          return  authDiscordVerify(data,requestOptions)
+        }
 
 
-export function useAuthDiscordVerify<TData = Awaited<ReturnType<typeof authDiscordVerify>>, TError = ErrorType<ValidationExceptionResponse>>(
- params: AuthDiscordVerifyParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof authDiscordVerify>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof authDiscordVerify>>,
-          TError,
-          Awaited<ReturnType<typeof authDiscordVerify>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof axiosInstance>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAuthDiscordVerify<TData = Awaited<ReturnType<typeof authDiscordVerify>>, TError = ErrorType<ValidationExceptionResponse>>(
- params: AuthDiscordVerifyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authDiscordVerify>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof authDiscordVerify>>,
-          TError,
-          Awaited<ReturnType<typeof authDiscordVerify>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof axiosInstance>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useAuthDiscordVerify<TData = Awaited<ReturnType<typeof authDiscordVerify>>, TError = ErrorType<ValidationExceptionResponse>>(
- params: AuthDiscordVerifyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authDiscordVerify>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-/**
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AuthDiscordVerifyMutationResult = NonNullable<Awaited<ReturnType<typeof authDiscordVerify>>>
+    export type AuthDiscordVerifyMutationBody = AuthDiscordVerifyBody
+    export type AuthDiscordVerifyMutationError = ErrorType<AuthDiscordVerify401 | ValidationExceptionResponse>
+
+    /**
  * @summary This route verifies the token received and logs the user
  */
-
-export function useAuthDiscordVerify<TData = Awaited<ReturnType<typeof authDiscordVerify>>, TError = ErrorType<ValidationExceptionResponse>>(
- params: AuthDiscordVerifyParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof authDiscordVerify>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
- , queryClient?: QueryClient 
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getAuthDiscordVerifyQueryOptions(params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return { ...query, queryKey: queryOptions.queryKey };
-}
-
-
-
-
+export const useAuthDiscordVerify = <TError = ErrorType<AuthDiscordVerify401 | ValidationExceptionResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authDiscordVerify>>, TError,{data: AuthDiscordVerifyBody}, TContext>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof authDiscordVerify>>,
+        TError,
+        {data: AuthDiscordVerifyBody},
+        TContext
+      > => {
+      return useMutation(getAuthDiscordVerifyMutationOptions(options), queryClient);
+    }
+    
