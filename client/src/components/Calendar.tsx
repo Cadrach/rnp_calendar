@@ -85,7 +85,7 @@ export function Calendar() {
   return (
     <>
       <CalendarFilter filters={filters} onChange={setFilters} />
-      <div style={{ height: "calc(100vh - 56px - 52px)", padding: "1rem" }}>
+      <div style={{ height: "calc(100vh - var(--app-shell-header-height) - 52px)", padding: "1rem" }}>
         <BigCalendar
           localizer={localizer}
           events={calendarEvents}

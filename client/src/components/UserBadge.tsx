@@ -10,12 +10,20 @@ export function UserBadge() {
     <Group gap="xs">
       {member && <MemberAvatar member={member} />}
       {user.is_mj && (
-        <Badge variant="light" color="violet">
+        <Badge
+          variant="filled"
+          color="neon"
+          style={{ boxShadow: "0 0 6px #00d4e8, 0 0 16px rgba(0,212,232,0.7), 0 0 32px rgba(0,212,232,0.4)" }}
+        >
           MJ
         </Badge>
       )}
       {user.is_admin && (
-        <Badge variant="light" color="red">
+        <Badge
+          variant="filled"
+          color="red"
+          style={{ boxShadow: "0 0 6px #ff5050, 0 0 16px rgba(255,80,80,0.7), 0 0 32px rgba(255,80,80,0.4)" }}
+        >
           ADM
         </Badge>
       )}
