@@ -39,6 +39,12 @@ export function useCalendarEvents(
             (e.player_ids as string[] | null)?.includes(user.discord_id);
           return isMj || isPlayer;
         })
+        .filter((e) => {
+          if (!filters.openGames) return true;
+          if (new Date(e.datetime_start) <= new Date()) return false;
+          if (e.max_players == null) return true;
+          return ((e.player_ids as string[] | null)?.length ?? 0) < e.max_players;
+        })
         .map((e) => {
           const mj = members.find((m) => m.id === e.mj_discord_id);
           const room = rooms.find((r) => r.id === e.room_id);
