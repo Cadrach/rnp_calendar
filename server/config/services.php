@@ -29,12 +29,13 @@ return [
     ],
 
     'discord' => [
-        'token'                   => env('DISCORD_BOT_TOKEN'),
-        'guild_id'                => env('DISCORD_GUILD_ID'),
-        'propositions_channel_id' => env('DISCORD_CHANNEL_ID_PROPOSITIONS'),
-        'channel_seances'         => env('DISCORD_CHANNEL_ID_SEANCES'),
-        'role_id_mj'              => env('DISCORD_ROLE_ID_MJ'),
-        'role_id_admin'           => env('DISCORD_ROLE_ID_ADMIN'),
+        'token'                        => env('DISCORD_BOT_TOKEN'),
+        'guild_id'                     => env('DISCORD_GUILD_ID'),
+        'propositions_channel_id'      => env('DISCORD_CHANNEL_ID_PROPOSITIONS'),
+        'channel_seances'              => env('DISCORD_CHANNEL_ID_SEANCES'),
+        'role_id_mj'                   => env('DISCORD_ROLE_ID_MJ'),
+        'role_id_admin'                => env('DISCORD_ROLE_ID_ADMIN'),
+        'tag_id_looking_for_players'   => env('DISCORD_TAG_ID_LOOKING_FOR_PLAYERS'),
     ],
 
     'slack' => [

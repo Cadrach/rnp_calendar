@@ -89,18 +89,29 @@ class DiscordClient
         return $this->get("/guilds/{$this->guildId}/members/search", ['query' => $query, 'limit' => $limit]);
     }
 
-    public function createForumThread(string $channelId, string $name, string $content): array
+    public function createForumThread(string $channelId, string $name, string $content, array $appliedTags = []): array
     {
-        return $this->post("/channels/{$channelId}/threads", [
+        $payload = [
             'name'                  => $name,
             'auto_archive_duration' => 10080, // 7 days
             'message'               => ['content' => $content, 'flags' => 4],
-        ]);
+        ];
+
+        if (! empty($appliedTags)) {
+            $payload['applied_tags'] = $appliedTags;
+        }
+
+        return $this->post("/channels/{$channelId}/threads", $payload);
     }
 
     public function editThread(string $threadId, string $name): array
     {
         return $this->patch("/channels/{$threadId}", ['name' => $name]);
+    }
+
+    public function setThreadTags(string $threadId, array $tagIds): array
+    {
+        return $this->patch("/channels/{$threadId}", ['applied_tags' => $tagIds]);
     }
 
     public function getChannel(string $channelId): array
@@ -126,6 +137,11 @@ class DiscordClient
     public function createChannel(array $data): array
     {
         return $this->post("/guilds/{$this->guildId}/channels", $data);
+    }
+
+    public function patchChannel(string $channelId, array $data): array
+    {
+        return $this->patch("/channels/{$channelId}", $data);
     }
 
     public function createDmChannel(string $userId): array

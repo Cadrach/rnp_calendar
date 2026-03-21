@@ -19,16 +19,36 @@ class EventDiscordSync
 
         $title   = $this->buildTitle($event);
         $content = $this->buildContent($event);
+        $tagIds  = $this->openSpotsTagIds($event);
 
         if ($event->discord_thread_id) {
             $this->discord->editThread($event->discord_thread_id, $title);
             // The starter message ID equals the thread ID for forum posts
             $this->discord->editMessage($event->discord_thread_id, $event->discord_thread_id, $content);
+            $this->discord->setThreadTags($event->discord_thread_id, $tagIds);
         } else {
             $channelId = config('services.discord.channel_seances');
-            $thread    = $this->discord->createForumThread($channelId, $title, $content);
+            $thread    = $this->discord->createForumThread($channelId, $title, $content, $tagIds);
             $event->updateQuietly(['discord_thread_id' => $thread['id']]);
         }
+    }
+
+    /**
+     * Returns the list of tag IDs to apply to the thread.
+     * Adds the "open spots" tag when max_players is unset or not yet reached.
+     */
+    private function openSpotsTagIds(Event $event): array
+    {
+        $tagId = config('services.discord.tag_id_looking_for_players');
+
+        if (! $tagId) {
+            return [];
+        }
+
+        $registered = count($event->player_ids ?? []);
+        $hasOpenSpots = $event->max_players === null || $registered < $event->max_players;
+
+        return $hasOpenSpots ? [$tagId] : [];
     }
 
     /**
