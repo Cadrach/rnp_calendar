@@ -28,4 +28,7 @@ export interface Event {
   /** @nullable */
   discord_thread_id: string | null;
   mj_discord_id: string;
+  is_closed: boolean;
+  /** @nullable */
+  description: string | null;
 }

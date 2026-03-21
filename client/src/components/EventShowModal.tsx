@@ -58,6 +58,7 @@ export function EventShowModal({ eventId }: Props) {
   const isFull = event.max_players != null && registeredCount >= event.max_players;
   const isRegistered = !!user.discord_id && playerIds.includes(user.discord_id);
 
+  const isClosed = (event as unknown as { is_closed: boolean }).is_closed ?? false;
   const canEdit = user.is_admin || user.discord_id === event.mj_discord_id;
 
   const roomLabel = room?.url ? (
@@ -122,35 +123,37 @@ export function EventShowModal({ eventId }: Props) {
 
       <Group mt="sm" align="center">
         {canEdit && <DeleteEventButton eventId={Number(eventId)} />}
-        <Group grow flex={1}>
-        {canEdit && (
-          <Button variant="default" onClick={() => setEditing(true)}>
-            Modifier
-          </Button>
+        {!isClosed && (
+          <Group grow flex={1}>
+            {canEdit && (
+              <Button variant="default" onClick={() => setEditing(true)}>
+                Modifier
+              </Button>
+            )}
+            {isRegistered ? (
+              <Button
+                variant="filled"
+                color="orange"
+                loading={unregisterMutation.isPending}
+                onClick={() =>
+                  unregisterMutation.mutate({ event: Number(eventId), data: { user_id: user.id } })
+                }
+              >
+                Se désinscrire
+              </Button>
+            ) : (
+              <Button
+                disabled={isFull}
+                loading={registerMutation.isPending}
+                onClick={() =>
+                  registerMutation.mutate({ event: Number(eventId), data: { user_id: user.id } })
+                }
+              >
+                {isFull ? "Complet" : "S'inscrire"}
+              </Button>
+            )}
+          </Group>
         )}
-        {isRegistered ? (
-          <Button
-            variant="filled"
-            color="orange"
-            loading={unregisterMutation.isPending}
-            onClick={() =>
-              unregisterMutation.mutate({ event: Number(eventId), data: { user_id: user.id } })
-            }
-          >
-            Se désinscrire
-          </Button>
-        ) : (
-          <Button
-            disabled={isFull}
-            loading={registerMutation.isPending}
-            onClick={() =>
-              registerMutation.mutate({ event: Number(eventId), data: { user_id: user.id } })
-            }
-          >
-            {isFull ? "Complet" : "S'inscrire"}
-          </Button>
-        )}
-        </Group>
       </Group>
     </Stack>
   );

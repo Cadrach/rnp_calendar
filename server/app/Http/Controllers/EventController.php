@@ -132,6 +132,10 @@ class EventController extends Controller
 
     public function update(Request $request, Event $event): JsonResponse
     {
+        if ($event->is_closed) {
+            return response()->json(['message' => 'Cette séance est terminée et ne peut plus être modifiée.'], 422);
+        }
+
         $this->authorizeEventMutation($request, $event);
 
         $data = $request->validate([
@@ -168,6 +172,10 @@ class EventController extends Controller
 
     public function register(Request $request, Event $event): JsonResponse
     {
+        if ($event->is_closed) {
+            return response()->json(['message' => 'Cette séance est terminée.'], 422);
+        }
+
         $request->validate([
             'user_id' => ['required', 'integer', 'exists:users,id'],
         ]);
@@ -201,6 +209,10 @@ class EventController extends Controller
 
     public function unregister(Request $request, Event $event): JsonResponse
     {
+        if ($event->is_closed) {
+            return response()->json(['message' => 'Cette séance est terminée.'], 422);
+        }
+
         $request->validate([
             'user_id' => ['required', 'integer', 'exists:users,id'],
         ]);

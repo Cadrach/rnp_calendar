@@ -21,12 +21,15 @@ class Event extends Model
         'max_players',
         'player_ids',
         'discord_thread_id',
+        'is_closed',
+        'description',
     ];
 
     protected $casts = [
         'datetime_start' => 'datetime',
         'datetime_end'   => 'datetime',
         'player_ids'     => 'array',
+        'is_closed'      => 'boolean',
     ];
 
     public function room(): BelongsTo
