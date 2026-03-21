@@ -16,4 +16,5 @@ export type Dictionary200 = {
   rooms: Room[];
   scenarios: Scenario[];
   members: Dictionary200MembersItem[];
+  discord_guild_id: string;
 };
