@@ -52,7 +52,7 @@ class EventDiscordSync
     private function buildTitle(Event $event): string
     {
         $date  = Carbon::parse($event->datetime_start)->timezone('Europe/Paris')->format('d/m/y');
-        $title = "[{$event->room->code}][{$date}] {$event->game->name}";
+        $title = "{$event->room->code} {$date} · {$event->game->name}";
 
         if ($event->scenario) {
             $title .= " - {$event->scenario->name}";
