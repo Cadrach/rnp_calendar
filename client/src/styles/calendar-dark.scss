@@ -1,11 +1,11 @@
 // Diagonal stripe pattern used for unavailable slots
 @mixin unavailable-stripe($opacity: 0.22) {
     background-image: repeating-linear-gradient(
-        -45deg,
-        transparent,
-        transparent 6px,
-        rgba(0, 0, 0, $opacity) 6px,
-        rgba(0, 0, 0, $opacity) 10px
+            -45deg,
+            transparent,
+            transparent 6px,
+            rgba(0, 0, 0, $opacity) 6px,
+            rgba(0, 0, 0, $opacity) 10px
     );
 }
 
@@ -56,6 +56,10 @@
     & + .rbc-header {
         border-left: 1px solid var(--mantine-color-dark-4);
     }
+}
+
+.rbc-time-view .rbc-header + .rbc-header {
+    line-height: 8px;
 }
 
 .rbc-month-view,

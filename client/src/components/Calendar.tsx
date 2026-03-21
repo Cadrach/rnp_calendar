@@ -78,6 +78,7 @@ export function Calendar() {
   };
 
   const handleSelectEvent = (event: Event & { start: Date; end: Date; title: string }) => {
+    if (!event.id) return;
     navigate(`/show/${event.id}`);
   };
 
