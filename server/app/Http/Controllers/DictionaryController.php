@@ -24,7 +24,6 @@ class DictionaryController extends Controller
             'user' => $request->user(),
             'games' => Game::all(),
             'rooms' => Room::all(),
-            'scenarios' => Scenario::all(),
             'members' => $this->getMembers(),
             'discord_guild_id' => config('services.discord.guild_id'),
         ]);

@@ -5,6 +5,7 @@ use App\Http\Controllers\DictionaryController;
 use App\Http\Controllers\DiscordController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\GameController;
+use App\Http\Controllers\ScenarioController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\RoomCrudController;
 use App\Http\Controllers\RoomRuleController;
@@ -40,6 +41,7 @@ Route::middleware('auth')->group(function () {
 
     Route::apiResource('room-rules', RoomRuleController::class);
     Route::apiResource('games', GameController::class);
+    Route::apiResource('scenarios', ScenarioController::class);
 
     Route::apiResource('events', EventController::class);
     Route::post('events/{event}/register', [EventController::class, 'register']);
