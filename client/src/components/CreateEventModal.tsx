@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Button, Loader, NumberInput, Select, Stack, Text } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useQueryClient } from "@tanstack/react-query";
@@ -13,6 +14,7 @@ import {
 } from "../api/generated/event/event";
 import { useAvailableRooms } from "../api/rooms";
 import { useDictionary } from "../contexts/DictionaryContext";
+import { EventDateRangePicker } from "./EventDateRangePicker";
 import { MembersSelect } from "./MembersSelect";
 import { ScenarioSelect } from "./ScenarioSelect";
 
@@ -26,10 +28,20 @@ interface Props {
 
 export function CreateEventModal({ start, end, onClose, event, initialRoomId }: Props) {
   const { user, games, members } = useDictionary();
-  const { data: availableRooms, isLoading: isLoadingRooms } = useAvailableRooms(start, end, event?.id);
   const queryClient = useQueryClient();
 
   const mjUserId = event ? event.mj_user_id : user.id;
+
+  // In edit mode, start/end are editable — track them in local state so the
+  // available-rooms query reacts immediately when either date changes.
+  const [editStart, setEditStart] = useState(start);
+  const [editEnd, setEditEnd] = useState(end);
+
+  const { data: availableRooms, isLoading: isLoadingRooms } = useAvailableRooms(
+    event ? editStart : start,
+    event ? editEnd : end,
+    event?.id,
+  );
 
   const form = useForm({
     initialValues: {
@@ -47,6 +59,17 @@ export function CreateEventModal({ start, end, onClose, event, initialRoomId }: 
         v && values.min_players && v < values.min_players ? "Doit être ≥ au minimum" : null,
     },
   });
+
+  // When available rooms refresh after a date change, clear the selected room
+  // if it is no longer in the list.
+  useEffect(() => {
+    if (!availableRooms || !form.values.room_id) return;
+    const stillAvailable = availableRooms.some((r) => String(r.id) === form.values.room_id);
+    if (!stillAvailable) {
+      form.setFieldValue("room_id", null);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [availableRooms]);
 
   const onSuccess = () => {
     queryClient.invalidateQueries({ queryKey: getEventsIndexQueryKey() });
@@ -67,10 +90,15 @@ export function CreateEventModal({ start, end, onClose, event, initialRoomId }: 
     form.setFieldValue("scenario_key", null);
   };
 
+  const handleDateChange = (newStart: Date, newEnd: Date) => {
+    setEditStart(newStart);
+    setEditEnd(newEnd);
+  };
+
   const handleSubmit = form.onSubmit((values) => {
     const payload = {
-      datetime_start: start.toISOString(),
-      datetime_end: end.toISOString(),
+      datetime_start: (event ? editStart : start).toISOString(),
+      datetime_end: (event ? editEnd : end).toISOString(),
       mj_user_id: mjUserId,
       room_id: Number(values.room_id),
       game_id: Number(values.game_id),
@@ -90,9 +118,17 @@ export function CreateEventModal({ start, end, onClose, event, initialRoomId }: 
   return (
     <form onSubmit={handleSubmit}>
       <Stack>
-        <Text size="sm" c="dimmed">
-          {format(start, "PPPp", { locale: fr })} → {format(end, "PPPp", { locale: fr })}
-        </Text>
+        {event ? (
+          <EventDateRangePicker
+            start={editStart}
+            end={editEnd}
+            onChange={handleDateChange}
+          />
+        ) : (
+          <Text size="sm" c="dimmed">
+            {format(start, "PPPp", { locale: fr })} → {format(end, "PPPp", { locale: fr })}
+          </Text>
+        )}
 
         <Select
           label="Salle"
