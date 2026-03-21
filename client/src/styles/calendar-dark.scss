@@ -1,5 +1,27 @@
+// ─── Neon theme tokens ────────────────────────────────────────────────────────
+$bg: #071520;
+$bg-cell: #0a1c2e;
+$bg-alt: #060f18;
+$bg-header: #071d30;
+$neon: #00d4e8;
+$neon-dim: rgba(0, 212, 232, 0.15);
+$neon-mid: rgba(0, 212, 232, 0.35);
+$neon-glow: rgba(0, 212, 232, 0.55);
+$text: #c8f4f9;
+$text-dim: rgba(200, 244, 249, 0.4);
+$text-muted: rgba(200, 244, 249, 0.25);
+
+@mixin neon-border($opacity: 0.4) {
+    border-color: rgba(0, 212, 232, $opacity) !important;
+}
+
+@mixin neon-glow($spread: 6px, $opacity: 0.45) {
+    box-shadow: 0 0 $spread rgba(0, 212, 232, $opacity),
+    0 0 ($spread * 2.5) rgba(0, 212, 232, $opacity * 0.4);
+}
+
 // Diagonal stripe pattern used for unavailable slots
-@mixin unavailable-stripe($opacity: 0.22) {
+@mixin unavailable-stripe($opacity: 0.18) {
     background-image: repeating-linear-gradient(
             -45deg,
             transparent,
@@ -9,25 +31,40 @@
     );
 }
 
-// Dark mode styles for react-big-calendar
+// ─── Base ─────────────────────────────────────────────────────────────────────
 
 .rbc-calendar {
-    background-color: var(--mantine-color-dark-7);
-    color: var(--mantine-color-dark-0);
+    background-color: $bg;
+    color: $text;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    letter-spacing: 0.01em;
 }
+
+// ─── Toolbar ──────────────────────────────────────────────────────────────────
 
 .rbc-toolbar {
     margin-bottom: 1rem;
 
+    .rbc-toolbar-label {
+        font-size: 1.05rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: $neon;
+        text-shadow: 0 0 8px $neon-glow;
+    }
+
     button {
-        color: #c1c2c5 !important;
-        background-color: #25262b !important;
-        border: 1px solid #373a40 !important;
-        transition: background-color 150ms ease, border-color 150ms ease;
+        color: $text !important;
+        background-color: $bg-header !important;
+        border: 1px solid rgba(0, 212, 232, 0.25) !important;
+        transition: all 150ms ease;
 
         &:hover {
-            background-color: #373a40 !important;
-            border-color: #4a4d54 !important;
+            background-color: $neon-dim !important;
+            border-color: $neon-mid !important;
+            color: $neon !important;
+            @include neon-glow(4px, 0.3);
         }
 
         &:active {
@@ -35,26 +72,39 @@
         }
 
         &.rbc-active {
-            background-color: #228be6 !important;
-            border-color: #228be6 !important;
-            color: #fff !important;
+            background-color: $neon-dim !important;
+            border-color: $neon !important;
+            color: $neon !important;
+            position: relative;
+            z-index: 1;
+            @include neon-glow;
 
             &:hover {
-                background-color: #1c7ed6 !important;
-                border-color: #1c7ed6 !important;
+                background-color: rgba(0, 212, 232, 0.22) !important;
             }
         }
     }
 }
 
+// ─── Headers ──────────────────────────────────────────────────────────────────
+
 .rbc-header {
-    background-color: var(--mantine-color-dark-6);
-    border-bottom: 1px solid var(--mantine-color-dark-4);
+    background-color: $bg-header;
+    border-bottom: 1px solid rgba(0, 212, 232, 0.3);
     padding: 8px;
-    font-weight: 500;
+    font-weight: 600;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: $neon;
+    text-shadow: 0 0 6px $neon-glow;
 
     & + .rbc-header {
-        border-left: 1px solid var(--mantine-color-dark-4);
+        border-left: 1px solid rgba(0, 212, 232, 0.15);
+    }
+
+    a, a:visited {
+        color: inherit;
     }
 }
 
@@ -62,68 +112,89 @@
     line-height: 8px;
 }
 
+// ─── Month / time / agenda containers ─────────────────────────────────────────
+
 .rbc-month-view,
 .rbc-time-view,
 .rbc-agenda-view {
-    border: 1px solid var(--mantine-color-dark-4);
-    background-color: var(--mantine-color-dark-7);
+    border: 2px solid rgba(0, 212, 232, 0.6);
+    border-radius: 10px;
+    overflow: hidden;
+    background-color: $bg;
+    box-shadow: 0 0 12px rgba(0, 212, 232, 0.4),
+    0 0 32px rgba(0, 212, 232, 0.2),
+    0 0 64px rgba(0, 212, 232, 0.08),
+    inset 0 0 40px rgba(0, 0, 0, 0.3);
 }
 
 .rbc-month-row {
-    border-bottom: 1px solid var(--mantine-color-dark-4);
+    border-bottom: 1px solid rgba(0, 212, 232, 0.12) !important;
+
+    & + .rbc-month-row {
+        border-top: 1px solid rgba(0, 212, 232, 0.32) !important;
+    }
 }
 
+
+// ─── Day cells ────────────────────────────────────────────────────────────────
+
 .rbc-day-bg {
-    background-color: var(--mantine-color-dark-7);
+    background-color: $bg-cell;
+    transition: background-color 120ms ease;
 
     & + .rbc-day-bg {
-        border-left: 1px solid var(--mantine-color-dark-4);
+        border-left: 1px solid rgba(0, 212, 232, 0.1);
     }
 
     &.rbc-day-unavailable {
-        @include unavailable-stripe(0.28);
+        @include unavailable-stripe(0.3);
     }
 }
 
 .rbc-off-range-bg {
-    background-color: var(--mantine-color-dark-8);
+    background-color: $bg-alt;
 }
 
 .rbc-today {
-    background-color: var(--mantine-color-dark-6);
+    background-color: rgba(0, 212, 232, 0.06) !important;
+    box-shadow: inset 0 0 12px rgba(0, 212, 232, 0.07);
 }
 
 .rbc-date-cell {
     padding: 4px 8px;
-    color: var(--mantine-color-dark-1);
+    color: $text-dim;
+    font-size: 0.8rem;
 
     &.rbc-off-range {
-        color: var(--mantine-color-dark-3);
+        color: $text-muted;
     }
 
     &.rbc-now {
-        font-weight: bold;
-        color: var(--mantine-color-blue-4);
+        font-weight: 700;
+        color: $neon;
+        text-shadow: 0 0 6px $neon-glow;
     }
 }
 
+// ─── Events ───────────────────────────────────────────────────────────────────
+
 .rbc-event {
-    background-color: var(--mantine-color-blue-filled);
-    border: 1px solid rgba(0, 0, 0, 0.25) !important;
-    border-radius: 4px;
-    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 3px;
     padding: 2px 5px;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
 
     &:focus {
-        outline: 2px solid var(--mantine-color-blue-4);
-        outline-offset: 2px;
+        outline: 1px solid $neon;
+        outline-offset: 1px;
+        @include neon-glow(4px, 0.4);
     }
 
     &.rbc-selected {
-        background-color: var(--mantine-color-blue-filled-hover);
+        filter: brightness(1.15);
+        @include neon-glow(4px, 0.3);
     }
 
-    // Ensure event text color is inherited in all views
     &,
     .rbc-event-content,
     .rbc-event-label {
@@ -131,51 +202,57 @@
     }
 
     .rbc-event-label {
-        opacity: 0.9;
+        opacity: 0.85;
     }
 }
 
 .rbc-show-more {
-    color: var(--mantine-color-blue-4);
+    color: $neon;
     background-color: transparent;
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
 
     &:hover {
-        color: var(--mantine-color-blue-3);
+        color: lighten(#00d4e8, 10%);
+        text-shadow: 0 0 6px $neon-glow;
     }
 }
 
-// Time view
+// ─── Time view ────────────────────────────────────────────────────────────────
+
 .rbc-time-header {
-    border-bottom: 1px solid var(--mantine-color-dark-4);
+    border-bottom: 1px solid rgba(0, 212, 232, 0.25);
 
     &-content {
-        border-left: 1px solid var(--mantine-color-dark-4);
+        border-left: 1px solid rgba(0, 212, 232, 0.15);
     }
 }
 
 .rbc-time-content {
-    border-top: 1px solid var(--mantine-color-dark-4);
+    border-top: 1px solid rgba(0, 212, 232, 0.2);
 
     > * + * > * {
-        border-left: 1px solid var(--mantine-color-dark-4);
+        border-left: 1px solid rgba(0, 212, 232, 0.1);
     }
 }
 
 .rbc-timeslot-group {
-    border-bottom: 1px solid var(--mantine-color-dark-5);
+    border-bottom: 1px solid rgba(0, 212, 232, 0.07);
 }
 
 .rbc-time-slot {
-    color: var(--mantine-color-dark-2);
+    color: $text-muted;
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
 }
 
 .rbc-time-gutter {
-    background-color: var(--mantine-color-dark-6);
+    background-color: $bg-header;
 }
 
 .rbc-day-slot {
     .rbc-time-slot {
-        border-top: 1px solid var(--mantine-color-dark-5);
+        border-top: 1px solid rgba(0, 212, 232, 0.05);
     }
 
     // Unavailable time slots — striped overlay
@@ -184,7 +261,6 @@
         background-color: transparent !important;
         border: none !important;
         border-radius: 0 !important;
-        // Override inline left/right set by rbc's overlap stacking logic
         left: 0 !important;
         right: 0 !important;
         width: calc(100% + 10px) !important;
@@ -194,7 +270,6 @@
             display: none;
         }
 
-        // Suppress selection/focus feedback on unavailability overlays
         &.rbc-selected,
         &:focus {
             @include unavailable-stripe;
@@ -205,33 +280,41 @@
 }
 
 .rbc-current-time-indicator {
-    background-color: var(--mantine-color-red-6);
+    background-color: $neon;
+    box-shadow: 0 0 6px $neon-glow, 0 0 12px rgba(0, 212, 232, 0.3);
+    height: 2px;
 }
 
-// Agenda view
+// ─── Agenda view ──────────────────────────────────────────────────────────────
+
 .rbc-agenda-view {
     table.rbc-agenda-table {
-        border: 1px solid var(--mantine-color-dark-4);
+        border: 1px solid rgba(0, 212, 232, 0.2);
 
         thead > tr > th {
-            background-color: var(--mantine-color-dark-6);
-            border-bottom: 1px solid var(--mantine-color-dark-4);
+            background-color: $bg-header;
+            border-bottom: 1px solid rgba(0, 212, 232, 0.25);
             padding: 8px;
+            color: $neon;
+            text-shadow: 0 0 5px $neon-glow;
+            font-size: 0.75rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
         }
 
         tbody > tr > td {
-            border-bottom: 1px solid var(--mantine-color-dark-5);
+            border-bottom: 1px solid rgba(0, 212, 232, 0.08);
             padding: 8px;
 
             & + td {
-                border-left: 1px solid var(--mantine-color-dark-5);
+                border-left: 1px solid rgba(0, 212, 232, 0.08);
             }
         }
     }
 }
 
 .rbc-agenda-empty {
-    color: var(--mantine-color-dark-2);
+    color: $text-muted;
     text-align: center;
     padding: 2rem;
 }
@@ -241,27 +324,36 @@
 }
 
 .rbc-agenda-date-cell {
-    background: var(--mantine-color-dark-5) !important;
-    color: rgb(255, 255, 255);
+    background-color: $bg-header !important;
+    color: $neon !important;
+    text-shadow: 0 0 5px $neon-glow;
     text-transform: capitalize;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
 }
 
-// Selection
+// ─── Selection ────────────────────────────────────────────────────────────────
+
 .rbc-slot-selection {
-    background-color: rgba(var(--mantine-color-blue-filled-rgb), 0.3);
-    border: 1px solid var(--mantine-color-blue-filled);
+    background-color: rgba(0, 212, 232, 0.12);
+    border: 1px solid $neon;
+    @include neon-glow(4px, 0.3);
 }
 
-// Popover overlay
+// ─── Popover overlay ──────────────────────────────────────────────────────────
+
 .rbc-overlay {
-    background-color: var(--mantine-color-dark-6);
-    border: 1px solid var(--mantine-color-dark-4);
-    border-radius: 4px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    background-color: $bg-header;
+    border: 1px solid rgba(0, 212, 232, 0.35);
+    border-radius: 6px;
+    box-shadow: 0 0 16px rgba(0, 212, 232, 0.2), 0 8px 24px rgba(0, 0, 0, 0.6);
 
     &-header {
-        background-color: var(--mantine-color-dark-5);
-        border-bottom: 1px solid var(--mantine-color-dark-4);
+        background-color: $bg-alt;
+        border-bottom: 1px solid rgba(0, 212, 232, 0.25);
         padding: 8px;
+        color: $neon;
+        font-size: 0.8rem;
+        letter-spacing: 0.06em;
     }
 }

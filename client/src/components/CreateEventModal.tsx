@@ -45,7 +45,11 @@ export function CreateEventModal({ start, end, onClose, event, initialRoomId }: 
 
   const form = useForm({
     initialValues: {
-      room_id: event?.room_id ? String(event.room_id) : initialRoomId ? String(initialRoomId) : (null as string | null),
+      room_id: event?.room_id
+        ? String(event.room_id)
+        : initialRoomId
+          ? String(initialRoomId)
+          : (null as string | null),
       game_id: event?.game_id ? String(event.game_id) : (null as string | null),
       scenario_key: event?.scenario_id ? `id:${event.scenario_id}` : (null as string | null),
       min_players: event?.min_players ?? (null as number | null),
@@ -68,7 +72,7 @@ export function CreateEventModal({ start, end, onClose, event, initialRoomId }: 
     if (!stillAvailable) {
       form.setFieldValue("room_id", null);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [availableRooms]);
 
   const onSuccess = () => {
@@ -117,13 +121,9 @@ export function CreateEventModal({ start, end, onClose, event, initialRoomId }: 
 
   return (
     <form onSubmit={handleSubmit}>
-      <Stack>
+      <Stack mt="sm">
         {event ? (
-          <EventDateRangePicker
-            start={editStart}
-            end={editEnd}
-            onChange={handleDateChange}
-          />
+          <EventDateRangePicker start={editStart} end={editEnd} onChange={handleDateChange} />
         ) : (
           <Text size="sm" c="dimmed">
             {format(start, "PPPp", { locale: fr })} → {format(end, "PPPp", { locale: fr })}

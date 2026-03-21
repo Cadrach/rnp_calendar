@@ -19,7 +19,19 @@ export default function App() {
               <AppShell header={{ height: 56 }}>
                 <AppShell.Header>
                   <Group h="100%" px="md" justify="space-between">
-                    <Title order={4}>RNP Calendar</Title>
+                    <Title
+                      order={4}
+                      style={{
+                        fontFamily: "'Orbitron', sans-serif",
+                        fontWeight: 900,
+                        letterSpacing: "0.12em",
+                        textTransform: "uppercase",
+                        color: "#00d4e8",
+                        textShadow: "0 0 6px #00d4e8, 0 0 16px rgba(0,212,232,0.9), 0 0 40px rgba(0,212,232,0.6), 0 0 80px rgba(0,212,232,0.3)",
+                      }}
+                    >
+                      RNP Calendar
+                    </Title>
                     <UserBadge />
                   </Group>
                 </AppShell.Header>
