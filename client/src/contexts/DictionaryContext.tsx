@@ -15,6 +15,7 @@ interface DictionaryContext {
   rooms: Room[];
   scenarios: Scenario[];
   members: DiscordMember[];
+  discordGuildId: string | null;
 }
 
 const DictionaryContext = createContext<DictionaryContext | null>(null);
@@ -42,6 +43,7 @@ export function DictionaryProvider({ children }: { children: React.ReactNode }) 
         rooms: data.rooms,
         scenarios: data.scenarios,
         members: (data.members ?? []) as DiscordMember[],
+        discordGuildId: (data as unknown as { discord_guild_id?: string }).discord_guild_id ?? null,
       }}
     >
       {children}

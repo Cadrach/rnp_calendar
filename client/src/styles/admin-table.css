@@ -1,0 +1,15 @@
+.mantine-Table-th {
+    .mrt-table-head-cell-content{
+        justify-content: space-between;
+    }
+    .mrt-table-head-cell-labels{
+        width: 100%;
+        justify-content: space-between;
+    }
+    .mrt-table-head-sort-button{
+        background: transparent;
+        color:rgb(248, 249, 250);
+        height: 20px;
+        min-height: auto;
+    }
+}
