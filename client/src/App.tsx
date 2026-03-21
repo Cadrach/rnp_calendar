@@ -12,6 +12,7 @@ import { useDictionary } from "./contexts/DictionaryContext";
 import { usePostAuthLogout } from "./api/generated/default/default";
 import { RoomRulesTable } from "./components/admin/RoomRulesTable";
 import { GamesTable } from "./components/admin/GamesTable";
+import { RoomsTable } from "./components/admin/RoomsTable";
 
 // ── Admin pages registry ───────────────────────────────────────────────────────
 // Add new CRUD pages here; they'll appear automatically in the admin nav section.
@@ -19,6 +20,7 @@ import { GamesTable } from "./components/admin/GamesTable";
 const ADMIN_PAGES = [
   { label: "Règles des salles", path: "/admin/room-rules", icon: <IconSettings size={16} /> },
   { label: "Jeux", path: "/admin/games", icon: <IconSettings size={16} /> },
+  { label: "Salles", path: "/admin/rooms", icon: <IconSettings size={16} /> },
 ];
 
 // ── Shell ──────────────────────────────────────────────────────────────────────
@@ -137,6 +139,7 @@ function Shell() {
           <Route path="/show/:id" element={<Calendar />} />
           <Route path="/admin/room-rules" element={<RoomRulesTable />} />
           <Route path="/admin/games" element={<GamesTable />} />
+          <Route path="/admin/rooms" element={<RoomsTable />} />
         </Routes>
       </AppShell.Main>
     </AppShell>

@@ -17,6 +17,8 @@ class Room extends Model
 {
     public $timestamps = false;
 
+    protected $fillable = ['code', 'name', 'url', 'color', 'unlimited'];
+
     protected $casts = [
         'unlimited' => 'boolean',
     ];
@@ -24,5 +26,15 @@ class Room extends Model
     public function rules(): HasMany
     {
         return $this->hasMany(RoomRule::class);
+    }
+
+    public function events(): HasMany
+    {
+        return $this->hasMany(Event::class);
+    }
+
+    public function isInUse(): bool
+    {
+        return $this->events()->exists();
     }
 }

@@ -5,6 +5,7 @@
  * OpenAPI spec version: 0.0.1
  */
 
+export * from './appModelsRoom';
 export * from './authDiscordRequest200';
 export * from './authDiscordRequestBody';
 export * from './authDiscordVerify200';
@@ -44,6 +45,9 @@ export * from './roomRulesStoreBodyScope';
 export * from './roomRulesUpdateBody';
 export * from './roomRulesUpdateBodyKind';
 export * from './roomRulesUpdateBodyScope';
+export * from './roomsDestroy422';
+export * from './roomsStoreBody';
+export * from './roomsUpdateBody';
 export * from './scenario';
 export * from './user';
 export * from './validationExceptionResponse';

@@ -6,6 +6,7 @@ use App\Http\Controllers\DiscordController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\RoomController;
+use App\Http\Controllers\RoomCrudController;
 use App\Http\Controllers\RoomRuleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -35,6 +36,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('rooms/available', [RoomController::class, 'availableRooms']);
     Route::get('rooms/{room}/availability', [RoomController::class, 'availability']);
+    Route::apiResource('rooms', RoomCrudController::class);
 
     Route::apiResource('room-rules', RoomRuleController::class);
     Route::apiResource('games', GameController::class);
