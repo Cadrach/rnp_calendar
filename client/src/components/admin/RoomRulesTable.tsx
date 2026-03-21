@@ -1,10 +1,8 @@
 import { useMemo, useState } from "react";
-import "../../styles/admin-table.css";
-import { MantineReactTable, useMantineReactTable, type MRT_ColumnDef } from "mantine-react-table";
-import { ActionIcon, Badge, Button, Group, Popover, Stack, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconEdit, IconPlus, IconTrash } from "@tabler/icons-react";
+import { Badge } from "@mantine/core";
 import { useQueryClient } from "@tanstack/react-query";
+import type { MRT_ColumnDef } from "mantine-react-table";
 import {
   getRoomRulesIndexQueryKey,
   useRoomRulesDestroy,
@@ -12,9 +10,8 @@ import {
 } from "../../api/generated/room-rule/room-rule";
 import type { RoomRule } from "../../api/generated/model";
 import { useDictionary } from "../../contexts/DictionaryContext";
+import { AdminTable, type DeleteState } from "./AdminTable";
 import { RoomRuleFormModal } from "./RoomRuleFormModal";
-
-// ── Constants ─────────────────────────────────────────────────────────────────
 
 const WEEKDAY_SHORT: Record<number, string> = {
   1: "Lun", 2: "Mar", 3: "Mer", 4: "Jeu", 5: "Ven", 6: "Sam", 7: "Dim",
@@ -26,68 +23,26 @@ const SCOPE_LABEL: Record<string, string> = {
   once: "Ponctuel",
 };
 
-// ── Delete button ──────────────────────────────────────────────────────────────
-
-function DeleteButton({ rule }: { rule: RoomRule }) {
-  const [opened, setOpened] = useState(false);
+export function RoomRulesTable() {
+  const { rooms } = useDictionary();
   const queryClient = useQueryClient();
+  const { data: rules = [], isLoading } = useRoomRulesIndex();
+
+  const [modalOpened, { open: openModal, close: closeModal }] = useDisclosure(false);
+  const [editingRule, setEditingRule] = useState<RoomRule | undefined>(undefined);
+  const [deleteState, setDeleteState] = useState<DeleteState | null>(null);
 
   const destroy = useRoomRulesDestroy({
     mutation: {
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: getRoomRulesIndexQueryKey() });
-        setOpened(false);
+        setDeleteState(null);
+      },
+      onError: () => {
+        setDeleteState((prev) => (prev ? { ...prev, error: "Une erreur est survenue." } : null));
       },
     },
   });
-
-  return (
-    <Popover opened={opened} onClose={() => setOpened(false)} position="left" withArrow>
-      <Popover.Target>
-        <ActionIcon variant="subtle" color="red" size="md" onClick={() => setOpened(true)}>
-          <IconTrash size={16} />
-        </ActionIcon>
-      </Popover.Target>
-      <Popover.Dropdown>
-        <Stack gap="xs">
-          <Text size="sm">Supprimer cette règle ?</Text>
-          <Group gap="xs">
-            <Button size="xs" variant="default" onClick={() => setOpened(false)}>
-              Annuler
-            </Button>
-            <Button
-              size="xs"
-              color="red"
-              loading={destroy.isPending}
-              onClick={() => destroy.mutate({ roomRule: rule.id })}
-            >
-              Supprimer
-            </Button>
-          </Group>
-        </Stack>
-      </Popover.Dropdown>
-    </Popover>
-  );
-}
-
-// ── Main table ─────────────────────────────────────────────────────────────────
-
-export function RoomRulesTable() {
-  const { rooms } = useDictionary();
-  const { data: rules = [], isLoading } = useRoomRulesIndex();
-
-  const [modalOpened, { open: openModal, close: closeModal }] = useDisclosure(false);
-  const [editingRule, setEditingRule] = useState<RoomRule | undefined>(undefined);
-
-  const openCreate = () => {
-    setEditingRule(undefined);
-    openModal();
-  };
-
-  const openEdit = (rule: RoomRule) => {
-    setEditingRule(rule);
-    openModal();
-  };
 
   const roomName = (id: number) => rooms.find((r) => r.id === id)?.name ?? String(id);
 
@@ -163,61 +118,35 @@ export function RoomRulesTable() {
     [rooms],
   );
 
-  const table = useMantineReactTable({
-    columns,
-    data: rules,
-    state: { isLoading },
-    enableHiding: false,
-    enableColumnFilters: true,
-    enableGlobalFilter: true,
-    enableSorting: true,
-    enablePagination: false,
-    enableBottomToolbar: false,
-    enableTopToolbar: false,
-    enableRowActions: true,
-    positionActionsColumn: "last",
-    displayColumnDefOptions: {
-      "mrt-row-actions": {
-        header: "",
-        Header: () => (
-          <Button
-            size="xs"
-            variant="light"
-            color="neon"
-            leftSection={<IconPlus size={14} />}
-            onClick={openCreate}
-          >
-            Créer
-          </Button>
-        ),
-        size: 90,
-      },
-    },
-    renderRowActions: ({ row }) => (
-      <Group gap={4} wrap="nowrap">
-        <ActionIcon variant="subtle" color="neon" size="md" onClick={() => openEdit(row.original)}>
-          <IconEdit size={16} />
-        </ActionIcon>
-        <DeleteButton rule={row.original} />
-      </Group>
-    ),
-    mantineTableProps: {
-      striped: true,
-      highlightOnHover: true,
-      withTableBorder: true,
-      withColumnBorders: true,
-    },
-    initialState: {
-      sorting: [{ id: "priority", desc: true }],
-      showGlobalFilter: true,
-    },
-  });
+  const openCreate = () => {
+    setEditingRule(undefined);
+    openModal();
+  };
+
+  const openEdit = (rule: RoomRule) => {
+    setEditingRule(rule);
+    openModal();
+  };
+
+  const handleDelete = (rule: RoomRule) => {
+    setDeleteState({ id: rule.id, error: null });
+    destroy.mutate({ roomRule: rule.id });
+  };
 
   return (
     <>
-      <div style={{ padding: "1rem", marginTop: 64 }}>
-        <MantineReactTable table={table} />
-      </div>
+      <AdminTable
+        columns={columns}
+        data={rules}
+        isLoading={isLoading}
+        onCreate={openCreate}
+        onEdit={openEdit}
+        onDelete={handleDelete}
+        deleteState={deleteState}
+        deleteConfirmMessage="Supprimer cette règle ?"
+        initialSortId="priority"
+        initialSortDesc
+      />
 
       <RoomRuleFormModal
         opened={modalOpened}
