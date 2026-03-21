@@ -69,6 +69,130 @@ class EventDiscordSync
         );
     }
 
+    // ── Trail messages ──────────────────────────────────────────────────────────
+
+    /**
+     * Captures a displayable snapshot of the event's current state for diffing.
+     * Call this *before* an update, then pass the result to trailUpdated().
+     */
+    public function snapshot(Event $event): array
+    {
+        $tz = config('app.club_timezone');
+
+        return [
+            'datetime_start' => Carbon::parse($event->datetime_start)->timezone($tz)->format('d/m/y H\hi'),
+            'datetime_end'   => Carbon::parse($event->datetime_end)->timezone($tz)->format('d/m/y H\hi'),
+            'mj_discord_id'  => $event->mj_discord_id,
+            'room'           => $event->room?->name ?? '—',
+            'game'           => $event->game?->name ?? '—',
+            'scenario'       => $event->scenario?->name,
+            'min_players'    => $event->min_players !== null ? (string) $event->min_players : null,
+            'max_players'    => $event->max_players !== null ? (string) $event->max_players : null,
+        ];
+    }
+
+    public function trailRegistered(Event $event, string $discordId): void
+    {
+        if (! $event->discord_thread_id) {
+            return;
+        }
+
+        $this->discord->sendMessage(
+            $event->discord_thread_id,
+            "✅ <@{$discordId}> s'est inscrit(e).",
+        );
+    }
+
+    public function trailUnregistered(Event $event, string $discordId): void
+    {
+        if (! $event->discord_thread_id) {
+            return;
+        }
+
+        $this->discord->sendMessage(
+            $event->discord_thread_id,
+            "❌ <@{$discordId}> s'est désinscrit(e).",
+        );
+    }
+
+    /**
+     * @param array $before Snapshot captured before the update via snapshot()
+     */
+    public function trailUpdated(array $before, Event $event, string $editorDiscordId): void
+    {
+        if (! $event->discord_thread_id) {
+            return;
+        }
+
+        $after   = $this->snapshot($event);
+        $changes = $this->buildChangeDiff($before, $after);
+
+        if (empty($changes)) {
+            return;
+        }
+
+        $lines = ["✏️ <@{$editorDiscordId}> a modifié la séance :"];
+        foreach ($changes as $line) {
+            $lines[] = "- {$line}";
+        }
+
+        $this->discord->sendMessage($event->discord_thread_id, implode("\n", $lines));
+    }
+
+    public function trailClosed(Event $event): void
+    {
+        if (! $event->discord_thread_id) {
+            return;
+        }
+
+        $this->discord->sendMessage(
+            $event->discord_thread_id,
+            '🔒 Cette séance est maintenant terminée.',
+        );
+    }
+
+    public function trailDeleted(Event $event, string $editorDiscordId): void
+    {
+        if (! $event->discord_thread_id) {
+            return;
+        }
+
+        $this->discord->sendMessage(
+            $event->discord_thread_id,
+            "🗑️ Séance annulée par <@{$editorDiscordId}>.",
+        );
+    }
+
+    private function buildChangeDiff(array $before, array $after): array
+    {
+        $changes = [];
+
+        $fieldLabels = [
+            'datetime_start' => 'Début',
+            'datetime_end'   => 'Fin',
+            'room'           => 'Salle',
+            'game'           => 'Jeu',
+            'scenario'       => 'Scénario',
+            'min_players'    => 'Min joueurs',
+            'max_players'    => 'Max joueurs',
+        ];
+
+        foreach ($fieldLabels as $key => $label) {
+            $old = $before[$key] ?? null;
+            $new = $after[$key] ?? null;
+
+            if ($old !== $new) {
+                $changes[] = "**{$label}** : " . ($old ?? '—') . ' → ' . ($new ?? '—');
+            }
+        }
+
+        if ($before['mj_discord_id'] !== $after['mj_discord_id']) {
+            $changes[] = '**MJ** : <@' . $before['mj_discord_id'] . '> → <@' . $after['mj_discord_id'] . '>';
+        }
+
+        return $changes;
+    }
+
     private function buildTitle(Event $event): string
     {
         $date  = Carbon::parse($event->datetime_start)->timezone('Europe/Paris')->format('d/m/y');

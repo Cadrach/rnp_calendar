@@ -12,6 +12,7 @@ use App\Services\EventDiscordSync;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class EventController extends Controller
 {
@@ -51,7 +52,7 @@ class EventController extends Controller
             'game_id'         => ['required', 'exists:games,id'],
             'scenario_key'    => ['nullable', 'string'],
             'min_players'     => ['nullable', 'integer', 'min:1'],
-            'max_players'     => ['nullable', 'integer', 'min:1', 'gte:min_players'],
+            'max_players'     => ['nullable', 'integer', 'min:1', Rule::when($request->filled('min_players'), 'gte:min_players')],
             'player_ids'      => ['nullable', 'array'],
             'player_ids.*'    => ['string'],
         ]);
@@ -146,7 +147,7 @@ class EventController extends Controller
             'game_id'         => ['sometimes', 'exists:games,id'],
             'scenario_key'    => ['nullable', 'string'],
             'min_players'     => ['nullable', 'integer', 'min:1'],
-            'max_players'     => ['nullable', 'integer', 'min:1', 'gte:min_players'],
+            'max_players'     => ['nullable', 'integer', 'min:1', Rule::when($request->filled('min_players'), 'gte:min_players')],
             'player_ids'      => ['nullable', 'array'],
             'player_ids.*'    => ['string'],
         ]);
@@ -163,9 +164,13 @@ class EventController extends Controller
         $end   = Carbon::parse($data['datetime_end'] ?? $event->datetime_end);
         $this->bookingValidator->validate($room, $start, $end, excludeEventId: $event->id);
 
+        $event->load(['room', 'game', 'scenario']);
+        $before = $this->discordSync->snapshot($event);
+
         $event->update($data);
 
         $this->discordSync->sync($event);
+        $this->discordSync->trailUpdated($before, $event, $request->user()->discord_id ?? '');
 
         return response()->json($event);
     }
@@ -203,6 +208,7 @@ class EventController extends Controller
         $event->update(['player_ids' => [...$playerIds, $discordId]]);
 
         $this->discordSync->sync($event);
+        $this->discordSync->trailRegistered($event, $discordId);
 
         return response()->json($event);
     }
@@ -236,6 +242,7 @@ class EventController extends Controller
         $event->update(['player_ids' => array_values(array_filter($playerIds, fn($id) => $id !== $discordId))]);
 
         $this->discordSync->sync($event);
+        $this->discordSync->trailUnregistered($event, $discordId);
 
         return response()->json($event);
     }
@@ -244,6 +251,7 @@ class EventController extends Controller
     {
         $this->authorizeEventMutation($request, $event);
 
+        $this->discordSync->trailDeleted($event, $request->user()->discord_id ?? '');
         $this->discordSync->cancel($event);
 
         $event->delete();

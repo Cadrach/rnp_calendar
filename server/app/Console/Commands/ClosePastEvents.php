@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Event;
 use App\Services\DiscordClient;
+use App\Services\EventDiscordSync;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 
@@ -12,8 +13,10 @@ class ClosePastEvents extends Command
     protected $signature   = 'events:close-past';
     protected $description = 'Close all past events and remove their "looking for players" Discord tag';
 
-    public function __construct(private readonly DiscordClient $discord)
-    {
+    public function __construct(
+        private readonly DiscordClient $discord,
+        private readonly EventDiscordSync $discordSync,
+    ) {
         parent::__construct();
     }
 
@@ -35,11 +38,14 @@ class ClosePastEvents extends Command
         foreach ($events as $event) {
             $event->updateQuietly(['is_closed' => true]);
 
-            if ($tagId && $event->discord_thread_id) {
+            if ($event->discord_thread_id) {
                 try {
-                    $this->discord->setThreadTags($event->discord_thread_id, []);
+                    if ($tagId) {
+                        $this->discord->setThreadTags($event->discord_thread_id, []);
+                    }
+                    $this->discordSync->trailClosed($event);
                 } catch (\Throwable $e) {
-                    $this->warn("  Could not update Discord tags for event #{$event->id}: {$e->getMessage()}");
+                    $this->warn("  Could not update Discord for event #{$event->id}: {$e->getMessage()}");
                 }
             }
 

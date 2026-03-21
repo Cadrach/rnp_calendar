@@ -70,7 +70,7 @@ export function EventShowModal({ eventId }: Props) {
   );
 
   return (
-    <Stack>
+    <Stack mt="lg">
       <Stack gap={4}>
         <Row label="Date">
           <Text size="sm">
@@ -79,9 +79,7 @@ export function EventShowModal({ eventId }: Props) {
           </Text>
         </Row>
 
-        <Row label="MJ">
-          {mj ? <MemberAvatar member={mj} /> : <Text size="sm">—</Text>}
-        </Row>
+        <Row label="MJ">{mj ? <MemberAvatar member={mj} /> : <Text size="sm">—</Text>}</Row>
 
         <Row label="Salle">{roomLabel}</Row>
 

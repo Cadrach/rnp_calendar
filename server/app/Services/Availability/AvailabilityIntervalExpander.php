@@ -35,8 +35,8 @@ class AvailabilityIntervalExpander
                 // means 14:00 local club time, not 14:00 UTC.
                 $tz = config('app.club_timezone');
                 $intervals[] = new TimeInterval(
-                    Carbon::createFromFormat('Y-m-d H:i:s', $day->format('Y-m-d') . ' ' . $rule->start_time, $tz),
-                    Carbon::createFromFormat('Y-m-d H:i:s', $day->format('Y-m-d') . ' ' . $rule->end_time, $tz),
+                    Carbon::createFromFormat('Y-m-d H:i', $day->format('Y-m-d') . ' ' . substr($rule->start_time, 0, 5), $tz),
+                    Carbon::createFromFormat('Y-m-d H:i', $day->format('Y-m-d') . ' ' . substr($rule->end_time, 0, 5), $tz),
                 );
             }
 
