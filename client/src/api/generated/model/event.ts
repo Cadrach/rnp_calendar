@@ -9,7 +9,6 @@ export interface Event {
   id: number;
   datetime_start: string;
   datetime_end: string;
-  mj_user_id: number;
   room_id: number;
   game_id: number;
   /** @nullable */

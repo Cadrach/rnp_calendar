@@ -15,7 +15,7 @@ class EventDiscordSync
 
     public function sync(Event $event): void
     {
-        $event->load(['mj', 'room', 'game', 'scenario']);
+        $event->load(['room', 'game', 'scenario']);
 
         $title   = $this->buildTitle($event);
         $content = $this->buildContent($event);
@@ -83,9 +83,9 @@ class EventDiscordSync
             $lines[] = "📖 **Scénario :** {$this->scenarioLabel($event->scenario)}";
         }
 
-        $mjMention = $event->mj?->discord_id
-            ? "<@{$event->mj->discord_id}>"
-            : $event->mj?->name ?? '—';
+        $mjMention = $event->mj_discord_id
+            ? "<@{$event->mj_discord_id}>"
+            : '—';
 
         $lines[] = "👑 **MJ :** {$mjMention}";
 

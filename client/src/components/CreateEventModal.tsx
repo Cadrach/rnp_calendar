@@ -30,7 +30,7 @@ export function CreateEventModal({ start, end, onClose, event, initialRoomId }: 
   const { user, games, members } = useDictionary();
   const queryClient = useQueryClient();
 
-  const mjUserId = event ? event.mj_user_id : user.id;
+  const mjDiscordId = event ? event.mj_discord_id : user.discord_id;
 
   // In edit mode, start/end are editable — track them in local state so the
   // available-rooms query reacts immediately when either date changes.
@@ -99,7 +99,7 @@ export function CreateEventModal({ start, end, onClose, event, initialRoomId }: 
     const payload = {
       datetime_start: (event ? editStart : start).toISOString(),
       datetime_end: (event ? editEnd : end).toISOString(),
-      mj_user_id: mjUserId,
+      mj_discord_id: mjDiscordId!,
       room_id: Number(values.room_id),
       game_id: Number(values.game_id),
       scenario_key: values.scenario_key,

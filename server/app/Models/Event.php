@@ -9,10 +9,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Event extends Model
 {
     use SoftDeletes;
+
     protected $fillable = [
         'datetime_start',
         'datetime_end',
-        'mj_user_id',
+        'mj_discord_id',
         'room_id',
         'game_id',
         'scenario_id',
@@ -27,20 +28,6 @@ class Event extends Model
         'datetime_end'   => 'datetime',
         'player_ids'     => 'array',
     ];
-
-    protected $appends = ['mj_discord_id'];
-
-    protected function mjDiscordId(): \Illuminate\Database\Eloquent\Casts\Attribute
-    {
-        return \Illuminate\Database\Eloquent\Casts\Attribute::get(
-            fn() => $this->mj?->discord_id
-        );
-    }
-
-    public function mj(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'mj_user_id');
-    }
 
     public function room(): BelongsTo
     {

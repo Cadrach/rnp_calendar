@@ -8,7 +8,7 @@
 export type EventsUpdateBody = {
   datetime_start?: string;
   datetime_end?: string;
-  mj_user_id?: number;
+  mj_discord_id?: string;
   room_id?: number;
   game_id?: number;
   /** @nullable */

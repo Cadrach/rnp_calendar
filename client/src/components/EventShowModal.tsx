@@ -48,6 +48,7 @@ export function EventShowModal({ eventId }: Props) {
   const game = games.find((g) => g.id === event.game_id);
   const room = rooms.find((r) => r.id === event.room_id);
   const scenario = event.scenario_id ? scenarios.find((s) => s.id === event.scenario_id) : null;
+  const mj = members.find((m) => m.id === event.mj_discord_id);
 
   const start = new Date(event.datetime_start);
   const end = new Date(event.datetime_end);
@@ -57,7 +58,7 @@ export function EventShowModal({ eventId }: Props) {
   const isFull = event.max_players != null && registeredCount >= event.max_players;
   const isRegistered = !!user.discord_id && playerIds.includes(user.discord_id);
 
-  const canEdit = user.is_admin || user.id === event.mj_user_id;
+  const canEdit = user.is_admin || user.discord_id === event.mj_discord_id;
 
   const roomLabel = room?.url ? (
     <Anchor href={room.url} target="_blank" rel="noopener noreferrer">
@@ -75,6 +76,10 @@ export function EventShowModal({ eventId }: Props) {
             {format(start, "PPP", { locale: fr })}, {format(start, "HH'h'mm")} →{" "}
             {format(end, "HH'h'mm")}
           </Text>
+        </Row>
+
+        <Row label="MJ">
+          {mj ? <MemberAvatar member={mj} /> : <Text size="sm">—</Text>}
         </Row>
 
         <Row label="Salle">{roomLabel}</Row>

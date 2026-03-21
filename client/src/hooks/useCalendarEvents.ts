@@ -18,7 +18,7 @@ export function useCalendarEvents(
   availabilityRange: { start: Date; end: Date },
   filters: CalendarFilters,
 ) {
-  const { games, rooms, members } = useDictionary();
+  const { games, rooms, members, user } = useDictionary();
 
   const { data: events } = useEventsIndex(
     {
@@ -32,6 +32,13 @@ export function useCalendarEvents(
     () =>
       (events ?? [])
         .filter((e) => filters.roomId === null || e.room_id === filters.roomId)
+        .filter((e) => {
+          if (!filters.myCalendar) return true;
+          const isMj = e.mj_discord_id === user.discord_id;
+          const isPlayer = user.discord_id != null &&
+            (e.player_ids as string[] | null)?.includes(user.discord_id);
+          return isMj || isPlayer;
+        })
         .map((e) => {
           const mj = members.find((m) => m.id === e.mj_discord_id);
           const room = rooms.find((r) => r.id === e.room_id);
