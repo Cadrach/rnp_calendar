@@ -1,5 +1,15 @@
 import { useState } from "react";
-import { Anchor, Button, Group, Stack, Text } from "@mantine/core";
+import { ActionIcon, Anchor, Button, Divider, Group, Stack, Text, Tooltip } from "@mantine/core";
+import {
+  IconCalendar,
+  IconUser,
+  IconDoor,
+  IconBooks,
+  IconBookmark,
+  IconUsers,
+  IconUsersGroup,
+  IconBrandDiscord,
+} from "@tabler/icons-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale/fr";
@@ -16,7 +26,7 @@ interface Props {
 }
 
 export function EventShowModal({ eventId }: Props) {
-  const { games, rooms, scenarios, members, user } = useDictionary();
+  const { games, rooms, scenarios, members, user, discordGuildId } = useDictionary();
   const queryClient = useQueryClient();
   // Search all cached events index queries (the Calendar uses a parameterized one)
   // without triggering any new request.
@@ -71,58 +81,75 @@ export function EventShowModal({ eventId }: Props) {
 
   return (
     <Stack mt="lg">
-      <Stack gap={4}>
-        <Row label="Date">
-          <Text size="sm">
+      <Stack gap="sm">
+        <Row label="Date" icon={IconCalendar}>
+          <Text size="md">
             {format(start, "PPP", { locale: fr })}, {format(start, "HH'h'mm")} →{" "}
             {format(end, "HH'h'mm")}
           </Text>
         </Row>
 
-        <Row label="MJ">{mj ? <MemberAvatar member={mj} /> : <Text size="sm">—</Text>}</Row>
+        <GlowDivider />
+        <Row label="MJ" icon={IconUser}>
+          {mj ? <MemberAvatar member={mj} /> : <Text size="md">—</Text>}
+        </Row>
 
-        <Row label="Salle">{roomLabel}</Row>
+        <GlowDivider />
+        <Row label="Salle" icon={IconDoor}>
+          {roomLabel}
+        </Row>
 
-        <Row label="Jeu">
-          <Text size="sm">{game?.name ?? "—"}</Text>
+        <GlowDivider />
+        <Row label="Jeu" icon={IconBooks}>
+          <Text size="md">{game?.name ?? "—"}</Text>
         </Row>
 
         {scenario && (
-          <Row label="Scénario">
-            <Text size="sm">{scenario.name}</Text>
-          </Row>
+          <>
+            <GlowDivider />
+            <Row label="Scénario" icon={IconBookmark}>
+              <Text size="md">{scenario.name}</Text>
+            </Row>
+          </>
         )}
 
         {(event.min_players != null || event.max_players != null) && (
-          <Row label="Joueurs">
-            <Text size="sm">
-              {event.min_players ?? "?"} – {event.max_players ?? "∞"}
-            </Text>
-          </Row>
+          <>
+            <GlowDivider />
+            <Row label="Joueurs" icon={IconUsers}>
+              <Text size="md">
+                {event.min_players ?? "?"} – {event.max_players ?? "∞"}
+              </Text>
+            </Row>
+          </>
         )}
 
         {playerIds.length > 0 && (
-          <Row label="Inscrits">
-            <Stack gap={4}>
-              {playerIds.map((id) => {
-                const member = members.find((m) => m.id === id);
-                return member ? (
-                  <MemberAvatar key={id} member={member} />
-                ) : (
-                  <Text key={id} size="sm">
-                    {id}
-                  </Text>
-                );
-              })}
-            </Stack>
-          </Row>
+          <>
+            <GlowDivider />
+            <Row label="Inscrits" icon={IconUsersGroup}>
+              <Stack gap={4}>
+                {playerIds.map((id) => {
+                  const member = members.find((m) => m.id === id);
+                  return member ? (
+                    <MemberAvatar key={id} member={member} />
+                  ) : (
+                    <Text key={id} size="sm">
+                      {id}
+                    </Text>
+                  );
+                })}
+              </Stack>
+            </Row>
+          </>
         )}
       </Stack>
 
-      <Group mt="sm" align="center">
+      <Group mt="sm" align="center" justify="space-between" wrap="nowrap">
         {canEdit && <DeleteEventButton eventId={Number(eventId)} />}
+
         {!isClosed && (
-          <Group grow flex={1}>
+          <Group grow flex={1} mx="xs">
             {canEdit && (
               <Button variant="default" onClick={() => setEditing(true)}>
                 Modifier
@@ -152,17 +179,55 @@ export function EventShowModal({ eventId }: Props) {
             )}
           </Group>
         )}
+
+        {discordGuildId && event.discord_thread_id && (
+          <Tooltip label="Voir le post Discord">
+            <ActionIcon
+              component="a"
+              href={`https://discord.com/channels/${discordGuildId}/${event.discord_thread_id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              variant="filled"
+              size="lg"
+              color="#7a6ff0"
+            >
+              <IconBrandDiscord size={20} />
+            </ActionIcon>
+          </Tooltip>
+        )}
       </Group>
     </Stack>
   );
 }
 
-function Row({ label, children }: { label: string; children: React.ReactNode }) {
+function GlowDivider() {
+  return (
+    <Divider
+      style={{
+        borderColor: "rgba(0, 212, 232, 0.2)",
+        boxShadow: "0 0 6px rgba(0, 212, 232, 0.35)",
+      }}
+    />
+  );
+}
+
+function Row({
+  label,
+  icon: Icon,
+  children,
+}: {
+  label: string;
+  icon: React.FC<{ size?: number; stroke?: number }>;
+  children: React.ReactNode;
+}) {
   return (
     <Group justify="space-between" wrap="nowrap" align="flex-start">
-      <Text size="sm" c="dimmed" w={80} style={{ flexShrink: 0 }}>
-        {label}
-      </Text>
+      <Group gap={6} w={100} style={{ flexShrink: 0 }} align="center">
+        <Icon size={16} stroke={1.5} />
+        <Text size="md" c="dimmed">
+          {label}
+        </Text>
+      </Group>
       {children}
     </Group>
   );
