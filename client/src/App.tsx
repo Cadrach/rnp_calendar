@@ -1,7 +1,23 @@
 import "@mantine/core/styles.css";
-import { AppShell, Burger, Divider, Group, MantineProvider, NavLink, Stack, Text, Title } from "@mantine/core";
+import {
+  AppShell,
+  Burger,
+  Divider,
+  Group,
+  MantineProvider,
+  NavLink,
+  Stack,
+  Text,
+  Title,
+} from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconBrandDiscord, IconCalendar, IconLogout, IconSettings, IconShieldLock } from "@tabler/icons-react";
+import {
+  IconBrandDiscord,
+  IconCalendar,
+  IconLogout,
+  IconSettings,
+  IconShieldLock,
+} from "@tabler/icons-react";
 import { Route, Routes, useNavigate, useLocation } from "react-router";
 import { theme } from "./theme";
 import { Calendar } from "./components/Calendar";
@@ -18,9 +34,9 @@ import { RoomsTable } from "./components/admin/RoomsTable";
 // Add new CRUD pages here; they'll appear automatically in the admin nav section.
 
 const ADMIN_PAGES = [
-  { label: "Règles des salles", path: "/admin/room-rules", icon: <IconSettings size={16} /> },
   { label: "Jeux", path: "/admin/games", icon: <IconSettings size={16} /> },
   { label: "Salles", path: "/admin/rooms", icon: <IconSettings size={16} /> },
+  { label: "Règles des salles", path: "/admin/room-rules", icon: <IconSettings size={16} /> },
 ];
 
 // ── Shell ──────────────────────────────────────────────────────────────────────
@@ -43,7 +59,12 @@ function Shell() {
   return (
     <AppShell
       header={{ height: 56 }}
-      navbar={{ width: 220, breakpoint: "sm", collapsed: { mobile: !navOpened, desktop: !navOpened } }}
+      navbar={{
+        width: 220,
+        breakpoint: "sm",
+        collapsed: { mobile: !navOpened, desktop: !navOpened },
+      }}
+      transitionDuration={200}
     >
       <AppShell.Header>
         <Group h="100%" px="md" justify="space-between">
@@ -54,7 +75,8 @@ function Shell() {
               size="sm"
               color="#00d4e8"
               style={{
-                filter: "drop-shadow(0 0 4px rgba(0,212,232,0.8)) drop-shadow(0 0 10px rgba(0,212,232,0.5))",
+                filter:
+                  "drop-shadow(0 0 4px rgba(0,212,232,0.8)) drop-shadow(0 0 10px rgba(0,212,232,0.5))",
               }}
             />
             <Title
@@ -101,7 +123,15 @@ function Shell() {
           {user.is_admin && (
             <>
               <Divider my={4} />
-              <Text size="xs" c="dimmed" px="sm" py={2} tt="uppercase" fw={600} style={{ letterSpacing: "0.08em" }}>
+              <Text
+                size="xs"
+                c="dimmed"
+                px="sm"
+                py={2}
+                tt="uppercase"
+                fw={600}
+                style={{ letterSpacing: "0.08em" }}
+              >
                 <Group gap={6}>
                   <IconShieldLock size={12} />
                   Administration
@@ -126,14 +156,23 @@ function Shell() {
         <NavLink
           label="Déconnexion"
           leftSection={<IconLogout size={16} />}
-          onClick={() => { closeNav(); logout.mutate(); }}
+          onClick={() => {
+            closeNav();
+            logout.mutate();
+          }}
           disabled={logout.isPending}
           color="red"
           variant="subtle"
         />
       </AppShell.Navbar>
 
-      <AppShell.Main p={0}>
+      <AppShell.Main
+        style={{
+          padding: 0,
+          paddingLeft: navOpened ? 220 : 0,
+          transition: "padding-left 200ms ease",
+        }}
+      >
         <Routes>
           <Route path="/" element={<Calendar />} />
           <Route path="/show/:id" element={<Calendar />} />
