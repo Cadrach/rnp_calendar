@@ -27,7 +27,7 @@ export function GamesTable() {
       },
       onError: (error) => {
         const message =
-          (error.response?.data as { message?: string })?.message ??
+          (error as unknown as { message?: string })?.message ??
           "Une erreur est survenue lors de la suppression.";
         setDeleteState((prev) => (prev ? { ...prev, error: message } : null));
       },

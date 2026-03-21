@@ -89,7 +89,7 @@ export function Calendar() {
         <BigCalendar
           localizer={localizer}
           events={calendarEvents}
-          backgroundEvents={backgroundEvents}
+          backgroundEvents={backgroundEvents as unknown as typeof calendarEvents}
           style={{ height: "100%" }}
           date={date}
           view={view}

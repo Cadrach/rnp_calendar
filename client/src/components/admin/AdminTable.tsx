@@ -29,7 +29,6 @@ export interface AdminTableProps<T extends { id: number }> {
 // ── Delete button ──────────────────────────────────────────────────────────────
 
 function DeleteButton<T extends { id: number }>({
-  row,
   onDelete,
   isDeleting,
   error,

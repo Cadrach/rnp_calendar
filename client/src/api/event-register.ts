@@ -17,7 +17,7 @@ const makeHook =
     mutation?: UseMutationOptions<Awaited<T>, TError, Variables, TContext>;
   }): UseMutationResult<Awaited<T>, TError, Variables, TContext> => {
     const mutationFn: MutationFunction<Awaited<T>, Variables> = ({ event, data }) =>
-      fn(event, data);
+      fn(event, data) as Promise<Awaited<T>>;
     return useMutation({ mutationFn, ...options?.mutation });
   };
 

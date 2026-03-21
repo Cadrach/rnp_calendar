@@ -42,7 +42,7 @@ export function DictionaryProvider({ children }: { children: React.ReactNode }) 
         games: data.games,
         rooms: data.rooms,
         scenarios: data.scenarios,
-        members: (data.members ?? []) as DiscordMember[],
+        members: (data.members ?? []) as unknown as DiscordMember[],
         discordGuildId: (data as unknown as { discord_guild_id?: string }).discord_guild_id ?? null,
       }}
     >
