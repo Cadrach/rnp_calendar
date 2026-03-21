@@ -7,12 +7,14 @@
 import type { Dictionary200MembersItem } from './dictionary200MembersItem';
 import type { Game } from './game';
 import type { Room } from './room';
+import type { Scenario } from './scenario';
 import type { User } from './user';
 
 export type Dictionary200 = {
   user: User;
   games: Game[];
   rooms: Room[];
+  scenarios: Scenario[];
   members: Dictionary200MembersItem[];
   discord_guild_id: string;
 };
