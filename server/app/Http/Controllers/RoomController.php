@@ -42,7 +42,8 @@ class RoomController extends Controller
         $end         = Carbon::parse($request->input('end'));
         $excludeId   = $request->integer('event_id') ?: null;
 
-        $available = Room::all()
+        $available = Room::orderBy('name')
+            ->get()
             ->filter(fn(Room $room) => $this->bookingValidator->isAvailable($room, $start, $end, $excludeId))
             ->values();
 

@@ -52,14 +52,14 @@ class EventBookingValidator
      * within its effective available hours and not already booked.
      * Unlimited rooms always return true.
      */
-    public function isAvailable(Room $room, Carbon $start, Carbon $end): bool
+    public function isAvailable(Room $room, Carbon $start, Carbon $end, ?int $excludeEventId = null): bool
     {
         if ($room->unlimited) {
             return true;
         }
 
         return $this->isWithinAvailableHours($room, $start, $end)
-            && ! $this->hasOverlap($room, $start, $end, excludeEventId: null);
+            && ! $this->hasOverlap($room, $start, $end, $excludeEventId);
     }
 
     /**
