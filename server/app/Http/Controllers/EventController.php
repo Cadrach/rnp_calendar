@@ -44,6 +44,10 @@ class EventController extends Controller
 
     public function store(Request $request): JsonResponse
     {
+        if (! $request->user()->is_mj) {
+            abort(403);
+        }
+
         $data = $request->validate([
             'datetime_start'  => ['required', 'date'],
             'datetime_end'    => ['required', 'date', 'after:datetime_start'],

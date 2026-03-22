@@ -48,7 +48,7 @@ export function Calendar() {
   const [filters, setFilters] = useState<CalendarFilters>(DEFAULT_FILTERS);
   const [createOpened, { open: openCreate, close: closeCreate }] = useDisclosure(false);
 
-  const { games } = useDictionary();
+  const { games, user } = useDictionary();
 
   const {
     date,
@@ -72,6 +72,7 @@ export function Calendar() {
   );
 
   const handleSelectSlot = (slotInfo: SlotInfo) => {
+    if (!user.is_mj) return;
     if (!handleSelecting({ start: slotInfo.start, end: slotInfo.end })) return;
     setSlot({ start: slotInfo.start, end: slotInfo.end });
     openCreate();

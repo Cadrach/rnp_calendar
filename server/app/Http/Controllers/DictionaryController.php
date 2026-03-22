@@ -22,9 +22,9 @@ class DictionaryController extends Controller
     {
         return response()->json([
             'user' => $request->user(),
-            'games' => Game::all(),
-            'rooms' => Room::all(),
-            'scenarios' => Scenario::all(),
+            'games' => Game::orderBy('name')->get(),
+            'rooms' => Room::orderBy('name')->get(),
+            'scenarios' => Scenario::orderBy('name')->get(),
             'members' => $this->getMembers(),
             'discord_guild_id' => config('services.discord.guild_id'),
         ]);
