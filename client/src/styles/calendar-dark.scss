@@ -109,8 +109,8 @@ $text-muted: rgba(200, 244, 249, 0.25);
   }
 }
 
-.rbc-time-view .rbc-header + .rbc-header, .rbc-time-view .rbc-header.rbc-today {
-  line-height: 8px;
+.rbc-time-view .rbc-header, .rbc-time-view .rbc-header.rbc-today {
+  line-height: 4px;
 }
 
 // ─── Month / time / agenda containers ─────────────────────────────────────────

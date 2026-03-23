@@ -1,5 +1,16 @@
-import { useMemo } from "react";
-import { Box, Group, RangeSlider, Select, Switch, Text } from "@mantine/core";
+import { useMemo, useState, type MutableRefObject } from "react";
+import {
+  Box,
+  Button,
+  Indicator,
+  Popover,
+  RangeSlider,
+  Select,
+  Stack,
+  Switch,
+  Text,
+} from "@mantine/core";
+import { IconFilter } from "@tabler/icons-react";
 import { useDictionary } from "../contexts/DictionaryContext";
 
 export interface CalendarFilters {
@@ -26,65 +37,121 @@ const SLOT_MARKS = [
   { value: 4, label: "4+" },
 ];
 
-interface CalendarFilterProps {
-  filters: CalendarFilters;
+export function useActiveFilterCount(filters: CalendarFilters): number {
+  return useMemo(() => {
+    let count = 0;
+    if (filters.roomId !== null) count++;
+    if (filters.gameId !== null) count++;
+    if (filters.mjId !== null) count++;
+    if (filters.myCalendar) count++;
+    if (filters.availableSlots !== null) count++;
+    return count;
+  }, [filters]);
+}
+
+interface FilterDropdownProps {
+  filtersRef: MutableRefObject<CalendarFilters>;
   onChange: (filters: CalendarFilters) => void;
 }
 
-export function CalendarFilter({ filters, onChange }: CalendarFilterProps) {
+export function FilterDropdown({ filtersRef, onChange }: FilterDropdownProps) {
+  const [opened, setOpened] = useState(false);
+  // Local state for reactivity, initialized from ref
+  const [filters, setFilters] = useState(filtersRef.current);
   const { rooms, games, members } = useDictionary();
-
   const mjMembers = useMemo(() => members.filter((m) => m.is_mj), [members]);
+  const activeCount = useActiveFilterCount(filters);
+
+  const handleChange = (newFilters: CalendarFilters) => {
+    setFilters(newFilters);
+    onChange(newFilters);
+  };
 
   return (
-    <Group px="md" py="xs" gap="lg" align="flex-end">
-      <Select
-        placeholder="Toutes les salles"
-        clearable
-        data={rooms.map((r) => ({ value: String(r.id), label: r.name ?? r.code }))}
-        value={filters.roomId !== null ? String(filters.roomId) : null}
-        onChange={(val) => onChange({ ...filters, roomId: val ? Number(val) : null })}
-      />
-      <Select
-        placeholder="Tous les jeux"
-        clearable
-        searchable
-        data={games.map((g) => ({ value: String(g.id), label: g.name }))}
-        value={filters.gameId !== null ? String(filters.gameId) : null}
-        onChange={(val) => onChange({ ...filters, gameId: val ? Number(val) : null })}
-      />
-      <Select
-        placeholder="Tous les MJ"
-        clearable
-        searchable
-        data={mjMembers.map((m) => ({ value: m.id, label: m.username }))}
-        value={filters.mjId}
-        onChange={(val) => onChange({ ...filters, mjId: val })}
-      />
-      <Switch
-        label="Mon calendrier"
-        checked={filters.myCalendar}
-        onChange={(e) => onChange({ ...filters, myCalendar: e.currentTarget.checked })}
-      />
-      <Box w={180}>
-        <Text size="sm" mb={4}>
-          Places
-        </Text>
-        <RangeSlider
-          min={0}
-          max={4}
-          step={1}
-          minRange={0}
-          marks={SLOT_MARKS}
-          value={filters.availableSlots ?? [0, 4]}
-          onChange={(val) => onChange({ ...filters, availableSlots: val })}
-          onChangeEnd={(val) => {
-            if (val[0] === 0 && val[1] === 4) {
-              onChange({ ...filters, availableSlots: null });
-            }
-          }}
-        />
-      </Box>
-    </Group>
+    <Popover width={300} position="bottom-start" shadow="md" opened={opened} onChange={setOpened}>
+      <Popover.Target>
+        <Indicator
+          label={activeCount}
+          size={18}
+          disabled={activeCount === 0}
+          color="cyan"
+          offset={4}
+        >
+          <Button
+            variant="default"
+            leftSection={<IconFilter size={18} />}
+            onClick={() => setOpened((o) => !o)}
+          >
+            Filtrer
+          </Button>
+        </Indicator>
+      </Popover.Target>
+
+      <Popover.Dropdown>
+        <Stack gap="md">
+          <Select
+            label="Salle"
+            placeholder="Toutes les salles"
+            clearable
+            data={rooms.map((r) => ({ value: String(r.id), label: r.name ?? r.code }))}
+            value={filters.roomId !== null ? String(filters.roomId) : null}
+            onChange={(val) => handleChange({ ...filters, roomId: val ? Number(val) : null })}
+          />
+          <Select
+            label="Jeu"
+            placeholder="Tous les jeux"
+            clearable
+            searchable
+            data={games.map((g) => ({ value: String(g.id), label: g.name }))}
+            value={filters.gameId !== null ? String(filters.gameId) : null}
+            onChange={(val) => handleChange({ ...filters, gameId: val ? Number(val) : null })}
+          />
+          <Select
+            label="MJ"
+            placeholder="Tous les MJ"
+            clearable
+            searchable
+            data={mjMembers.map((m) => ({ value: m.id, label: m.username }))}
+            value={filters.mjId}
+            onChange={(val) => handleChange({ ...filters, mjId: val })}
+          />
+          <Box onMouseDown={(e) => e.stopPropagation()} onTouchStart={(e) => e.stopPropagation()}>
+            <Text size="sm">Places disponibles</Text>
+            <RangeSlider
+              min={0}
+              max={4}
+              step={1}
+              minRange={0}
+              marks={SLOT_MARKS}
+              value={filters.availableSlots ?? [0, 4]}
+              onChange={(val) => handleChange({ ...filters, availableSlots: val })}
+              onChangeEnd={(val) => {
+                if (val[0] === 0 && val[1] === 4) {
+                  handleChange({ ...filters, availableSlots: null });
+                }
+              }}
+            />
+          </Box>
+          <Box mt="md">
+            <Switch
+              size="md"
+              label="Mon calendrier"
+              checked={filters.myCalendar}
+              onChange={(e) => handleChange({ ...filters, myCalendar: e.currentTarget.checked })}
+            />
+          </Box>
+          {activeCount > 0 && (
+            <Button
+              variant="subtle"
+              color="gray"
+              size="xs"
+              onClick={() => handleChange(DEFAULT_FILTERS)}
+            >
+              Réinitialiser les filtres
+            </Button>
+          )}
+        </Stack>
+      </Popover.Dropdown>
+    </Popover>
   );
 }

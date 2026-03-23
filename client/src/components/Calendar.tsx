@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, useRef } from "react";
 import { Box, Modal } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { Calendar as BigCalendar, dateFnsLocalizer, SlotInfo } from "react-big-calendar";
@@ -9,7 +9,8 @@ import "../styles/calendar-dark.scss";
 import { useNavigate, useParams } from "react-router";
 import type { Event } from "../api/generated/model";
 import { CalendarEvent } from "./CalendarEvent";
-import { CalendarFilter, CalendarFilters, DEFAULT_FILTERS } from "./CalendarFilter";
+import { CalendarToolbar } from "./CalendarToolbar";
+import { CalendarFilters, DEFAULT_FILTERS } from "./CalendarFilter";
 import { CreateEventModal } from "./CreateEventModal";
 import { EventShowModal } from "./EventShowModal";
 import { useDictionary } from "../contexts/DictionaryContext";
@@ -48,6 +49,10 @@ export function Calendar() {
   const [filters, setFilters] = useState<CalendarFilters>(DEFAULT_FILTERS);
   const [createOpened, { open: openCreate, close: closeCreate }] = useDisclosure(false);
 
+  // Use ref to avoid recreating toolbar component on filter changes
+  const filtersRef = useRef(filters);
+  filtersRef.current = filters;
+
   const { games, user } = useDictionary();
 
   const {
@@ -83,16 +88,20 @@ export function Calendar() {
     navigate(`/show/${event.id}`);
   };
 
+  const components = useMemo(
+    () => ({
+      event: CalendarEvent,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      toolbar: (props: any) => (
+        <CalendarToolbar {...props} filtersRef={filtersRef} onFiltersChange={setFilters} />
+      ),
+    }),
+    [],
+  );
+
   return (
     <>
-      <CalendarFilter filters={filters} onChange={setFilters} />
-      <Box
-        h={{
-          base: "calc(100vh - var(--app-shell-header-height) - 120px)",
-          sm: "calc(100vh - var(--app-shell-header-height) - 72px)",
-        }}
-        p="md"
-      >
+      <Box h="calc(100vh - var(--app-shell-header-height) - 10px)" p="md">
         <BigCalendar
           localizer={localizer}
           events={calendarEvents}
@@ -109,7 +118,7 @@ export function Calendar() {
           selectable
           culture="fr"
           messages={messages}
-          components={{ event: CalendarEvent }}
+          components={components}
           eventPropGetter={eventStyleGetter}
           dayPropGetter={dayPropGetter}
         />
