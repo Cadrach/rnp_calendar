@@ -18,7 +18,7 @@ class EventDiscordSync
         $event->load(['room', 'game', 'scenario']);
 
         $title   = $this->buildTitle($event);
-        $content = $this->buildContent($event);
+        $content = $this->buildContent($event, cancelled: false);
         $tagIds  = $this->openSpotsTagIds($event);
 
         if ($event->discord_thread_id) {
@@ -66,6 +66,12 @@ class EventDiscordSync
         $this->discord->editThread(
             $event->discord_thread_id,
             '[ANNULÉ] ' . $this->buildTitle($event),
+        );
+
+        $this->discord->editMessage(
+            $event->discord_thread_id,
+            $event->discord_thread_id,
+            $this->buildContent($event, cancelled: true),
         );
     }
 
@@ -205,7 +211,7 @@ class EventDiscordSync
         return $title;
     }
 
-    private function buildContent(Event $event): string
+    private function buildContent(Event $event, bool $cancelled = false): string
     {
         $tz    = config('app.club_timezone');
         $start = Carbon::parse($event->datetime_start)->timezone($tz)->locale('fr');
@@ -257,7 +263,7 @@ class EventDiscordSync
         $registeredCount = count($playerIds);
         $isFull          = $event->max_players !== null && $registeredCount >= $event->max_players;
 
-        if (! $isFull) {
+        if (! $isFull && ! $cancelled) {
             $url     = rtrim(config('app.frontend_url'), '/') . '/show/' . $event->id;
             $lines[] = '';
             $lines[] = "👉 [S'inscrire à cette séance]({$url})";
