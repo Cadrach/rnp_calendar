@@ -49,6 +49,8 @@ export function useCalendarEvents(
           const mj = members.find((m) => m.id === e.mj_discord_id);
           const room = rooms.find((r) => r.id === e.room_id);
           const roomColor = room?.color ?? "#3b82f6";
+          const playerCount = (e.player_ids as string[] | null)?.length ?? 0;
+          const isFull = e.max_players != null && playerCount >= e.max_players;
           return {
             ...e,
             title: games.find((g) => g.id === e.game_id)?.name ?? String(e.game_id),
@@ -59,6 +61,7 @@ export function useCalendarEvents(
             roomColor,
             textColor: getContrastColor(roomColor),
             mj,
+            isFull,
           };
         }),
     [events, games, rooms, members, filters],

@@ -118,7 +118,7 @@ export function EventShowModal({ eventId }: Props) {
             <GlowDivider />
             <Row label="Joueurs" icon={IconUsers}>
               <Text size="md">
-                {event.min_players ?? "?"} – {event.max_players ?? "∞"}
+                {event.min_players ?? "1"} – {event.max_players ?? "∞"}
               </Text>
             </Row>
           </>
