@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { startOfWeek, endOfWeek, startOfMonth, endOfMonth } from "date-fns";
+import { startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfDay, addDays } from "date-fns";
 import type { View, NavigateAction } from "react-big-calendar";
 
 export function useCalendarNavigation() {
@@ -10,13 +10,22 @@ export function useCalendarNavigation() {
     end: endOfMonth(new Date()),
   });
 
-  // Exact grid shown in month view for the current date: first Monday on or before
-  // the 1st to last Sunday on or after the last day. Week/day views reuse this same
-  // range (and thus the same cache entry) as long as date stays in the same month.
-  const availabilityRange = useMemo(() => ({
-    start: startOfWeek(startOfMonth(date), { weekStartsOn: 1 }),
-    end: endOfWeek(endOfMonth(date), { weekStartsOn: 1 }),
-  }), [date]);
+  // Range depends on view:
+  // - month: first Monday on or before the 1st to last Sunday on or after the last day
+  // - week/day: reuse month range for cache efficiency
+  // - agenda: 30 days starting from current date (react-big-calendar default)
+  const availabilityRange = useMemo(() => {
+    if (view === "agenda") {
+      return {
+        start: startOfDay(date),
+        end: addDays(startOfDay(date), 30),
+      };
+    }
+    return {
+      start: startOfWeek(startOfMonth(date), { weekStartsOn: 1 }),
+      end: endOfWeek(endOfMonth(date), { weekStartsOn: 1 }),
+    };
+  }, [date, view]);
 
   const handleNavigate = (newDate: Date, _view: View, _action: NavigateAction) => {
     setDate(newDate);

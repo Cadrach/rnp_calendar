@@ -19,7 +19,7 @@ export function CalendarEvent({ event }: Props) {
       <Group gap={4} wrap="nowrap">
         {event.isFull && (
           <Tooltip label="Evenement Complet">
-            <IconLockFilled size={14} style={{ flexShrink: 0, opacity: 0.8 }} />
+            <IconLockFilled size={14} style={{ flexShrink: 0, opacity: 1 }} />
           </Tooltip>
         )}
         <Text size="xs" fw={600} truncate style={{ color: "inherit" }}>
