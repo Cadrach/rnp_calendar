@@ -62,6 +62,11 @@ export function EventShowModal({ eventId }: Props) {
 
   const start = new Date(event.datetime_start);
   const end = new Date(event.datetime_end);
+  const durationMinutes = Math.round((end.getTime() - start.getTime()) / 60000);
+  const durationHours = Math.floor(durationMinutes / 60);
+  const durationRemainder = durationMinutes % 60;
+  const durationLabel =
+    durationRemainder > 0 ? `${durationHours}h${String(durationRemainder).padStart(2, "0")}` : `${durationHours}h`;
 
   const playerIds = (event.player_ids as string[] | null) ?? [];
   const registeredCount = playerIds.length;
@@ -85,7 +90,7 @@ export function EventShowModal({ eventId }: Props) {
         <Row label="Date" icon={IconCalendar}>
           <Text size="md">
             {format(start, "PPP", { locale: fr })}, {format(start, "HH'h'mm")} →{" "}
-            {format(end, "HH'h'mm")}
+            {format(end, "HH'h'mm")} ({durationLabel})
           </Text>
         </Row>
 
