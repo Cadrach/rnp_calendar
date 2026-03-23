@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Room;
 use App\Models\RoomRule;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -47,6 +48,11 @@ class RoomRuleController extends Controller
             'priority'    => ['sometimes', 'integer'],
             'reason'      => ['nullable', 'string', 'max:255'],
         ]);
+
+        $room = Room::findOrFail($data['room_id']);
+        if ($room->unlimited) {
+            abort(422, 'Les salles illimitées ne peuvent pas avoir de règles de disponibilité.');
+        }
 
         $rule = RoomRule::create($data);
 

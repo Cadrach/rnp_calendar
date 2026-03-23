@@ -121,7 +121,9 @@ export function RoomRuleFormModal({ opened, onClose, rule }: Props) {
           <Select
             label="Salle"
             required
-            data={rooms.map((r) => ({ value: String(r.id), label: r.name ?? r.code }))}
+            data={rooms
+              .filter((r) => !r.unlimited)
+              .map((r) => ({ value: String(r.id), label: r.name ?? r.code }))}
             {...form.getInputProps("room_id")}
           />
 
