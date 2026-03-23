@@ -31,6 +31,7 @@ import type {
   EventUnregister403,
   EventUnregisterBody,
   EventsIndexParams,
+  EventsStore403,
   EventsStoreBody,
   EventsUpdateBody,
   ModelNotFoundExceptionResponse,
@@ -146,7 +147,7 @@ export const eventsStore = (
   
 
 
-export const getEventsStoreMutationOptions = <TError = ErrorType<AuthenticationExceptionResponse | ValidationExceptionResponse>,
+export const getEventsStoreMutationOptions = <TError = ErrorType<AuthenticationExceptionResponse | EventsStore403 | ValidationExceptionResponse>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof eventsStore>>, TError,{data: EventsStoreBody}, TContext>, request?: SecondParameter<typeof axiosInstance>}
 ): UseMutationOptions<Awaited<ReturnType<typeof eventsStore>>, TError,{data: EventsStoreBody}, TContext> => {
 
@@ -175,9 +176,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type EventsStoreMutationResult = NonNullable<Awaited<ReturnType<typeof eventsStore>>>
     export type EventsStoreMutationBody = EventsStoreBody
-    export type EventsStoreMutationError = ErrorType<AuthenticationExceptionResponse | ValidationExceptionResponse>
+    export type EventsStoreMutationError = ErrorType<AuthenticationExceptionResponse | EventsStore403 | ValidationExceptionResponse>
 
-    export const useEventsStore = <TError = ErrorType<AuthenticationExceptionResponse | ValidationExceptionResponse>,
+    export const useEventsStore = <TError = ErrorType<AuthenticationExceptionResponse | EventsStore403 | ValidationExceptionResponse>,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof eventsStore>>, TError,{data: EventsStoreBody}, TContext>, request?: SecondParameter<typeof axiosInstance>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof eventsStore>>,

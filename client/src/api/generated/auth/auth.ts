@@ -32,69 +32,6 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 /**
- * @summary This method sends a dm to the user with a link to login. Stores redirect in cache
- */
-export const authDiscordRequest = (
-    authDiscordRequestBody: AuthDiscordRequestBody,
- options?: SecondParameter<typeof axiosInstance>,signal?: AbortSignal
-) => {
-      
-      
-      return axiosInstance<AuthDiscordRequest200>(
-      {url: `/auth/discord/request`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: authDiscordRequestBody, signal
-    },
-      options);
-    }
-  
-
-
-export const getAuthDiscordRequestMutationOptions = <TError = ErrorType<ValidationExceptionResponse>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authDiscordRequest>>, TError,{data: AuthDiscordRequestBody}, TContext>, request?: SecondParameter<typeof axiosInstance>}
-): UseMutationOptions<Awaited<ReturnType<typeof authDiscordRequest>>, TError,{data: AuthDiscordRequestBody}, TContext> => {
-
-const mutationKey = ['authDiscordRequest'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-      
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof authDiscordRequest>>, {data: AuthDiscordRequestBody}> = (props) => {
-          const {data} = props ?? {};
-
-          return  authDiscordRequest(data,requestOptions)
-        }
-
-
-
-        
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type AuthDiscordRequestMutationResult = NonNullable<Awaited<ReturnType<typeof authDiscordRequest>>>
-    export type AuthDiscordRequestMutationBody = AuthDiscordRequestBody
-    export type AuthDiscordRequestMutationError = ErrorType<ValidationExceptionResponse>
-
-    /**
- * @summary This method sends a dm to the user with a link to login. Stores redirect in cache
- */
-export const useAuthDiscordRequest = <TError = ErrorType<ValidationExceptionResponse>,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authDiscordRequest>>, TError,{data: AuthDiscordRequestBody}, TContext>, request?: SecondParameter<typeof axiosInstance>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof authDiscordRequest>>,
-        TError,
-        {data: AuthDiscordRequestBody},
-        TContext
-      > => {
-      return useMutation(getAuthDiscordRequestMutationOptions(options), queryClient);
-    }
-    /**
  * @summary This route verifies the token received and logs the user
  */
 export const authDiscordVerify = (
@@ -156,5 +93,68 @@ export const useAuthDiscordVerify = <TError = ErrorType<AuthDiscordVerify401 | V
         TContext
       > => {
       return useMutation(getAuthDiscordVerifyMutationOptions(options), queryClient);
+    }
+    /**
+ * @summary This method sends a dm to the user with a link to login. Stores redirect in cache
+ */
+export const authDiscordRequest = (
+    authDiscordRequestBody: AuthDiscordRequestBody,
+ options?: SecondParameter<typeof axiosInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return axiosInstance<AuthDiscordRequest200>(
+      {url: `/auth/discord/request`, method: 'POST',
+      headers: {'Content-Type': 'application/json', },
+      data: authDiscordRequestBody, signal
+    },
+      options);
+    }
+  
+
+
+export const getAuthDiscordRequestMutationOptions = <TError = ErrorType<ValidationExceptionResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authDiscordRequest>>, TError,{data: AuthDiscordRequestBody}, TContext>, request?: SecondParameter<typeof axiosInstance>}
+): UseMutationOptions<Awaited<ReturnType<typeof authDiscordRequest>>, TError,{data: AuthDiscordRequestBody}, TContext> => {
+
+const mutationKey = ['authDiscordRequest'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+      
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof authDiscordRequest>>, {data: AuthDiscordRequestBody}> = (props) => {
+          const {data} = props ?? {};
+
+          return  authDiscordRequest(data,requestOptions)
+        }
+
+
+
+        
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AuthDiscordRequestMutationResult = NonNullable<Awaited<ReturnType<typeof authDiscordRequest>>>
+    export type AuthDiscordRequestMutationBody = AuthDiscordRequestBody
+    export type AuthDiscordRequestMutationError = ErrorType<ValidationExceptionResponse>
+
+    /**
+ * @summary This method sends a dm to the user with a link to login. Stores redirect in cache
+ */
+export const useAuthDiscordRequest = <TError = ErrorType<ValidationExceptionResponse>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authDiscordRequest>>, TError,{data: AuthDiscordRequestBody}, TContext>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof authDiscordRequest>>,
+        TError,
+        {data: AuthDiscordRequestBody},
+        TContext
+      > => {
+      return useMutation(getAuthDiscordRequestMutationOptions(options), queryClient);
     }
     
