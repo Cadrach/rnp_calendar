@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Modal } from "@mantine/core";
+import { Box, Modal } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { Calendar as BigCalendar, dateFnsLocalizer, SlotInfo } from "react-big-calendar";
 import { format, parse, startOfWeek, getDay } from "date-fns";
@@ -86,14 +86,18 @@ export function Calendar() {
   return (
     <>
       <CalendarFilter filters={filters} onChange={setFilters} />
-      <div
-        style={{ height: "calc(100vh - var(--app-shell-header-height) - 52px)", padding: "1rem" }}
+      <Box
+        h={{
+          base: "calc(100vh - var(--app-shell-header-height) - 120px)",
+          sm: "calc(100vh - var(--app-shell-header-height) - 72px)",
+        }}
+        p="md"
       >
         <BigCalendar
           localizer={localizer}
           events={calendarEvents}
           backgroundEvents={backgroundEvents as unknown as typeof calendarEvents}
-          style={{ height: "calc(100% - 64px)" }}
+          style={{ height: "100%" }}
           date={date}
           view={view}
           onNavigate={handleNavigate}
@@ -109,7 +113,7 @@ export function Calendar() {
           eventPropGetter={eventStyleGetter}
           dayPropGetter={dayPropGetter}
         />
-      </div>
+      </Box>
 
       <Modal opened={createOpened} onClose={closeCreate} title="Nouvelle partie">
         {slot && (

@@ -168,6 +168,7 @@ function Shell() {
       </AppShell.Navbar>
 
       <AppShell.Main
+        pt={64}
         style={{
           paddingTop: 0,
           paddingRight: 0,
