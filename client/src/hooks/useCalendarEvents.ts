@@ -35,15 +35,26 @@ export function useCalendarEvents(
         .filter((e) => {
           if (!filters.myCalendar) return true;
           const isMj = e.mj_discord_id === user.discord_id;
-          const isPlayer = user.discord_id != null &&
-            (e.player_ids as string[] | null)?.includes(user.discord_id);
+          const isPlayer =
+            user.discord_id != null && (e.player_ids as string[] | null)?.includes(user.discord_id);
           return isMj || isPlayer;
         })
         .filter((e) => {
-          if (!filters.openGames) return true;
-          if (new Date(e.datetime_start) <= new Date()) return false;
-          if (e.max_players == null) return true;
-          return ((e.player_ids as string[] | null)?.length ?? 0) < e.max_players;
+          if (!filters.availableSlots) return true;
+          // Past events have 0 available slots
+          if (new Date(e.datetime_start) <= new Date()) {
+            return filters.availableSlots[0] === 0;
+          }
+          const playerCount = (e.player_ids as string[] | null)?.length ?? 0;
+          // No max = unlimited slots, treat as 4+
+          const availableSlots =
+            e.max_players == null ? 4 : Math.max(0, e.max_players - playerCount);
+          const [min, max] = filters.availableSlots;
+          // max=4 means "4+" so include anything >= 4
+          if (max === 4) {
+            return availableSlots >= min;
+          }
+          return availableSlots >= min && availableSlots <= max;
         })
         .map((e) => {
           const mj = members.find((m) => m.id === e.mj_discord_id);
