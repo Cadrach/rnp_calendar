@@ -4,9 +4,10 @@ import type { DiscordMember } from "../contexts/DictionaryContext";
 interface Props {
   member: DiscordMember;
   size?: "sm" | "md";
+  hideName?: boolean;
 }
 
-export function MemberAvatar({ member, size = "sm" }: Props) {
+export function MemberAvatar({ member, size = "sm", hideName = false }: Props) {
   return (
     <Group gap="xs" wrap="nowrap">
       <Avatar
@@ -18,9 +19,11 @@ export function MemberAvatar({ member, size = "sm" }: Props) {
       >
         {member.username[0].toUpperCase()}
       </Avatar>
-      <Text size={size === "sm" ? "sm" : "md"} inherit style={{ whiteSpace: "nowrap" }}>
-        {member.username}
-      </Text>
+      {!hideName && (
+        <Text size={size === "sm" ? "sm" : "md"} inherit style={{ whiteSpace: "nowrap" }}>
+          {member.username}
+        </Text>
+      )}
     </Group>
   );
 }

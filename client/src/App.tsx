@@ -169,9 +169,9 @@ function Shell() {
 
       <AppShell.Main
         style={{
-          padding: 0,
-          paddingLeft: navOpened ? 220 : 0,
-          transition: "padding-left 200ms ease",
+          paddingTop: 0,
+          paddingRight: 0,
+          paddingBottom: 0,
         }}
       >
         <Routes>

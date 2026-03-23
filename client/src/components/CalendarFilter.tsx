@@ -22,7 +22,7 @@ export function CalendarFilter({ filters, onChange }: CalendarFilterProps) {
   const { rooms } = useDictionary();
 
   return (
-    <Group px="md" py="xs" gap="lg">
+    <Group px="md" py="xs" gap="lg" mt={64}>
       <Select
         placeholder="Toutes les salles"
         clearable

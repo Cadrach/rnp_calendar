@@ -1,14 +1,16 @@
 import { Badge, Group } from "@mantine/core";
+import { useMediaQuery } from "@mantine/hooks";
 import { useDictionary } from "../contexts/DictionaryContext";
 import { MemberAvatar } from "./MemberAvatar";
 
 export function UserBadge() {
   const { user, members } = useDictionary();
   const member = members.find((m) => m.id === user.discord_id);
+  const isMobile = useMediaQuery("(max-width: 768px)");
 
   return (
     <Group gap="xs">
-      {member && <MemberAvatar member={member} />}
+      {member && <MemberAvatar member={member} hideName={isMobile} />}
       {user.is_mj && (
         <Badge
           variant="filled"

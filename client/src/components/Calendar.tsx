@@ -86,12 +86,14 @@ export function Calendar() {
   return (
     <>
       <CalendarFilter filters={filters} onChange={setFilters} />
-      <div style={{ height: "calc(100vh - var(--app-shell-header-height) - 52px)", padding: "1rem" }}>
+      <div
+        style={{ height: "calc(100vh - var(--app-shell-header-height) - 52px)", padding: "1rem" }}
+      >
         <BigCalendar
           localizer={localizer}
           events={calendarEvents}
           backgroundEvents={backgroundEvents as unknown as typeof calendarEvents}
-          style={{ height: "100%" }}
+          style={{ height: "calc(100% - 64px)" }}
           date={date}
           view={view}
           onNavigate={handleNavigate}
