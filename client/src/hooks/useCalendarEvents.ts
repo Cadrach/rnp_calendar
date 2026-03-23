@@ -32,6 +32,8 @@ export function useCalendarEvents(
     () =>
       (events ?? [])
         .filter((e) => filters.roomId === null || e.room_id === filters.roomId)
+        .filter((e) => filters.gameId === null || e.game_id === filters.gameId)
+        .filter((e) => filters.mjId === null || e.mj_discord_id === filters.mjId)
         .filter((e) => {
           if (!filters.myCalendar) return true;
           const isMj = e.mj_discord_id === user.discord_id;

@@ -7,6 +7,8 @@ export interface DiscordMember {
   id: string;
   username: string;
   avatar: string | null;
+  is_mj: boolean;
+  is_admin: boolean;
 }
 
 interface DictionaryContext {
