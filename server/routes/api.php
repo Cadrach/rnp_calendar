@@ -82,6 +82,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('rooms/available', [RoomController::class, 'availableRooms']);
     Route::get('rooms/{room}/availability', [RoomController::class, 'availability']);
+    Route::get('rooms/{room}/free-slots', [RoomController::class, 'freeSlots']);
     Route::apiResource('rooms', RoomCrudController::class);
 
     Route::apiResource('room-rules', RoomRuleController::class);
