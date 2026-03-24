@@ -125,6 +125,7 @@ function Shell() {
             <>
               <Divider my={4} />
               <Text
+                span
                 size="xs"
                 c="dimmed"
                 px="sm"

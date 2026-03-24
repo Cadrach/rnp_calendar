@@ -41,6 +41,7 @@ export * from './room';
 export * from './roomAvailability200';
 export * from './roomAvailabilityParams';
 export * from './roomAvailableRoomsParams';
+export * from './roomFreeSlotsParams';
 export * from './roomRule';
 export * from './roomRulesIndexParams';
 export * from './roomRulesStoreBody';

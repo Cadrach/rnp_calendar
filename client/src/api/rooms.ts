@@ -22,3 +22,4 @@ export const useAvailableRooms = (start: Date, end: Date, eventId?: number | nul
     queryFn: () => getAvailableRooms(start, end, eventId),
     staleTime: 30 * 1000,
   });
+

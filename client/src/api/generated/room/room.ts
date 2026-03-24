@@ -26,6 +26,7 @@ import type {
   RoomAvailability200,
   RoomAvailabilityParams,
   RoomAvailableRoomsParams,
+  RoomFreeSlotsParams,
   ValidationExceptionResponse
 } from '../model';
 
@@ -136,19 +137,6 @@ export function useRoomAvailableRooms<TData = Awaited<ReturnType<typeof roomAvai
 
 
 
-/**
- * Query params:
-  - start: Y-m-d  (required) — first day of the range, inclusive
-  - end:   Y-m-d  (required) — last day of the range, inclusive
-
-Response shape mirrors react-big-calendar's event object so the frontend can feed
-the `intervals` array directly into the `backgroundEvents` prop after mapping
-each entry's `start`/`end` strings through `new Date()`.
-
-For unlimited rooms the entire requested range is returned as a single interval,
-since no booking restriction applies.
- * @summary Returns the effective available intervals for a room over the requested date range
- */
 export const roomAvailability = (
     room: number,
     params: RoomAvailabilityParams,
@@ -224,9 +212,6 @@ export function useRoomAvailability<TData = Awaited<ReturnType<typeof roomAvaila
     params: RoomAvailabilityParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof roomAvailability>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-/**
- * @summary Returns the effective available intervals for a room over the requested date range
- */
 
 export function useRoomAvailability<TData = Awaited<ReturnType<typeof roomAvailability>>, TError = ErrorType<AuthenticationExceptionResponse | ModelNotFoundExceptionResponse | ValidationExceptionResponse>>(
  room: number,
@@ -235,6 +220,111 @@ export function useRoomAvailability<TData = Awaited<ReturnType<typeof roomAvaila
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getRoomAvailabilityQueryOptions(room,params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+/**
+ * Query params:
+  - date:     Y-m-d   (required) — range start day, in club timezone
+  - end_date: Y-m-d   (optional) — range end day, inclusive (defaults to date); use for multi-day slots
+  - event_id: integer (optional) — exclude this event from the overlap check (editing flow)
+
+For unlimited rooms, the full range minus any booked events is returned.
+For constrained rooms, effective availability is computed first, then booked events are subtracted.
+ * @summary Returns the free (unbooked) time slots for a room on a given date
+ */
+export const roomFreeSlots = (
+    room: number,
+    params: RoomFreeSlotsParams,
+ options?: SecondParameter<typeof axiosInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return axiosInstance<unknown[]>(
+      {url: `/rooms/${room}/free-slots`, method: 'GET',
+        params, signal
+    },
+      options);
+    }
+  
+
+
+
+export const getRoomFreeSlotsQueryKey = (room: number,
+    params?: RoomFreeSlotsParams,) => {
+    return [
+    `/rooms/${room}/free-slots`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+    
+export const getRoomFreeSlotsQueryOptions = <TData = Awaited<ReturnType<typeof roomFreeSlots>>, TError = ErrorType<AuthenticationExceptionResponse | ModelNotFoundExceptionResponse | ValidationExceptionResponse>>(room: number,
+    params: RoomFreeSlotsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof roomFreeSlots>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getRoomFreeSlotsQueryKey(room,params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof roomFreeSlots>>> = ({ signal }) => roomFreeSlots(room,params, requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, enabled: !!(room), ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof roomFreeSlots>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type RoomFreeSlotsQueryResult = NonNullable<Awaited<ReturnType<typeof roomFreeSlots>>>
+export type RoomFreeSlotsQueryError = ErrorType<AuthenticationExceptionResponse | ModelNotFoundExceptionResponse | ValidationExceptionResponse>
+
+
+export function useRoomFreeSlots<TData = Awaited<ReturnType<typeof roomFreeSlots>>, TError = ErrorType<AuthenticationExceptionResponse | ModelNotFoundExceptionResponse | ValidationExceptionResponse>>(
+ room: number,
+    params: RoomFreeSlotsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof roomFreeSlots>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof roomFreeSlots>>,
+          TError,
+          Awaited<ReturnType<typeof roomFreeSlots>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useRoomFreeSlots<TData = Awaited<ReturnType<typeof roomFreeSlots>>, TError = ErrorType<AuthenticationExceptionResponse | ModelNotFoundExceptionResponse | ValidationExceptionResponse>>(
+ room: number,
+    params: RoomFreeSlotsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof roomFreeSlots>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof roomFreeSlots>>,
+          TError,
+          Awaited<ReturnType<typeof roomFreeSlots>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useRoomFreeSlots<TData = Awaited<ReturnType<typeof roomFreeSlots>>, TError = ErrorType<AuthenticationExceptionResponse | ModelNotFoundExceptionResponse | ValidationExceptionResponse>>(
+ room: number,
+    params: RoomFreeSlotsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof roomFreeSlots>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Returns the free (unbooked) time slots for a room on a given date
+ */
+
+export function useRoomFreeSlots<TData = Awaited<ReturnType<typeof roomFreeSlots>>, TError = ErrorType<AuthenticationExceptionResponse | ModelNotFoundExceptionResponse | ValidationExceptionResponse>>(
+ room: number,
+    params: RoomFreeSlotsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof roomFreeSlots>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getRoomFreeSlotsQueryOptions(room,params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

@@ -9,6 +9,7 @@ export interface Event {
   id: number;
   datetime_start: string;
   datetime_end: string;
+  mj_discord_id: string;
   room_id: number;
   game_id: number;
   /** @nullable */
@@ -18,17 +19,16 @@ export interface Event {
   /** @nullable */
   max_players: number | null;
   /** @nullable */
+  player_ids: unknown[] | null;
+  /** @nullable */
+  discord_thread_id: string | null;
+  is_closed: boolean;
+  /** @nullable */
+  description: string | null;
+  /** @nullable */
   created_at: string | null;
   /** @nullable */
   updated_at: string | null;
   /** @nullable */
   deleted_at: string | null;
-  /** @nullable */
-  player_ids: unknown[] | null;
-  /** @nullable */
-  discord_thread_id: string | null;
-  mj_discord_id: string;
-  is_closed: boolean;
-  /** @nullable */
-  description: string | null;
 }

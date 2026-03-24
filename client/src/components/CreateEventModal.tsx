@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
-import { Button, Loader, NumberInput, Select, Stack, Text } from "@mantine/core";
+import { useState } from "react";
+import { Badge, Button, Group, Loader, NumberInput, Select, Stack, Text } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useQueryClient } from "@tanstack/react-query";
-import { format } from "date-fns";
+import { format, isSameDay } from "date-fns";
 import { fr } from "date-fns/locale/fr";
 import type { Event } from "../api/generated/model";
 import { getDictionaryQueryKey } from "../api/generated/dictionary/dictionary";
@@ -12,11 +12,16 @@ import {
   useEventsStore,
   useEventsUpdate,
 } from "../api/generated/event/event";
-import { useAvailableRooms } from "../api/rooms";
+import { useRoomFreeSlots } from "../api/generated/room/room";
 import { useDictionary } from "../contexts/DictionaryContext";
 import { EventDateRangePicker } from "./EventDateRangePicker";
 import { MembersSelect } from "./MembersSelect";
 import { ScenarioSelect } from "./ScenarioSelect";
+
+interface FreeSlot {
+  start: string;
+  end: string;
+}
 
 interface Props {
   start: Date;
@@ -27,21 +32,13 @@ interface Props {
 }
 
 export function CreateEventModal({ start, end, onClose, event, initialRoomId }: Props) {
-  const { user, games, members } = useDictionary();
+  const { user, games, rooms, members } = useDictionary();
   const queryClient = useQueryClient();
 
   const mjDiscordId = event ? event.mj_discord_id : user.discord_id;
 
-  // In edit mode, start/end are editable — track them in local state so the
-  // available-rooms query reacts immediately when either date changes.
   const [editStart, setEditStart] = useState(start);
   const [editEnd, setEditEnd] = useState(end);
-
-  const { data: availableRooms, isLoading: isLoadingRooms } = useAvailableRooms(
-    event ? editStart : start,
-    event ? editEnd : end,
-    event?.id,
-  );
 
   const form = useForm({
     initialValues: {
@@ -64,16 +61,24 @@ export function CreateEventModal({ start, end, onClose, event, initialRoomId }: 
     },
   });
 
-  // When available rooms refresh after a date change, clear the selected room
-  // if it is no longer in the list.
-  useEffect(() => {
-    if (!availableRooms || !form.values.room_id) return;
-    const stillAvailable = availableRooms.some((r) => String(r.id) === form.values.room_id);
-    if (!stillAvailable) {
-      form.setFieldValue("room_id", null);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [availableRooms]);
+  const roomId = form.values.room_id ? Number(form.values.room_id) : null;
+  const dateStr = format(editStart, "yyyy-MM-dd");
+  const endDateStr = format(editEnd, "yyyy-MM-dd");
+
+  const { data: rawSlots, isLoading: isLoadingSlots } = useRoomFreeSlots(
+    roomId ?? 0,
+    { date: dateStr, end_date: endDateStr, event_id: event?.id ?? null },
+    { query: { enabled: roomId !== null } },
+  );
+  const freeSlots = rawSlots as FreeSlot[] | undefined;
+
+  // A slot is "active" if it fully contains the current interval
+  const isSlotActive = (slot: FreeSlot) =>
+    new Date(slot.start) <= editStart && new Date(slot.end) >= editEnd;
+
+  const intervalValid = !freeSlots || freeSlots.some(isSlotActive);
+
+  const noSlotsAtAll = freeSlots !== undefined && freeSlots.length === 0;
 
   const onSuccess = () => {
     queryClient.invalidateQueries({ queryKey: getEventsIndexQueryKey() });
@@ -99,10 +104,23 @@ export function CreateEventModal({ start, end, onClose, event, initialRoomId }: 
     setEditEnd(newEnd);
   };
 
+  const handleSlotClick = (slot: FreeSlot) => {
+    setEditStart(new Date(slot.start));
+    setEditEnd(new Date(slot.end));
+  };
+
+  const formatSlot = (slot: FreeSlot) => {
+    const s = new Date(slot.start);
+    const e = new Date(slot.end);
+    const dayStart = format(s, "EEE", { locale: fr });
+    const endPrefix = isSameDay(s, e) ? "" : `${format(e, "EEE", { locale: fr })} `;
+    return `${dayStart} ${format(s, "HH'h'mm")} → ${endPrefix}${format(e, "HH'h'mm")}`;
+  };
+
   const handleSubmit = form.onSubmit((values) => {
     const payload = {
-      datetime_start: (event ? editStart : start).toISOString(),
-      datetime_end: (event ? editEnd : end).toISOString(),
+      datetime_start: editStart.toISOString(),
+      datetime_end: editEnd.toISOString(),
       mj_discord_id: mjDiscordId!,
       room_id: Number(values.room_id),
       game_id: Number(values.game_id),
@@ -122,23 +140,46 @@ export function CreateEventModal({ start, end, onClose, event, initialRoomId }: 
   return (
     <form onSubmit={handleSubmit}>
       <Stack mt="sm">
-        {event ? (
-          <EventDateRangePicker start={editStart} end={editEnd} onChange={handleDateChange} />
-        ) : (
-          <Text size="sm" c="dimmed">
-            {format(start, "PPPp", { locale: fr })} → {format(end, "PPPp", { locale: fr })}
-          </Text>
-        )}
-
         <Select
           label="Salle"
           placeholder="Choisir une salle"
           required
-          data={(availableRooms ?? []).map((r) => ({ value: String(r.id), label: r.name }))}
-          disabled={isLoadingRooms}
-          rightSection={isLoadingRooms ? <Loader size="xs" /> : undefined}
+          data={rooms.map((r) => ({ value: String(r.id), label: r.name ?? r.code }))}
           {...form.getInputProps("room_id")}
         />
+
+        <EventDateRangePicker
+          start={editStart}
+          end={editEnd}
+          onChange={handleDateChange}
+          error={roomId && !intervalValid ? "Horaire non disponible pour cette salle" : undefined}
+        />
+
+        {roomId && (
+          <Stack gap={6}>
+            {isLoadingSlots ? (
+              <Loader size="xs" />
+            ) : noSlotsAtAll ? (
+              <Text size="xs" c="red">
+                Aucun créneau disponible pour cette salle ce jour-là.
+              </Text>
+            ) : freeSlots && freeSlots.length > 0 ? (
+              <Group gap="xs">
+                {freeSlots.map((slot) => (
+                  <Badge
+                    key={slot.start}
+                    variant={isSlotActive(slot) ? "filled" : "outline"}
+                    color="neon"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => handleSlotClick(slot)}
+                  >
+                    {formatSlot(slot)}
+                  </Badge>
+                ))}
+              </Group>
+            ) : null}
+          </Stack>
+        )}
 
         <Select
           label="Jeu"

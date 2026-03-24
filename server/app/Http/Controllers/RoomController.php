@@ -71,34 +71,37 @@ class RoomController extends Controller
      * Returns the free (unbooked) time slots for a room on a given date.
      *
      * Query params:
-     *   - date:     Y-m-d   (required) — the day to check, in club timezone
+     *   - date:     Y-m-d   (required) — range start day, in club timezone
+     *   - end_date: Y-m-d   (optional) — range end day, inclusive (defaults to date); use for multi-day slots
      *   - event_id: integer (optional) — exclude this event from the overlap check (editing flow)
      *
-     * For unlimited rooms, the full day minus any booked events is returned.
+     * For unlimited rooms, the full range minus any booked events is returned.
      * For constrained rooms, effective availability is computed first, then booked events are subtracted.
      */
     public function freeSlots(Request $request, Room $room): JsonResponse
     {
         $request->validate([
             'date'     => ['required', 'date_format:Y-m-d'],
+            'end_date' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:date'],
             'event_id' => ['nullable', 'integer', 'exists:events,id'],
         ]);
 
         $tz        = config('app.club_timezone');
-        $day       = Carbon::parse($request->input('date'), $tz)->startOfDay();
-        $excludeId = $request->integer('event_id') ?: null;
+        $rangeStart = Carbon::parse($request->input('date'), $tz)->startOfDay();
+        $rangeEnd   = Carbon::parse($request->input('end_date') ?? $request->input('date'), $tz)->endOfDay();
+        $excludeId  = $request->integer('event_id') ?: null;
 
         if ($room->unlimited) {
-            $slots = [new TimeInterval($day->copy(), $day->copy()->endOfDay())];
+            $slots = [new TimeInterval($rangeStart->copy(), $rangeEnd->copy())];
         } else {
-            $slots = $this->resolver->resolve($room, $day->copy(), $day->copy());
+            $slots = $this->resolver->resolve($room, $rangeStart->copy(), $rangeEnd->copy()->startOfDay());
         }
 
-        // Subtract booked events for this room on this day
+        // Subtract booked events for this room over the range
         $events = Event::where('room_id', $room->id)
             ->when($excludeId !== null, fn ($q) => $q->where('id', '!=', $excludeId))
-            ->where('datetime_start', '<', $day->copy()->endOfDay())
-            ->where('datetime_end', '>', $day->copy()->startOfDay())
+            ->where('datetime_start', '<', $rangeEnd)
+            ->where('datetime_end', '>', $rangeStart)
             ->get();
 
         foreach ($events as $event) {
