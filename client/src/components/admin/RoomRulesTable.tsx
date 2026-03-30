@@ -14,7 +14,13 @@ import { AdminTable, type DeleteState } from "./AdminTable";
 import { RoomRuleFormModal } from "./RoomRuleFormModal";
 
 const WEEKDAY_SHORT: Record<number, string> = {
-  1: "Lun", 2: "Mar", 3: "Mer", 4: "Jeu", 5: "Ven", 6: "Sam", 7: "Dim",
+  1: "Lun",
+  2: "Mar",
+  3: "Mer",
+  4: "Jeu",
+  5: "Ven",
+  6: "Sam",
+  7: "Dim",
 };
 
 const SCOPE_LABEL: Record<string, string> = {
@@ -136,6 +142,7 @@ export function RoomRulesTable() {
   return (
     <>
       <AdminTable
+        title="Règles de disponibilité des salles"
         columns={columns}
         data={rules}
         isLoading={isLoading}
@@ -148,11 +155,7 @@ export function RoomRulesTable() {
         initialSortDesc
       />
 
-      <RoomRuleFormModal
-        opened={modalOpened}
-        onClose={closeModal}
-        rule={editingRule}
-      />
+      <RoomRuleFormModal opened={modalOpened} onClose={closeModal} rule={editingRule} />
     </>
   );
 }

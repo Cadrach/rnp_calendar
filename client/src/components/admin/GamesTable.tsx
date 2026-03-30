@@ -62,6 +62,7 @@ export function GamesTable() {
   return (
     <>
       <AdminTable
+        title="Jeux"
         columns={columns}
         data={games}
         isLoading={isLoading}

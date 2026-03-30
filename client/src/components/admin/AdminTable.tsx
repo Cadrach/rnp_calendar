@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type React from "react";
 import { MantineReactTable, useMantineReactTable, type MRT_ColumnDef } from "mantine-react-table";
-import { ActionIcon, Alert, Button, Group, Popover, Stack, Text } from "@mantine/core";
+import { ActionIcon, Alert, Button, Group, Popover, Stack, Text, Title } from "@mantine/core";
 import { IconAlertCircle, IconEdit, IconPlus, IconTrash } from "@tabler/icons-react";
 import "../../styles/admin-table.css";
 
@@ -13,6 +13,7 @@ export interface DeleteState {
 }
 
 export interface AdminTableProps<T extends { id: number }> {
+  title: string;
   columns: MRT_ColumnDef<T>[];
   data: T[];
   isLoading?: boolean;
@@ -45,8 +46,8 @@ function DeleteButton<T extends { id: number }>({
   return (
     <Popover opened={opened} onClose={() => setOpened(false)} position="left" withArrow>
       <Popover.Target>
-        <ActionIcon variant="subtle" color="red" size="md" onClick={() => setOpened(true)}>
-          <IconTrash size={16} />
+        <ActionIcon variant="subtle" color="red" size="lg" onClick={() => setOpened(true)}>
+          <IconTrash size={32} />
         </ActionIcon>
       </Popover.Target>
       <Popover.Dropdown>
@@ -77,6 +78,7 @@ function DeleteButton<T extends { id: number }>({
 // ── AdminTable ─────────────────────────────────────────────────────────────────
 
 export function AdminTable<T extends { id: number }>({
+  title,
   columns,
   data,
   isLoading,
@@ -120,14 +122,9 @@ export function AdminTable<T extends { id: number }>({
       },
     },
     renderRowActions: ({ row }) => (
-      <Group gap={4} wrap="nowrap">
-        <ActionIcon
-          variant="subtle"
-          color="neon"
-          size="md"
-          onClick={() => onEdit(row.original)}
-        >
-          <IconEdit size={16} />
+      <Group gap="lg" wrap="nowrap">
+        <ActionIcon variant="subtle" color="neon" size="lg" onClick={() => onEdit(row.original)}>
+          <IconEdit size={32} />
         </ActionIcon>
         <DeleteButton
           row={row.original}
@@ -146,14 +143,15 @@ export function AdminTable<T extends { id: number }>({
     },
     initialState: {
       showGlobalFilter: true,
-      ...(initialSortId
-        ? { sorting: [{ id: initialSortId, desc: initialSortDesc }] }
-        : {}),
+      ...(initialSortId ? { sorting: [{ id: initialSortId, desc: initialSortDesc }] } : {}),
     },
   });
 
   return (
-    <div style={{ padding: "1rem", marginTop: 64, width }}>
+    <div style={{ padding: "1rem", width }}>
+      <Title order={2} mb="md">
+        {title}
+      </Title>
       <MantineReactTable table={table} />
     </div>
   );

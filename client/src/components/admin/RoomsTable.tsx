@@ -76,8 +76,14 @@ export function RoomsTable() {
     [],
   );
 
-  const openCreate = () => { setEditingRoom(undefined); openModal(); };
-  const openEdit = (room: Room) => { setEditingRoom(room); openModal(); };
+  const openCreate = () => {
+    setEditingRoom(undefined);
+    openModal();
+  };
+  const openEdit = (room: Room) => {
+    setEditingRoom(room);
+    openModal();
+  };
 
   const handleDelete = (room: Room) => {
     setDeleteState({ id: room.id, error: null });
@@ -87,6 +93,7 @@ export function RoomsTable() {
   return (
     <>
       <AdminTable
+        title="Salles"
         columns={columns}
         data={rooms}
         isLoading={isLoading}
@@ -97,12 +104,7 @@ export function RoomsTable() {
         deleteConfirmMessage="Supprimer cette salle ?"
         initialSortId="name"
       />
-
-      <RoomsFormModal
-        opened={modalOpened}
-        onClose={closeModal}
-        room={editingRoom}
-      />
+      <RoomsFormModal opened={modalOpened} onClose={closeModal} room={editingRoom} />
     </>
   );
 }
