@@ -82,6 +82,7 @@ function Shell() {
             />
             <Title
               order={4}
+              visibleFrom="sm"
               style={{
                 fontFamily: "'Orbitron', sans-serif",
                 fontWeight: 900,
@@ -93,6 +94,21 @@ function Shell() {
               }}
             >
               RNP Calendar
+            </Title>
+            <Title
+              order={4}
+              hiddenFrom="sm"
+              style={{
+                fontFamily: "'Orbitron', sans-serif",
+                fontWeight: 900,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                color: "#00d4e8",
+                textShadow:
+                  "0 0 6px #00d4e8, 0 0 16px rgba(0,212,232,0.9), 0 0 40px rgba(0,212,232,0.6), 0 0 80px rgba(0,212,232,0.3)",
+              }}
+            >
+              RNP Cal
             </Title>
           </Group>
           <UserBadge />

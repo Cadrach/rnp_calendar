@@ -41,6 +41,13 @@ const messages = {
   showMore: (count: number) => `+ ${count} de plus`,
 };
 
+const formats = {
+  dayHeaderFormat: (date: Date) => format(date, "EEEE d MMMM", { locale: fr }),
+  agendaDateFormat: (date: Date) => format(date, "EEE d MMM", { locale: fr }),
+  agendaHeaderFormat: ({ start, end }: { start: Date; end: Date }) =>
+    `${format(start, "d MMM", { locale: fr })} – ${format(end, "d MMM yyyy", { locale: fr })}`,
+};
+
 export function Calendar() {
   const navigate = useNavigate();
   const { id: showEventId } = useParams<{ id?: string }>();
@@ -118,6 +125,7 @@ export function Calendar() {
           selectable
           culture="fr"
           messages={messages}
+          formats={formats}
           components={components}
           eventPropGetter={eventStyleGetter}
           dayPropGetter={dayPropGetter}
