@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ActionIcon, Anchor, Button, Divider, Group, Stack, Text, Tooltip } from "@mantine/core";
+import { ActionIcon, Anchor, Button, Divider, Group, Loader, Stack, Text, Tooltip } from "@mantine/core";
 import {
   IconCalendar,
   IconUser,
@@ -13,7 +13,7 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale/fr";
-import { getEventsIndexQueryKey } from "../api/generated/event/event";
+import { getEventsIndexQueryKey, getEventsShowQueryKey, useEventsShow } from "../api/generated/event/event";
 import type { Event } from "../api/generated/model";
 import { useDictionary } from "../contexts/DictionaryContext";
 import { useEventsRegister, useEventsUnregister } from "../api/event-register";
@@ -28,19 +28,36 @@ interface Props {
 export function EventShowModal({ eventId }: Props) {
   const { games, rooms, scenarios, members, user, discordGuildId } = useDictionary();
   const queryClient = useQueryClient();
+
   // Search all cached events index queries (the Calendar uses a parameterized one)
-  // without triggering any new request.
   const allCachedEvents = queryClient
     .getQueriesData<Event[]>({ queryKey: getEventsIndexQueryKey() })
     .flatMap(([, data]) => data ?? []);
-  const event = allCachedEvents.find((e) => e.id === Number(eventId));
+  const cachedEvent = allCachedEvents.find((e) => e.id === Number(eventId));
+
+  // Fetch from API if not in cache
+  const { data: fetchedEvent, isLoading } = useEventsShow(Number(eventId), {
+    query: { enabled: !cachedEvent },
+  });
+
+  const event = cachedEvent ?? fetchedEvent;
   const [editing, setEditing] = useState(false);
 
-  const invalidateShow = () =>
+  const invalidateShow = () => {
     queryClient.invalidateQueries({ queryKey: getEventsIndexQueryKey() });
+    queryClient.invalidateQueries({ queryKey: getEventsShowQueryKey(Number(eventId)) });
+  };
 
   const registerMutation = useEventsRegister({ mutation: { onSuccess: invalidateShow } });
   const unregisterMutation = useEventsUnregister({ mutation: { onSuccess: invalidateShow } });
+
+  if (isLoading) {
+    return (
+      <Stack align="center" py="xl">
+        <Loader color="neon" />
+      </Stack>
+    );
+  }
 
   if (!event) return null;
 
