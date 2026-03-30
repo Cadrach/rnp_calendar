@@ -35,6 +35,7 @@ export function EventDateRangePicker({ start, end, onChange, error }: Props) {
           onChange={handleStartChange}
           valueFormat="DD/MM/YYYY HH:mm"
           firstDayOfWeek={1}
+          dropdownType="modal"
         />
         <DateTimePicker
           label="Fin"
@@ -44,6 +45,7 @@ export function EventDateRangePicker({ start, end, onChange, error }: Props) {
           minDate={start}
           valueFormat="DD/MM/YYYY HH:mm"
           firstDayOfWeek={1}
+          dropdownType="modal"
         />
       </Group>
       {error && (
