@@ -1,11 +1,12 @@
-import type { MutableRefObject } from "react";
+import type { RefObject } from "react";
 import { Flex, Group } from "@mantine/core";
 import type { ToolbarProps, NavigateAction, View } from "react-big-calendar";
-import { FilterDropdown, CalendarFilters } from "./CalendarFilter";
+import { FilterDropdown } from "./CalendarFilter";
+import type { CalendarFilters } from "../hooks/useCalendarFilters";
 import { IconArrowBigLeftFilled, IconArrowBigRightFilled } from "@tabler/icons-react";
 
 interface CalendarToolbarProps extends ToolbarProps {
-  filtersRef: MutableRefObject<CalendarFilters>;
+  filtersRef: RefObject<CalendarFilters>;
   onFiltersChange: (filters: CalendarFilters) => void;
 }
 

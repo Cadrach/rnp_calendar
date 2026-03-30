@@ -1,3 +1,5 @@
+@use "sass:color";
+
 // ─── Neon theme tokens ────────────────────────────────────────────────────────
 $bg: #071520;
 $bg-cell: #0a1c2e;
@@ -213,7 +215,7 @@ $text-muted: rgba(200, 244, 249, 0.25);
     letter-spacing: 0.04em;
 
     &:hover {
-        color: lighten(#00d4e8, 10%);
+        color: color.adjust(#00d4e8, $lightness: 10%);
         text-shadow: 0 0 6px $neon-glow;
     }
 }

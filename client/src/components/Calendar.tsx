@@ -10,7 +10,7 @@ import { useNavigate, useParams } from "react-router";
 import type { Event } from "../api/generated/model";
 import { CalendarEvent } from "./CalendarEvent";
 import { CalendarToolbar } from "./CalendarToolbar";
-import { CalendarFilters, DEFAULT_FILTERS } from "./CalendarFilter";
+import { CalendarFilters, DEFAULT_FILTERS } from "../hooks/useCalendarFilters";
 import { CreateEventModal } from "./CreateEventModal";
 import { EventShowModal } from "./EventShowModal";
 import { useDictionary } from "../contexts/DictionaryContext";

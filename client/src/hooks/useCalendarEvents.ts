@@ -3,7 +3,7 @@ import { colord, extend } from "colord";
 import a11yPlugin from "colord/plugins/a11y";
 import { useEventsIndex } from "../api/generated/event/event";
 import { useDictionary } from "../contexts/DictionaryContext";
-import type { CalendarFilters } from "../components/CalendarFilter";
+import type { CalendarFilters } from "./useCalendarFilters";
 
 extend([a11yPlugin]);
 

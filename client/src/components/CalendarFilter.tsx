@@ -1,4 +1,4 @@
-import { useMemo, useState, type MutableRefObject } from "react";
+import { useMemo, useState, type RefObject } from "react";
 import {
   Box,
   Button,
@@ -12,22 +12,7 @@ import {
 } from "@mantine/core";
 import { IconFilter } from "@tabler/icons-react";
 import { useDictionary } from "../contexts/DictionaryContext";
-
-export interface CalendarFilters {
-  roomId: number | null;
-  gameId: number | null;
-  mjId: string | null;
-  myCalendar: boolean;
-  availableSlots: [number, number] | null;
-}
-
-export const DEFAULT_FILTERS: CalendarFilters = {
-  roomId: null,
-  gameId: null,
-  mjId: null,
-  myCalendar: false,
-  availableSlots: null,
-};
+import { CalendarFilters, DEFAULT_FILTERS, useActiveFilterCount } from "../hooks/useCalendarFilters";
 
 const SLOT_MARKS = [
   { value: 0, label: "0" },
@@ -37,27 +22,15 @@ const SLOT_MARKS = [
   { value: 4, label: "4+" },
 ];
 
-export function useActiveFilterCount(filters: CalendarFilters): number {
-  return useMemo(() => {
-    let count = 0;
-    if (filters.roomId !== null) count++;
-    if (filters.gameId !== null) count++;
-    if (filters.mjId !== null) count++;
-    if (filters.myCalendar) count++;
-    if (filters.availableSlots !== null) count++;
-    return count;
-  }, [filters]);
-}
-
 interface FilterDropdownProps {
-  filtersRef: MutableRefObject<CalendarFilters>;
+  filtersRef: RefObject<CalendarFilters>;
   onChange: (filters: CalendarFilters) => void;
 }
 
 export function FilterDropdown({ filtersRef, onChange }: FilterDropdownProps) {
   const [opened, setOpened] = useState(false);
   // Local state for reactivity, initialized from ref
-  const [filters, setFilters] = useState(filtersRef.current);
+  const [filters, setFilters] = useState(filtersRef.current ?? DEFAULT_FILTERS);
   const { rooms, games, members } = useDictionary();
   const mjMembers = useMemo(() => members.filter((m) => m.is_mj), [members]);
   const activeCount = useActiveFilterCount(filters);
