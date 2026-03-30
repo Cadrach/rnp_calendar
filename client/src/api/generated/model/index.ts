@@ -20,6 +20,8 @@ export * from './dictionaryScenarii200ItemMj';
 export * from './discordPermissions200';
 export * from './discordTest200';
 export * from './event';
+export * from './eventDiscordSummary200';
+export * from './eventDiscordSummary403';
 export * from './eventRegister403';
 export * from './eventRegisterBody';
 export * from './eventsIndexParams';

@@ -26,6 +26,8 @@ import type {
 import type {
   AuthenticationExceptionResponse,
   Event,
+  EventDiscordSummary200,
+  EventDiscordSummary403,
   EventRegister403,
   EventRegisterBody,
   EventUnregister403,
@@ -501,4 +503,95 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getEventUnregisterMutationOptions(options), queryClient);
     }
+    /**
+ * @summary Generate a Discord-formatted summary of upcoming events.
+Admin only
+ */
+export const eventDiscordSummary = (
     
+ options?: SecondParameter<typeof axiosInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return axiosInstance<EventDiscordSummary200>(
+      {url: `/events-discord-summary`, method: 'GET', signal
+    },
+      options);
+    }
+  
+
+
+
+export const getEventDiscordSummaryQueryKey = () => {
+    return [
+    `/events-discord-summary`
+    ] as const;
+    }
+
+    
+export const getEventDiscordSummaryQueryOptions = <TData = Awaited<ReturnType<typeof eventDiscordSummary>>, TError = ErrorType<AuthenticationExceptionResponse | EventDiscordSummary403>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventDiscordSummary>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getEventDiscordSummaryQueryKey();
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof eventDiscordSummary>>> = ({ signal }) => eventDiscordSummary(requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof eventDiscordSummary>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type EventDiscordSummaryQueryResult = NonNullable<Awaited<ReturnType<typeof eventDiscordSummary>>>
+export type EventDiscordSummaryQueryError = ErrorType<AuthenticationExceptionResponse | EventDiscordSummary403>
+
+
+export function useEventDiscordSummary<TData = Awaited<ReturnType<typeof eventDiscordSummary>>, TError = ErrorType<AuthenticationExceptionResponse | EventDiscordSummary403>>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventDiscordSummary>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof eventDiscordSummary>>,
+          TError,
+          Awaited<ReturnType<typeof eventDiscordSummary>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useEventDiscordSummary<TData = Awaited<ReturnType<typeof eventDiscordSummary>>, TError = ErrorType<AuthenticationExceptionResponse | EventDiscordSummary403>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventDiscordSummary>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof eventDiscordSummary>>,
+          TError,
+          Awaited<ReturnType<typeof eventDiscordSummary>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useEventDiscordSummary<TData = Awaited<ReturnType<typeof eventDiscordSummary>>, TError = ErrorType<AuthenticationExceptionResponse | EventDiscordSummary403>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventDiscordSummary>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Generate a Discord-formatted summary of upcoming events.
+Admin only
+ */
+
+export function useEventDiscordSummary<TData = Awaited<ReturnType<typeof eventDiscordSummary>>, TError = ErrorType<AuthenticationExceptionResponse | EventDiscordSummary403>>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventDiscordSummary>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getEventDiscordSummaryQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+

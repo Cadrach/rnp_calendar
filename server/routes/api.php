@@ -92,6 +92,7 @@ Route::middleware('auth')->group(function () {
     Route::apiResource('events', EventController::class);
     Route::post('events/{event}/register', [EventController::class, 'register']);
     Route::post('events/{event}/unregister', [EventController::class, 'unregister']);
+    Route::get('events-discord-summary', [EventController::class, 'discordSummary']);
 
     Route::prefix('discord')->controller(DiscordController::class)->group(function () {
         Route::get('/test', 'test');

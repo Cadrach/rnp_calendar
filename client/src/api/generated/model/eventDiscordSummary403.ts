@@ -5,9 +5,7 @@
  * OpenAPI spec version: 0.0.1
  */
 
-export interface Game {
-  id: number;
-  name: string;
-  /** @nullable */
-  icon: string | null;
-}
+export type EventDiscordSummary403 = {
+  /** Error overview. */
+  message: string;
+};

@@ -14,6 +14,7 @@ import { useDisclosure } from "@mantine/hooks";
 import {
   IconBrandDiscord,
   IconCalendar,
+  IconClipboardList,
   IconLogout,
   IconSettings,
   IconShieldLock,
@@ -30,6 +31,7 @@ import { usePostAuthLogout } from "./api/generated/default/default";
 import { RoomRulesTable } from "./components/admin/RoomRulesTable";
 import { GamesTable } from "./components/admin/GamesTable";
 import { RoomsTable } from "./components/admin/RoomsTable";
+import { DiscordSummaryModal } from "./components/admin/DiscordSummaryModal";
 
 // ── Admin pages registry ───────────────────────────────────────────────────────
 // Add new CRUD pages here; they'll appear automatically in the admin nav section.
@@ -44,6 +46,7 @@ const ADMIN_PAGES = [
 
 function Shell() {
   const [navOpened, { toggle: toggleNav, close: closeNav }] = useDisclosure(false);
+  const [summaryOpened, { open: openSummary, close: closeSummary }] = useDisclosure(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { user, discordGuildId } = useDictionary();
@@ -166,6 +169,17 @@ function Shell() {
                   color="neon"
                 />
               ))}
+              <Divider my={4} />
+              <NavLink
+                label="Résumé Discord"
+                leftSection={<IconClipboardList size={16} />}
+                onClick={() => {
+                  closeNav();
+                  openSummary();
+                }}
+                variant="subtle"
+                color="indigo"
+              />
             </>
           )}
         </Stack>
@@ -200,6 +214,8 @@ function Shell() {
           <Route path="/admin/rooms" element={<RoomsTable />} />
         </Routes>
       </AppShell.Main>
+
+      <DiscordSummaryModal opened={summaryOpened} onClose={closeSummary} />
     </AppShell>
   );
 }

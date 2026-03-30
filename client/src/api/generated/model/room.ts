@@ -9,8 +9,8 @@ export interface Room {
   id: number;
   code: string;
   name: string;
+  unlimited: boolean;
   /** @nullable */
   url: string | null;
   color: string;
-  unlimited: boolean;
 }
