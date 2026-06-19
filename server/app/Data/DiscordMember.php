@@ -23,7 +23,7 @@ class DiscordMember
 
         return new self(
             id:       $user['id'],
-            username: $user['global_name'] ?? $user['username'],
+            username: $member['nick'] ?? $user['global_name'] ?? $user['username'],
             avatar:   isset($user['avatar'])
                 ? "https://cdn.discordapp.com/avatars/{$user['id']}/{$user['avatar']}.png"
                 : null,
