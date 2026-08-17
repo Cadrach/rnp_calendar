@@ -35,7 +35,7 @@ export function RoomRulesTable() {
   const { data: rules = [], isLoading } = useRoomRulesIndex();
 
   const [modalOpened, { open: openModal, close: closeModal }] = useDisclosure(false);
-  const [editingRule, setEditingRule] = useState<RoomRule | undefined>(undefined);
+  const [editingRule, setEditingRule] = useState<Partial<RoomRule> | undefined>(undefined);
   const [deleteState, setDeleteState] = useState<DeleteState | null>(null);
 
   const destroy = useRoomRulesDestroy({
@@ -124,12 +124,7 @@ export function RoomRulesTable() {
     [rooms],
   );
 
-  const openCreate = () => {
-    setEditingRule(undefined);
-    openModal();
-  };
-
-  const openEdit = (rule: RoomRule) => {
+  const openForm = (rule?: Partial<RoomRule>) => {
     setEditingRule(rule);
     openModal();
   };
@@ -146,8 +141,9 @@ export function RoomRulesTable() {
         columns={columns}
         data={rules}
         isLoading={isLoading}
-        onCreate={openCreate}
-        onEdit={openEdit}
+        onCreate={() => openForm()}
+        onEdit={openForm}
+        onDuplicate={openForm}
         onDelete={handleDelete}
         deleteState={deleteState}
         deleteConfirmMessage="Supprimer cette règle ?"

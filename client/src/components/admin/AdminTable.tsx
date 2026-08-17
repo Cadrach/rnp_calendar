@@ -2,7 +2,7 @@ import { useState } from "react";
 import type React from "react";
 import { MantineReactTable, useMantineReactTable, type MRT_ColumnDef } from "mantine-react-table";
 import { ActionIcon, Alert, Button, Group, Popover, Stack, Text, Title } from "@mantine/core";
-import { IconAlertCircle, IconEdit, IconPlus, IconTrash } from "@tabler/icons-react";
+import { IconAlertCircle, IconCopy, IconEdit, IconPlus, IconTrash } from "@tabler/icons-react";
 import "../../styles/admin-table.css";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -19,6 +19,8 @@ export interface AdminTableProps<T extends { id: number }> {
   isLoading?: boolean;
   onCreate: () => void;
   onEdit: (row: T) => void;
+  /** Receives the row without its `id`, so the form opens as a creation. */
+  onDuplicate?: (row: Omit<T, "id">) => void;
   onDelete: (row: T) => void;
   deleteState?: DeleteState | null;
   deleteConfirmMessage?: string;
@@ -84,6 +86,7 @@ export function AdminTable<T extends { id: number }>({
   isLoading,
   onCreate,
   onEdit,
+  onDuplicate,
   onDelete,
   deleteState,
   deleteConfirmMessage = "Supprimer cet élément ?",
@@ -118,7 +121,7 @@ export function AdminTable<T extends { id: number }>({
             Créer
           </Button>
         ),
-        size: 90,
+        size: onDuplicate ? 140 : 90,
       },
     },
     renderRowActions: ({ row }) => (
@@ -126,6 +129,20 @@ export function AdminTable<T extends { id: number }>({
         <ActionIcon variant="subtle" color="neon" size="lg" onClick={() => onEdit(row.original)}>
           <IconEdit size={32} />
         </ActionIcon>
+        {onDuplicate && (
+          <ActionIcon
+            variant="subtle"
+            color="neon"
+            size="lg"
+            title="Dupliquer"
+            onClick={() => {
+              const { id: _id, ...rest } = row.original;
+              onDuplicate(rest);
+            }}
+          >
+            <IconCopy size={32} />
+          </ActionIcon>
+        )}
         <DeleteButton
           row={row.original}
           onDelete={() => onDelete(row.original)}

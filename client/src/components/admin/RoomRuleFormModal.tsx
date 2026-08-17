@@ -33,10 +33,11 @@ const WEEKDAYS = [
 interface Props {
   opened: boolean;
   onClose: () => void;
-  rule?: RoomRule;
+  /** Without `id`, the form prefills from these values but submits as a creation. */
+  rule?: Partial<RoomRule>;
 }
 
-function valuesFromRule(rule?: RoomRule) {
+function valuesFromRule(rule?: Partial<RoomRule>) {
   return {
     room_id: rule?.room_id ? String(rule.room_id) : (null as string | null),
     kind: rule?.kind ?? "available",
@@ -103,7 +104,7 @@ export function RoomRuleFormModal({ opened, onClose, rule }: Props) {
       reason: values.reason || null,
     };
 
-    if (rule) {
+    if (rule?.id) {
       update.mutate({ roomRule: rule.id, data: payload });
     } else {
       store.mutate({ data: payload });
@@ -114,7 +115,7 @@ export function RoomRuleFormModal({ opened, onClose, rule }: Props) {
     <Modal
       opened={opened}
       onClose={onClose}
-      title={rule ? "Modifier la règle" : "Nouvelle règle"}
+      title={rule?.id ? "Modifier la règle" : "Nouvelle règle"}
     >
       <form onSubmit={handleSubmit}>
         <Stack>
@@ -182,7 +183,7 @@ export function RoomRuleFormModal({ opened, onClose, rule }: Props) {
           <TextInput label="Raison" placeholder="Optionnel" {...form.getInputProps("reason")} />
 
           <Button type="submit" loading={isPending}>
-            {rule ? "Modifier" : "Créer"}
+            {rule?.id ? "Modifier" : "Créer"}
           </Button>
         </Stack>
       </form>
