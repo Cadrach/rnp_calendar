@@ -2,6 +2,8 @@ import { useMemo, useState } from "react";
 import { useDisclosure } from "@mantine/hooks";
 import { Badge } from "@mantine/core";
 import { useQueryClient } from "@tanstack/react-query";
+import { format, isValid, parseISO } from "date-fns";
+import { fr } from "date-fns/locale/fr";
 import type { MRT_ColumnDef } from "mantine-react-table";
 import {
   getRoomRulesIndexQueryKey,
@@ -53,7 +55,17 @@ export function RoomRulesTable() {
   const roomName = (id: number) => rooms.find((r) => r.id === id)?.name ?? String(id);
 
   const formatDays = (rule: RoomRule) => {
-    if (rule.scope === "once") return rule.date ?? "—";
+    if (rule.scope === "once") {
+      const iso = rule.date?.slice(0, 10);
+      if (!iso) return "—";
+      const parsed = parseISO(iso);
+      if (!isValid(parsed)) return iso;
+      const human = format(parsed, "EEEE d MMMM yyyy", { locale: fr }).replace(
+        /\p{L}+/gu,
+        (w) => w.charAt(0).toUpperCase() + w.slice(1),
+      );
+      return `${human} (${iso})`;
+    }
     if (rule.scope === "weekly") {
       const days = (rule.weekdays as number[] | null) ?? [];
       return days.map((d) => WEEKDAY_SHORT[d] ?? d).join(", ");
