@@ -64,6 +64,7 @@ class RoomRuleController extends Controller
         $this->authorizeAdmin($request);
 
         $data = $request->validate([
+            'room_id'     => ['sometimes', 'integer', 'exists:rooms,id'],
             'kind'        => ['sometimes', Rule::in([RoomRule::KIND_AVAILABLE, RoomRule::KIND_UNAVAILABLE])],
             'scope'       => ['sometimes', Rule::in([RoomRule::SCOPE_DAILY, RoomRule::SCOPE_WEEKLY, RoomRule::SCOPE_ONCE])],
             'date'        => ['nullable', 'date_format:Y-m-d'],
@@ -76,6 +77,13 @@ class RoomRuleController extends Controller
             'priority'    => ['sometimes', 'integer'],
             'reason'      => ['nullable', 'string', 'max:255'],
         ]);
+
+        if (isset($data['room_id'])) {
+            $room = Room::findOrFail($data['room_id']);
+            if ($room->unlimited) {
+                abort(422, 'Les salles illimitées ne peuvent pas avoir de règles de disponibilité.');
+            }
+        }
 
         $roomRule->update($data);
 
