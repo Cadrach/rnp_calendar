@@ -14,7 +14,8 @@ import {
 } from "../api/generated/event/event";
 import { useRoomFreeSlots } from "../api/generated/room/room";
 import { useDictionary } from "../contexts/DictionaryContext";
-import { EventDateRangePicker } from "./EventDateRangePicker";
+import { addDuration, clampDuration, durationBetween, MIN_EVENT_DURATION } from "../utils/duration";
+import { EventScheduleFields } from "./EventScheduleFields";
 import { MembersSelect } from "./MembersSelect";
 import { ScenarioSelect } from "./ScenarioSelect";
 
@@ -38,7 +39,13 @@ export function CreateEventModal({ start, end, onClose, event, initialRoomId }: 
   const mjDiscordId = event ? event.mj_discord_id : user.discord_id;
 
   const [editStart, setEditStart] = useState(start);
-  const [editEnd, setEditEnd] = useState(end);
+  const [duration, setDuration] = useState(() =>
+    clampDuration(durationBetween(start, end), MIN_EVENT_DURATION),
+  );
+  const [durationInvalid, setDurationInvalid] = useState(false);
+
+  // Derived, never stored: the server contract still takes datetime_end.
+  const editEnd = addDuration(editStart, duration);
 
   const form = useForm({
     initialValues: {
@@ -99,14 +106,11 @@ export function CreateEventModal({ start, end, onClose, event, initialRoomId }: 
     form.setFieldValue("scenario_key", null);
   };
 
-  const handleDateChange = (newStart: Date, newEnd: Date) => {
-    setEditStart(newStart);
-    setEditEnd(newEnd);
-  };
-
   const handleSlotClick = (slot: FreeSlot) => {
-    setEditStart(new Date(slot.start));
-    setEditEnd(new Date(slot.end));
+    const slotStart = new Date(slot.start);
+    setEditStart(slotStart);
+    setDuration(clampDuration(durationBetween(slotStart, new Date(slot.end)), MIN_EVENT_DURATION));
+    setDurationInvalid(false);
   };
 
   const formatSlot = (slot: FreeSlot) => {
@@ -118,6 +122,8 @@ export function CreateEventModal({ start, end, onClose, event, initialRoomId }: 
   };
 
   const handleSubmit = form.onSubmit((values) => {
+    if (durationInvalid) return;
+
     const payload = {
       datetime_start: editStart.toISOString(),
       datetime_end: editEnd.toISOString(),
@@ -148,10 +154,12 @@ export function CreateEventModal({ start, end, onClose, event, initialRoomId }: 
           {...form.getInputProps("room_id")}
         />
 
-        <EventDateRangePicker
+        <EventScheduleFields
           start={editStart}
-          end={editEnd}
-          onChange={handleDateChange}
+          duration={duration}
+          onStartChange={setEditStart}
+          onDurationChange={setDuration}
+          onDurationInvalidChange={setDurationInvalid}
           error={roomId && !intervalValid ? "Horaire non disponible pour cette salle" : undefined}
         />
 
@@ -220,7 +228,7 @@ export function CreateEventModal({ start, end, onClose, event, initialRoomId }: 
           maxValues={form.values.max_players ?? undefined}
         />
 
-        <Button type="submit" loading={isPending}>
+        <Button type="submit" loading={isPending} disabled={durationInvalid}>
           {event ? "Modifier" : "Créer"}
         </Button>
       </Stack>

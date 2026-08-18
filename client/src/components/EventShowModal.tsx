@@ -17,6 +17,7 @@ import { getEventsIndexQueryKey, getEventsShowQueryKey, useEventsShow } from "..
 import type { Event } from "../api/generated/model";
 import { useDictionary } from "../contexts/DictionaryContext";
 import { useEventsRegister, useEventsUnregister } from "../api/event-register";
+import { durationBetween, formatDurationLabel } from "../utils/duration";
 import { MemberAvatar } from "./MemberAvatar";
 import { CreateEventModal } from "./CreateEventModal";
 import { DeleteEventButton } from "./DeleteEventButton";
@@ -79,11 +80,7 @@ export function EventShowModal({ eventId }: Props) {
 
   const start = new Date(event.datetime_start);
   const end = new Date(event.datetime_end);
-  const durationMinutes = Math.round((end.getTime() - start.getTime()) / 60000);
-  const durationHours = Math.floor(durationMinutes / 60);
-  const durationRemainder = durationMinutes % 60;
-  const durationLabel =
-    durationRemainder > 0 ? `${durationHours}h${String(durationRemainder).padStart(2, "0")}` : `${durationHours}h`;
+  const durationLabel = formatDurationLabel(durationBetween(start, end));
 
   const playerIds = (event.player_ids as string[] | null) ?? [];
   const registeredCount = playerIds.length;
