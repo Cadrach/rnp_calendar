@@ -54,6 +54,67 @@ class RoomController extends Controller
 
 
     /**
+     * Returns the free (unbooked) time slots for a room on a given date.
+     *
+     * Query params:
+     *   - date:     Y-m-d   (required) — range start day, in club timezone
+     *   - end_date: Y-m-d   (optional) — range end day, inclusive (defaults to date); use for multi-day slots
+     *   - event_id: integer (optional) — exclude this event from the overlap check (editing flow)
+     *
+     * Unlimited rooms bypass every booking check, so the whole range is returned as a single slot
+     * with no event subtraction at all — consistent with EventBookingValidator, which accepts any
+     * interval for them.
+     * For constrained rooms, effective availability is computed first, then booked events are subtracted.
+     *
+     * All boundaries are serialized in the club timezone so a slot never mixes offsets.
+     */
+    public function freeSlots(Request $request, Room $room): JsonResponse
+    {
+        $request->validate([
+            'date'     => ['required', 'date_format:Y-m-d'],
+            'end_date' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:date'],
+            'event_id' => ['nullable', 'integer', 'exists:events,id'],
+        ]);
+
+        $tz         = config('app.club_timezone');
+        $rangeStart = Carbon::parse($request->input('date'), $tz)->startOfDay();
+        $rangeEnd   = Carbon::parse($request->input('end_date') ?? $request->input('date'), $tz)->endOfDay();
+        $excludeId  = $request->integer('event_id') ?: null;
+
+        if ($room->unlimited) {
+            return response()->json([[
+                'start' => $rangeStart->toIso8601String(),
+                'end'   => $rangeEnd->toIso8601String(),
+            ]]);
+        }
+
+        $slots = $this->resolver->resolve($room, $rangeStart->copy(), $rangeEnd->copy()->startOfDay());
+
+        // datetime_start / datetime_end are stored in UTC, and Connection::prepareBindings()
+        // formats Carbon bindings without converting them — so hand it UTC instants explicitly,
+        // otherwise club-timezone wall clock would be compared against UTC values.
+        $events = Event::where('room_id', $room->id)
+            ->when($excludeId !== null, fn ($q) => $q->where('id', '!=', $excludeId))
+            ->where('datetime_start', '<', $rangeEnd->copy()->utc())
+            ->where('datetime_end', '>', $rangeStart->copy()->utc())
+            ->get();
+
+        foreach ($events as $event) {
+            $slots = $this->resolver->subtractInterval($slots, new TimeInterval(
+                $event->datetime_start->copy()->setTimezone($tz),
+                $event->datetime_end->copy()->setTimezone($tz),
+            ));
+        }
+
+        $result = array_map(fn (TimeInterval $s) => [
+            'start' => $s->start->copy()->setTimezone($tz)->toIso8601String(),
+            'end'   => $s->end->copy()->setTimezone($tz)->toIso8601String(),
+        ], $slots);
+
+        return response()->json(array_values($result));
+    }
+
+    /**
      * Returns the effective available intervals for a room over the requested date range.
      *
      * Query params:
@@ -67,73 +128,6 @@ class RoomController extends Controller
      * For unlimited rooms the entire requested range is returned as a single interval,
      * since no booking restriction applies.
      */
-    /**
-     * Returns the free (unbooked) time slots for a room on a given date.
-     *
-     * Query params:
-     *   - date:     Y-m-d   (required) — range start day, in club timezone
-     *   - end_date: Y-m-d   (optional) — range end day, inclusive (defaults to date); use for multi-day slots
-     *   - event_id: integer (optional) — exclude this event from the overlap check (editing flow)
-     *
-     * For unlimited rooms, the full range minus any booked events is returned.
-     * For constrained rooms, effective availability is computed first, then booked events are subtracted.
-     */
-    public function freeSlots(Request $request, Room $room): JsonResponse
-    {
-        $request->validate([
-            'date'     => ['required', 'date_format:Y-m-d'],
-            'end_date' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:date'],
-            'event_id' => ['nullable', 'integer', 'exists:events,id'],
-        ]);
-
-        $tz        = config('app.club_timezone');
-        $rangeStart = Carbon::parse($request->input('date'), $tz)->startOfDay();
-        $rangeEnd   = Carbon::parse($request->input('end_date') ?? $request->input('date'), $tz)->endOfDay();
-        $excludeId  = $request->integer('event_id') ?: null;
-
-        if ($room->unlimited) {
-            $slots = [new TimeInterval($rangeStart->copy(), $rangeEnd->copy())];
-        } else {
-            $slots = $this->resolver->resolve($room, $rangeStart->copy(), $rangeEnd->copy()->startOfDay());
-        }
-
-        // Subtract booked events for this room over the range
-        $events = Event::where('room_id', $room->id)
-            ->when($excludeId !== null, fn ($q) => $q->where('id', '!=', $excludeId))
-            ->where('datetime_start', '<', $rangeEnd)
-            ->where('datetime_end', '>', $rangeStart)
-            ->get();
-
-        foreach ($events as $event) {
-            $booked = new TimeInterval(
-                Carbon::parse($event->datetime_start),
-                Carbon::parse($event->datetime_end),
-            );
-
-            $remaining = [];
-            foreach ($slots as $slot) {
-                if (! $slot->overlaps($booked)) {
-                    $remaining[] = $slot;
-                    continue;
-                }
-                if ($slot->start < $booked->start) {
-                    $remaining[] = new TimeInterval($slot->start, $booked->start);
-                }
-                if ($slot->end > $booked->end) {
-                    $remaining[] = new TimeInterval($booked->end, $slot->end);
-                }
-            }
-            $slots = $remaining;
-        }
-
-        $result = array_map(fn (TimeInterval $s) => [
-            'start' => $s->start->toIso8601String(),
-            'end'   => $s->end->toIso8601String(),
-        ], $slots);
-
-        return response()->json(array_values($result));
-    }
-
     public function availability(Request $request, Room $room): JsonResponse
     {
         $request->validate([

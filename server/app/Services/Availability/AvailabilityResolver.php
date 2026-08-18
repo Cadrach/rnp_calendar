@@ -99,7 +99,7 @@ class AvailabilityResolver
      * @param  TimeInterval[] $slots
      * @return TimeInterval[]
      */
-    private function subtractInterval(array $slots, TimeInterval $block): array
+    public function subtractInterval(array $slots, TimeInterval $block): array
     {
         $result = [];
 
