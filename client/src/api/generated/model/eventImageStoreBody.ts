@@ -5,7 +5,10 @@
  * OpenAPI spec version: 0.0.1
  */
 
-export interface Game {
-  id: number;
-  name: string;
-}
+export type EventImageStoreBody = {
+  /**
+   * @minItems 1
+   * @maxItems 10
+   */
+  images: Blob[];
+};

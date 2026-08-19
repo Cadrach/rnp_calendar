@@ -8,6 +8,7 @@ import type { RoomRulesUpdateBodyKind } from './roomRulesUpdateBodyKind';
 import type { RoomRulesUpdateBodyScope } from './roomRulesUpdateBodyScope';
 
 export type RoomRulesUpdateBody = {
+  room_id?: number;
   kind?: RoomRulesUpdateBodyKind;
   scope?: RoomRulesUpdateBodyScope;
   /** @nullable */

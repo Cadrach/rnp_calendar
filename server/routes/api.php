@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DictionaryController;
 use App\Http\Controllers\DiscordController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\EventImageController;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\ScenarioController;
 use App\Http\Controllers\RoomController;
@@ -75,6 +76,10 @@ Route::prefix('auth')->group(function () {
 
 
 
+// Public: an <img> cannot carry the SameSite=lax session cookie cross-origin, so the opaque
+// 32-char slug is what guards these. Redirects to a freshly signed Discord CDN URL.
+Route::get('images/{slug}', [EventImageController::class, 'show']);
+
 // Protected routes go here
 Route::middleware('auth')->group(function () {
     Route::get('/dictionary', DictionaryController::class);
@@ -92,6 +97,8 @@ Route::middleware('auth')->group(function () {
     Route::apiResource('events', EventController::class);
     Route::post('events/{event}/register', [EventController::class, 'register']);
     Route::post('events/{event}/unregister', [EventController::class, 'unregister']);
+    Route::post('events/{event}/images', [EventImageController::class, 'store']);
+    Route::delete('events/{event}/images/{image}', [EventImageController::class, 'destroy']);
     Route::get('events-discord-summary', [EventController::class, 'discordSummary']);
 
     Route::prefix('discord')->controller(DiscordController::class)->group(function () {

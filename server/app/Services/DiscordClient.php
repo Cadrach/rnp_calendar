@@ -54,6 +54,34 @@ class DiscordClient
         return $response->json();
     }
 
+    /**
+     * PATCH with a multipart/form-data body, as required whenever files are involved.
+     *
+     * The JSON part travels as `payload_json` and each file as `files[n]`, per Discord's
+     * "Uploading Files" contract. Uploads are far slower than this client's text-only calls, hence
+     * the explicit timeout.
+     *
+     * @param  array<int, array{contents: string, filename: string}>  $files
+     */
+    private function patchMultipart(string $endpoint, array $payload, array $files): array
+    {
+        $request = $this->http()->timeout(60);
+
+        foreach (array_values($files) as $i => $file) {
+            $request = $request->attach("files[{$i}]", $file['contents'], $file['filename']);
+        }
+
+        $response = $request->patch(self::BASE_URL . $endpoint, [
+            'payload_json' => json_encode($payload),
+        ]);
+
+        if ($response->failed()) {
+            throw new DiscordApiException($response->json(), $response->status());
+        }
+
+        return $response->json();
+    }
+
     public function getMe(): array
     {
         return $this->get('/users/@me');
@@ -127,6 +155,37 @@ class DiscordClient
     public function editMessage(string $channelId, string $messageId, string $content): array
     {
         return $this->patch("/channels/{$channelId}/messages/{$messageId}", ['content' => $content, 'flags' => 4]);
+    }
+
+    /**
+     * Replaces a message's attachment set.
+     *
+     * $keepIds lists the existing attachment ids to preserve — anything omitted is removed by
+     * Discord. New uploads are appended, each referenced from the `attachments` manifest by its
+     * `files[n]` index. `content` and `flags` are deliberately absent so the message body is left
+     * untouched.
+     *
+     * Returns the updated message, whose `attachments` array is the authoritative post-upload state.
+     *
+     * @param  array<int, string>  $keepIds
+     * @param  array<int, array{contents: string, filename: string}>  $files
+     */
+    public function setMessageAttachments(string $channelId, string $messageId, array $keepIds, array $files = []): array
+    {
+        $manifest = array_map(fn (string $id) => ['id' => $id], array_values($keepIds));
+
+        foreach (array_values($files) as $i => $file) {
+            $manifest[] = ['id' => $i, 'filename' => $file['filename']];
+        }
+
+        $endpoint = "/channels/{$channelId}/messages/{$messageId}";
+        $payload  = ['attachments' => $manifest];
+
+        // Removing attachments needs no file parts, and a plain JSON edit is the correct shape then —
+        // multipart is only how new bytes travel.
+        return $files === []
+            ? $this->patch($endpoint, $payload)
+            : $this->patchMultipart($endpoint, $payload, $files);
     }
 
     public function createRole(array $data): array

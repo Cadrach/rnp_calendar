@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Event extends Model
@@ -25,6 +26,10 @@ class Event extends Model
         'description',
     ];
 
+    // EventShowModal reads events out of the cached index query before falling back to show,
+    // so images have to be present on every return path or the detail view misses them.
+    protected $with = ['images'];
+
     protected $casts = [
         'datetime_start' => 'datetime',
         'datetime_end'   => 'datetime',
@@ -45,5 +50,10 @@ class Event extends Model
     public function scenario(): BelongsTo
     {
         return $this->belongsTo(Scenario::class);
+    }
+
+    public function images(): HasMany
+    {
+        return $this->hasMany(EventImage::class)->orderBy('position')->orderBy('id');
     }
 }

@@ -13,8 +13,10 @@ import {
   useEventsUpdate,
 } from "../api/generated/event/event";
 import { useRoomFreeSlots } from "../api/generated/room/room";
+import { eventImages, eventsImagesStore, useEventsImagesDestroy } from "../api/event-images";
 import { useDictionary } from "../contexts/DictionaryContext";
 import { addDuration, clampDuration, durationBetween, MIN_EVENT_DURATION } from "../utils/duration";
+import { EventImagesField } from "./EventImagesField";
 import { EventScheduleFields } from "./EventScheduleFields";
 import { MembersSelect } from "./MembersSelect";
 import { ScenarioSelect } from "./ScenarioSelect";
@@ -43,6 +45,14 @@ export function CreateEventModal({ start, end, onClose, event, initialRoomId }: 
     clampDuration(durationBetween(start, end), MIN_EVENT_DURATION),
   );
   const [durationInvalid, setDurationInvalid] = useState(false);
+
+  // Illustrations: picked here, uploaded once the event (and so its Discord post) exists.
+  const [newFiles, setNewFiles] = useState<File[]>([]);
+  const [deletedImageIds, setDeletedImageIds] = useState<number[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const [imagesError, setImagesError] = useState<string | undefined>(undefined);
+
+  const existingImages = eventImages(event).filter((i) => !deletedImageIds.includes(i.id));
 
   // Derived, never stored: the server contract still takes datetime_end.
   const editEnd = addDuration(editStart, duration);
@@ -87,19 +97,60 @@ export function CreateEventModal({ start, end, onClose, event, initialRoomId }: 
 
   const noSlotsAtAll = freeSlots !== undefined && freeSlots.length === 0;
 
-  const onSuccess = () => {
+  const invalidate = (eventId?: number) => {
     queryClient.invalidateQueries({ queryKey: getEventsIndexQueryKey() });
     queryClient.invalidateQueries({ queryKey: getDictionaryQueryKey() });
-    if (event) {
-      queryClient.invalidateQueries({ queryKey: getEventsShowQueryKey(event.id) });
+    if (eventId) {
+      queryClient.invalidateQueries({ queryKey: getEventsShowQueryKey(eventId) });
     }
+  };
+
+  // Images cannot ride along with the event payload: PHP never populates $_FILES on PUT/PATCH, and
+  // on create the Discord post only exists once the event has been saved. Hence a second step.
+  const onSuccess = async (saved: Event) => {
+    if (newFiles.length > 0) {
+      setUploading(true);
+      try {
+        await eventsImagesStore(saved.id, newFiles);
+        setNewFiles([]);
+      } catch {
+        // The event itself is saved — say so rather than pretending nothing happened.
+        setImagesError(
+          "Les illustrations n'ont pas pu être envoyées. La séance est enregistrée, réessayez depuis « Modifier ».",
+        );
+        setUploading(false);
+        invalidate(saved.id);
+        return;
+      }
+      setUploading(false);
+    }
+
+    invalidate(saved.id);
     onClose();
   };
 
   const store = useEventsStore({ mutation: { onSuccess } });
   const update = useEventsUpdate({ mutation: { onSuccess } });
 
-  const isPending = store.isPending || update.isPending;
+  const destroyImage = useEventsImagesDestroy({
+    mutation: {
+      onSuccess: (_data, variables) => invalidate(variables.event),
+      onError: () => {
+        setImagesError("L'illustration n'a pas pu être supprimée.");
+        setDeletedImageIds([]);
+      },
+    },
+  });
+
+  const handleDeleteImage = (imageId: number) => {
+    if (!event) return;
+    setImagesError(undefined);
+    // Optimistic: drop the thumbnail now, the invalidation confirms it.
+    setDeletedImageIds((ids) => [...ids, imageId]);
+    destroyImage.mutate({ event: event.id, image: imageId });
+  };
+
+  const isPending = store.isPending || update.isPending || uploading;
 
   const handleGameChange = (value: string | null) => {
     form.setFieldValue("game_id", value);
@@ -226,6 +277,19 @@ export function CreateEventModal({ start, end, onClose, event, initialRoomId }: 
           value={form.values.player_ids}
           onChange={(ids) => form.setFieldValue("player_ids", ids)}
           maxValues={form.values.max_players ?? undefined}
+        />
+
+        <EventImagesField
+          existing={existingImages}
+          files={newFiles}
+          onFilesChange={(files) => {
+            setImagesError(undefined);
+            setNewFiles(files);
+          }}
+          onDeleteExisting={(image) => handleDeleteImage(image.id)}
+          deletingId={destroyImage.isPending ? destroyImage.variables?.image : null}
+          disabled={isPending}
+          error={imagesError}
         />
 
         <Button type="submit" loading={isPending} disabled={durationInvalid}>

@@ -1,5 +1,16 @@
 import { useState } from "react";
-import { ActionIcon, Anchor, Button, Divider, Group, Loader, Stack, Text, Tooltip } from "@mantine/core";
+import {
+  ActionIcon,
+  Anchor,
+  Button,
+  Divider,
+  Group,
+  Image,
+  Loader,
+  Stack,
+  Text,
+  Tooltip,
+} from "@mantine/core";
 import {
   IconCalendar,
   IconUser,
@@ -13,10 +24,15 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale/fr";
-import { getEventsIndexQueryKey, getEventsShowQueryKey, useEventsShow } from "../api/generated/event/event";
+import {
+  getEventsIndexQueryKey,
+  getEventsShowQueryKey,
+  useEventsShow,
+} from "../api/generated/event/event";
 import type { Event } from "../api/generated/model";
 import { useDictionary } from "../contexts/DictionaryContext";
 import { useEventsRegister, useEventsUnregister } from "../api/event-register";
+import { eventImages } from "../api/event-images";
 import { durationBetween, formatDurationLabel } from "../utils/duration";
 import { MemberAvatar } from "./MemberAvatar";
 import { CreateEventModal } from "./CreateEventModal";
@@ -88,6 +104,7 @@ export function EventShowModal({ eventId }: Props) {
   const isRegistered = !!user.discord_id && playerIds.includes(user.discord_id);
 
   const isClosed = (event as unknown as { is_closed: boolean }).is_closed ?? false;
+  const images = eventImages(event);
   const canEdit = user.is_admin || user.discord_id === event.mj_discord_id;
 
   const roomLabel = room?.url ? (
@@ -163,6 +180,24 @@ export function EventShowModal({ eventId }: Props) {
           </>
         )}
       </Stack>
+
+      {images.length > 0 && (
+        <Group gap="xs">
+          {images.map((image) => (
+            <Image
+              key={image.id}
+              /* Stable app URL: it redirects to a freshly signed Discord CDN URL. */
+              src={image.url}
+              alt={image.filename}
+              h={110}
+              w="auto"
+              fit="cover"
+              radius="sm"
+              style={{ border: "1px solid rgba(0, 212, 232, 0.35)" }}
+            />
+          ))}
+        </Group>
+      )}
 
       <Group mt="sm" align="center" justify="space-between" wrap="nowrap">
         {canEdit && <DeleteEventButton eventId={Number(eventId)} />}

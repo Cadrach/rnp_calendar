@@ -26,6 +26,7 @@ import type {
   RoomAvailability200,
   RoomAvailabilityParams,
   RoomAvailableRoomsParams,
+  RoomFreeSlots200,
   RoomFreeSlotsParams,
   ValidationExceptionResponse
 } from '../model';
@@ -137,6 +138,19 @@ export function useRoomAvailableRooms<TData = Awaited<ReturnType<typeof roomAvai
 
 
 
+/**
+ * Query params:
+  - start: Y-m-d  (required) — first day of the range, inclusive
+  - end:   Y-m-d  (required) — last day of the range, inclusive
+
+Response shape mirrors react-big-calendar's event object so the frontend can feed
+the `intervals` array directly into the `backgroundEvents` prop after mapping
+each entry's `start`/`end` strings through `new Date()`.
+
+For unlimited rooms the entire requested range is returned as a single interval,
+since no booking restriction applies.
+ * @summary Returns the effective available intervals for a room over the requested date range
+ */
 export const roomAvailability = (
     room: number,
     params: RoomAvailabilityParams,
@@ -212,6 +226,9 @@ export function useRoomAvailability<TData = Awaited<ReturnType<typeof roomAvaila
     params: RoomAvailabilityParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof roomAvailability>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Returns the effective available intervals for a room over the requested date range
+ */
 
 export function useRoomAvailability<TData = Awaited<ReturnType<typeof roomAvailability>>, TError = ErrorType<AuthenticationExceptionResponse | ModelNotFoundExceptionResponse | ValidationExceptionResponse>>(
  room: number,
@@ -235,8 +252,12 @@ export function useRoomAvailability<TData = Awaited<ReturnType<typeof roomAvaila
   - end_date: Y-m-d   (optional) — range end day, inclusive (defaults to date); use for multi-day slots
   - event_id: integer (optional) — exclude this event from the overlap check (editing flow)
 
-For unlimited rooms, the full range minus any booked events is returned.
+Unlimited rooms bypass every booking check, so the whole range is returned as a single slot
+with no event subtraction at all — consistent with EventBookingValidator, which accepts any
+interval for them.
 For constrained rooms, effective availability is computed first, then booked events are subtracted.
+
+All boundaries are serialized in the club timezone so a slot never mixes offsets.
  * @summary Returns the free (unbooked) time slots for a room on a given date
  */
 export const roomFreeSlots = (
@@ -246,7 +267,7 @@ export const roomFreeSlots = (
 ) => {
       
       
-      return axiosInstance<unknown[]>(
+      return axiosInstance<RoomFreeSlots200>(
       {url: `/rooms/${room}/free-slots`, method: 'GET',
         params, signal
     },

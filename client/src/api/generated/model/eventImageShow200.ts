@@ -5,7 +5,4 @@
  * OpenAPI spec version: 0.0.1
  */
 
-export interface Game {
-  id: number;
-  name: string;
-}
+export type EventImageShow200 = { [key: string]: unknown };

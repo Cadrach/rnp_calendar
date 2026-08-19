@@ -7,15 +7,15 @@
 
 export interface User {
   id: number;
+  /** @nullable */
+  discord_id: string | null;
+  /** @nullable */
+  roles: unknown[] | null;
   name: string;
   /** @nullable */
   created_at: string | null;
   /** @nullable */
   updated_at: string | null;
-  /** @nullable */
-  discord_id: string | null;
-  /** @nullable */
-  roles: unknown[] | null;
   is_mj: string;
   is_admin: string;
 }

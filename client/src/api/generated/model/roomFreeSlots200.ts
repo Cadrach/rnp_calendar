@@ -5,7 +5,7 @@
  * OpenAPI spec version: 0.0.1
  */
 
-export interface Game {
-  id: number;
-  name: string;
-}
+export type RoomFreeSlots200 = unknown[] | [{
+  start: string;
+  end: string;
+}];
