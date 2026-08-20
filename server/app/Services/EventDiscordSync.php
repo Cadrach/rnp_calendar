@@ -263,10 +263,14 @@ class EventDiscordSync
         $registeredCount = count($playerIds);
         $isFull          = $event->max_players !== null && $registeredCount >= $event->max_players;
 
-        if (! $isFull && ! $cancelled) {
+        // A cancelled séance is soft-deleted right after this runs, so /show/{id} would 404 —
+        // that is the one case that stays link-free.
+        if (! $cancelled) {
             $url     = rtrim(config('app.frontend_url'), '/') . '/show/' . $event->id;
             $lines[] = '';
-            $lines[] = "👉 [S'inscrire à cette séance]({$url})";
+            $lines[] = $isFull
+                ? "👉 [Voir sur le calendrier]({$url})"
+                : "👉 [S'inscrire à cette séance]({$url})";
         }
 
         return implode("\n", $lines);
