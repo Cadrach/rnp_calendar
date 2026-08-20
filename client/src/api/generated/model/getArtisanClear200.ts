@@ -7,6 +7,9 @@
 
 export type GetArtisanClear200 = {
   message: 'Cleared.';
+  migrate_ok: boolean;
+  migrate_output: string;
+  migrate_error: string;
   db_prefix_env: unknown;
   db_prefix_config: string;
   db_prefix_live: string;

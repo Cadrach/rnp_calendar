@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Event;
 use App\Models\Room;
 use App\Services\Availability\AvailabilityResolver;
 use App\Services\Availability\EventBookingValidator;
-use App\Services\Availability\TimeInterval;
+use App\Services\Availability\FreeSlotResolver;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -16,6 +15,7 @@ class RoomController extends Controller
     public function __construct(
         private readonly AvailabilityResolver  $resolver,
         private readonly EventBookingValidator $bookingValidator,
+        private readonly FreeSlotResolver      $freeSlotResolver,
     )
     {
     }
@@ -70,48 +70,27 @@ class RoomController extends Controller
      */
     public function freeSlots(Request $request, Room $room): JsonResponse
     {
+        // Rules stay inline rather than shared with EventController via a constant: Scramble reads
+        // them statically, and anything it cannot evaluate drops the whole operation from the spec.
         $request->validate([
             'date'     => ['required', 'date_format:Y-m-d'],
             'end_date' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:date'],
             'event_id' => ['nullable', 'integer', 'exists:events,id'],
         ]);
 
-        $tz         = config('app.club_timezone');
-        $rangeStart = Carbon::parse($request->input('date'), $tz)->startOfDay();
-        $rangeEnd   = Carbon::parse($request->input('end_date') ?? $request->input('date'), $tz)->endOfDay();
-        $excludeId  = $request->integer('event_id') ?: null;
+        [$rangeStart, $rangeEnd] = $this->freeSlotResolver->range(
+            $request->input('date'),
+            $request->input('end_date'),
+        );
 
-        if ($room->unlimited) {
-            return response()->json([[
-                'start' => $rangeStart->toIso8601String(),
-                'end'   => $rangeEnd->toIso8601String(),
-            ]]);
-        }
+        $slots = $this->freeSlotResolver->forRoom(
+            $room,
+            $rangeStart,
+            $rangeEnd,
+            $request->integer('event_id') ?: null,
+        );
 
-        $slots = $this->resolver->resolve($room, $rangeStart->copy(), $rangeEnd->copy()->startOfDay());
-
-        // datetime_start / datetime_end are stored in UTC, and Connection::prepareBindings()
-        // formats Carbon bindings without converting them — so hand it UTC instants explicitly,
-        // otherwise club-timezone wall clock would be compared against UTC values.
-        $events = Event::where('room_id', $room->id)
-            ->when($excludeId !== null, fn ($q) => $q->where('id', '!=', $excludeId))
-            ->where('datetime_start', '<', $rangeEnd->copy()->utc())
-            ->where('datetime_end', '>', $rangeStart->copy()->utc())
-            ->get();
-
-        foreach ($events as $event) {
-            $slots = $this->resolver->subtractInterval($slots, new TimeInterval(
-                $event->datetime_start->copy()->setTimezone($tz),
-                $event->datetime_end->copy()->setTimezone($tz),
-            ));
-        }
-
-        $result = array_map(fn (TimeInterval $s) => [
-            'start' => $s->start->copy()->setTimezone($tz)->toIso8601String(),
-            'end'   => $s->end->copy()->setTimezone($tz)->toIso8601String(),
-        ], $slots);
-
-        return response()->json(array_values($result));
+        return response()->json($this->freeSlotResolver->toArray($slots));
     }
 
     /**

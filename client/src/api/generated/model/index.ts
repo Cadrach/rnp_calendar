@@ -22,6 +22,7 @@ export * from './discordTest200';
 export * from './event';
 export * from './eventDiscordSummary200';
 export * from './eventDiscordSummary403';
+export * from './eventFreeSlotsParams';
 export * from './eventImage';
 export * from './eventImageDestroy422';
 export * from './eventImageShow200';

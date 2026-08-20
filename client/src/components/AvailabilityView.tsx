@@ -1,14 +1,19 @@
 import { useMemo } from "react";
-import { ColorSwatch, Group, Skeleton, Stack, Table, Text, UnstyledButton } from "@mantine/core";
-import { useQueries } from "@tanstack/react-query";
+import { ColorSwatch, Group, Loader, Stack, Table, Text, UnstyledButton } from "@mantine/core";
 import { addDays, eachDayOfInterval, format, isToday, startOfDay } from "date-fns";
 import { fr } from "date-fns/locale/fr";
-import { getRoomFreeSlotsQueryOptions } from "../api/generated/room/room";
+import { useEventFreeSlots } from "../api/generated/event/event";
 import { useDictionary } from "../contexts/DictionaryContext";
 
 interface FreeSlot {
   start: string;
   end: string;
+}
+
+/** One entry per bookable (non-unlimited) room, ordered by name; `slots` is empty when fully booked. */
+interface RoomFreeSlots {
+  room_id: number;
+  slots: FreeSlot[];
 }
 
 interface Interval {
@@ -23,7 +28,7 @@ interface Props {
 }
 
 /**
- * Free slots are returned for the whole week at once, and the resolver merges adjacent intervals —
+ * Free slots come back for the whole week at once, and the resolver merges adjacent intervals —
  * so a slot can straddle midnight. Clipping each slot to the day (upper bound exclusive, i.e. next
  * midnight) is what makes a day-per-column grid correct in every case.
  */
@@ -49,29 +54,42 @@ const slotLabel = (interval: Interval) =>
 export function AvailabilityView({ weekStart, weekEnd, onSlotClick }: Props) {
   const { rooms } = useDictionary();
 
-  // Unlimited rooms are always free, so a grid row for them carries no information.
-  const limitedRooms = useMemo(() => rooms.filter((r) => !r.unlimited), [rooms]);
-
   const days = useMemo(
     () => eachDayOfInterval({ start: weekStart, end: weekEnd }),
     [weekStart, weekEnd],
   );
 
-  // One request per room covers the whole week (free-slots takes an inclusive end_date).
-  const results = useQueries({
-    queries: limitedRooms.map((room) =>
-      getRoomFreeSlotsQueryOptions(
-        room.id,
-        {
-          date: format(weekStart, "yyyy-MM-dd"),
-          end_date: format(weekEnd, "yyyy-MM-dd"),
-        },
-        { query: { staleTime: 5 * 60 * 1000 } },
-      ),
-    ),
-  });
+  // One request covers every bookable room for the whole week.
+  const { data, isPending, isError } = useEventFreeSlots(
+    {
+      date: format(weekStart, "yyyy-MM-dd"),
+      end_date: format(weekEnd, "yyyy-MM-dd"),
+    },
+    { query: { staleTime: 5 * 60 * 1000 } },
+  );
 
-  if (limitedRooms.length === 0) {
+  // The endpoint decides which rooms are bookable and in what order; the dictionary only supplies
+  // their display attributes.
+  const roomsById = useMemo(() => new Map(rooms.map((r) => [r.id, r])), [rooms]);
+  const rows = (data as RoomFreeSlots[] | undefined) ?? [];
+
+  if (isPending) {
+    return (
+      <Group justify="center" py="xl">
+        <Loader color="cyan" />
+      </Group>
+    );
+  }
+
+  if (isError) {
+    return (
+      <Text c="red.4" ta="center" py="xl">
+        Les disponibilités n'ont pas pu être chargées.
+      </Text>
+    );
+  }
+
+  if (rows.length === 0) {
     return (
       <Text c="dimmed" ta="center" py="xl">
         Aucune salle à disponibilité limitée.
@@ -97,46 +115,27 @@ export function AvailabilityView({ weekStart, weekEnd, onSlotClick }: Props) {
         </Table.Thead>
 
         <Table.Tbody>
-          {limitedRooms.map((room, index) => {
-            const { data, isPending, isError } = results[index];
-            const slots = (data as FreeSlot[] | undefined) ?? [];
+          {rows.map((row) => {
+            const room = roomsById.get(row.room_id);
 
             return (
-              <Table.Tr key={room.id}>
+              <Table.Tr key={row.room_id}>
                 <Table.Td className="availability-room-col">
                   <Group gap="xs" wrap="nowrap">
-                    <ColorSwatch color={room.color} size={12} />
-                    <Text size="sm" fw={500}>
-                      {room.name ?? room.code}
+                    {room && <ColorSwatch color={room.color} size={12} />}
+                    <Text className="availability-room-name" size="sm" fw={500}>
+                      {room?.name ?? room?.code ?? `Salle #${row.room_id}`}
                     </Text>
                   </Group>
                 </Table.Td>
 
                 {days.map((day) => {
-                  if (isPending) {
-                    return (
-                      <Table.Td key={day.toISOString()}>
-                        <Skeleton height={22} radius="sm" />
-                      </Table.Td>
-                    );
-                  }
-
-                  if (isError) {
-                    return (
-                      <Table.Td key={day.toISOString()}>
-                        <Text size="xs" c="red.4">
-                          Erreur
-                        </Text>
-                      </Table.Td>
-                    );
-                  }
-
-                  const intervals = clipToDay(slots, day);
+                  const intervals = clipToDay(row.slots, day);
 
                   return (
                     <Table.Td key={day.toISOString()}>
                       {intervals.length === 0 ? (
-                        <Text size="xs" c="dimmed">
+                        <Text size="xs" c="dimmed" ta="center">
                           —
                         </Text>
                       ) : (
@@ -145,8 +144,8 @@ export function AvailabilityView({ weekStart, weekEnd, onSlotClick }: Props) {
                             <UnstyledButton
                               key={interval.start.toISOString()}
                               className="availability-slot"
-                              onClick={() => onSlotClick(interval.start, interval.end, room.id)}
-                              title={`Créer une séance — ${room.name ?? room.code}`}
+                              onClick={() => onSlotClick(interval.start, interval.end, row.room_id)}
+                              title={`Créer une séance — ${room?.name ?? room?.code ?? ""}`}
                             >
                               {slotLabel(interval)}
                             </UnstyledButton>
@@ -159,6 +158,13 @@ export function AvailabilityView({ weekStart, weekEnd, onSlotClick }: Props) {
               </Table.Tr>
             );
           })}
+
+          <Table.Tr className="availability-note-row">
+            <Table.Td colSpan={days.length + 1}>
+              Seules les salles limitées sont affichées, les salles sans limites sont toujours
+              disponibles.
+            </Table.Td>
+          </Table.Tr>
         </Table.Tbody>
       </Table>
     </div>

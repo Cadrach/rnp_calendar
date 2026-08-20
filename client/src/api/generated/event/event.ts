@@ -28,6 +28,7 @@ import type {
   Event,
   EventDiscordSummary200,
   EventDiscordSummary403,
+  EventFreeSlotsParams,
   EventRegister403,
   EventRegisterBody,
   EventUnregister403,
@@ -45,6 +46,105 @@ import type { ErrorType } from '../../axios-instance';
 
 
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+
+
+
+/**
+ * Same query params as rooms/{room}/free-slots:
+  - date:     Y-m-d   (required) — range start day, in club timezone
+  - end_date: Y-m-d   (optional) — range end day, inclusive (defaults to date)
+  - event_id: integer (optional) — exclude this event from the overlap check (editing flow)
+
+Unlimited rooms are left out: they accept any interval, so "free slots" carries no
+information for them. Rooms with nothing free are still listed, with an empty slots array,
+so the caller can tell "fully booked" apart from "not a bookable room".
+ * @summary Returns the free (unbooked) slots of every bookable room over the requested date range
+ */
+export const eventFreeSlots = (
+    params: EventFreeSlotsParams,
+ options?: SecondParameter<typeof axiosInstance>,signal?: AbortSignal
+) => {
+      
+      
+      return axiosInstance<unknown[]>(
+      {url: `/events/free-slots`, method: 'GET',
+        params, signal
+    },
+      options);
+    }
+  
+
+
+
+export const getEventFreeSlotsQueryKey = (params?: EventFreeSlotsParams,) => {
+    return [
+    `/events/free-slots`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+    
+export const getEventFreeSlotsQueryOptions = <TData = Awaited<ReturnType<typeof eventFreeSlots>>, TError = ErrorType<AuthenticationExceptionResponse | ValidationExceptionResponse>>(params: EventFreeSlotsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventFreeSlots>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getEventFreeSlotsQueryKey(params);
+
+  
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof eventFreeSlots>>> = ({ signal }) => eventFreeSlots(params, requestOptions, signal);
+
+      
+
+      
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof eventFreeSlots>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type EventFreeSlotsQueryResult = NonNullable<Awaited<ReturnType<typeof eventFreeSlots>>>
+export type EventFreeSlotsQueryError = ErrorType<AuthenticationExceptionResponse | ValidationExceptionResponse>
+
+
+export function useEventFreeSlots<TData = Awaited<ReturnType<typeof eventFreeSlots>>, TError = ErrorType<AuthenticationExceptionResponse | ValidationExceptionResponse>>(
+ params: EventFreeSlotsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventFreeSlots>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof eventFreeSlots>>,
+          TError,
+          Awaited<ReturnType<typeof eventFreeSlots>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useEventFreeSlots<TData = Awaited<ReturnType<typeof eventFreeSlots>>, TError = ErrorType<AuthenticationExceptionResponse | ValidationExceptionResponse>>(
+ params: EventFreeSlotsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventFreeSlots>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof eventFreeSlots>>,
+          TError,
+          Awaited<ReturnType<typeof eventFreeSlots>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useEventFreeSlots<TData = Awaited<ReturnType<typeof eventFreeSlots>>, TError = ErrorType<AuthenticationExceptionResponse | ValidationExceptionResponse>>(
+ params: EventFreeSlotsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventFreeSlots>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Returns the free (unbooked) slots of every bookable room over the requested date range
+ */
+
+export function useEventFreeSlots<TData = Awaited<ReturnType<typeof eventFreeSlots>>, TError = ErrorType<AuthenticationExceptionResponse | ValidationExceptionResponse>>(
+ params: EventFreeSlotsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof eventFreeSlots>>, TError, TData>>, request?: SecondParameter<typeof axiosInstance>}
+ , queryClient?: QueryClient 
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getEventFreeSlotsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
 
 
 

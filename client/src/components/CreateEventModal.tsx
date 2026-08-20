@@ -7,6 +7,7 @@ import { fr } from "date-fns/locale/fr";
 import type { Event } from "../api/generated/model";
 import { getDictionaryQueryKey } from "../api/generated/dictionary/dictionary";
 import {
+  getEventFreeSlotsQueryKey,
   getEventsIndexQueryKey,
   getEventsShowQueryKey,
   useEventsStore,
@@ -104,7 +105,10 @@ export function CreateEventModal({ start, end, onClose, event, initialRoomId }: 
       queryClient.invalidateQueries({ queryKey: getEventsShowQueryKey(eventId) });
     }
     // Booking a room changes its free slots, so the availability grid and the calendar's greyed-out
-    // zones go stale too. Two calls: generated hooks key by URL, hand-written ones by ["rooms", …].
+    // zones go stale too. Three keys: the all-rooms grid, the per-room generated hooks (keyed by
+    // URL), and the hand-written availability hooks (keyed by ["rooms", …]).
+    // ["/events"] above does not cover ["/events/free-slots"] — query keys match element-wise.
+    queryClient.invalidateQueries({ queryKey: getEventFreeSlotsQueryKey() });
     queryClient.invalidateQueries({
       predicate: (q) => typeof q.queryKey[0] === "string" && q.queryKey[0].startsWith("/rooms/"),
     });

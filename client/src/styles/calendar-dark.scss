@@ -405,13 +405,38 @@ $text-muted: rgba(200, 244, 249, 0.25);
             vertical-align: top;
         }
 
-        // Room column stays readable while the week scrolls horizontally.
+        // Room column stays readable while the week scrolls horizontally. Overrides the
+        // vertical-align: top above, so the name sits centred however tall the row's cells get.
         .availability-room-col {
             position: sticky;
             left: 0;
             z-index: 2;
             background-color: $bg-header;
             white-space: nowrap;
+            vertical-align: middle;
+            transition: all 150ms ease;
+        }
+
+        // Hovering a range lights up its room name, so the eye can tie the two ends of a wide row
+        // together. :has() keeps this in CSS instead of React hover state.
+        tbody > tr:has(.availability-slot:hover) .availability-room-col {
+            background-color: $neon-dim;
+
+            .availability-room-name {
+                color: $neon;
+                text-shadow: 0 0 6px $neon-glow;
+            }
+        }
+
+        // Footnote spanning the whole week.
+        tbody > tr.availability-note-row > td {
+            background-color: $bg-alt;
+            color: $text-dim;
+            font-size: 0.8rem;
+            font-style: italic;
+            letter-spacing: 0.02em;
+            text-align: center;
+            padding: 8px;
         }
     }
 
@@ -426,6 +451,7 @@ $text-muted: rgba(200, 244, 249, 0.25);
         font-size: 0.75rem;
         font-variant-numeric: tabular-nums;
         white-space: nowrap;
+        text-align: center;
         transition: all 150ms ease;
 
         &:hover {

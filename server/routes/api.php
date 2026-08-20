@@ -112,6 +112,9 @@ Route::middleware('auth')->group(function () {
     Route::apiResource('games', GameController::class);
     Route::apiResource('scenarios', ScenarioController::class);
 
+    // Declared before the apiResource: GET events/{event} would otherwise match "free-slots"
+    // and fail route-model binding.
+    Route::get('events/free-slots', [EventController::class, 'freeSlots']);
     Route::apiResource('events', EventController::class);
     Route::post('events/{event}/register', [EventController::class, 'register']);
     Route::post('events/{event}/unregister', [EventController::class, 'unregister']);

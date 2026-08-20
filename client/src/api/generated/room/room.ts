@@ -26,7 +26,6 @@ import type {
   RoomAvailability200,
   RoomAvailabilityParams,
   RoomAvailableRoomsParams,
-  RoomFreeSlots200,
   RoomFreeSlotsParams,
   ValidationExceptionResponse
 } from '../model';
@@ -267,7 +266,7 @@ export const roomFreeSlots = (
 ) => {
       
       
-      return axiosInstance<RoomFreeSlots200>(
+      return axiosInstance<unknown[]>(
       {url: `/rooms/${room}/free-slots`, method: 'GET',
         params, signal
     },

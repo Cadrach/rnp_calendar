@@ -7,6 +7,7 @@ use App\Models\Room;
 use App\Models\Scenario;
 use App\Models\User;
 use App\Services\Availability\EventBookingValidator;
+use App\Services\Availability\FreeSlotResolver;
 use App\Services\DiscordClient;
 use App\Services\EventDiscordSync;
 use Carbon\Carbon;
@@ -20,8 +21,54 @@ class EventController extends Controller
         private readonly EventDiscordSync      $discordSync,
         private readonly DiscordClient         $discord,
         private readonly EventBookingValidator $bookingValidator,
+        private readonly FreeSlotResolver      $freeSlotResolver,
     )
     {
+    }
+
+    /**
+     * Returns the free (unbooked) slots of every bookable room over the requested date range.
+     *
+     * Same query params as rooms/{room}/free-slots:
+     *   - date:     Y-m-d   (required) — range start day, in club timezone
+     *   - end_date: Y-m-d   (optional) — range end day, inclusive (defaults to date)
+     *   - event_id: integer (optional) — exclude this event from the overlap check (editing flow)
+     *
+     * Unlimited rooms are left out: they accept any interval, so "free slots" carries no
+     * information for them. Rooms with nothing free are still listed, with an empty slots array,
+     * so the caller can tell "fully booked" apart from "not a bookable room".
+     */
+    public function freeSlots(Request $request): JsonResponse
+    {
+        // Rules stay inline rather than shared with RoomController via a constant: Scramble reads
+        // them statically, and anything it cannot evaluate drops the whole operation from the spec.
+        $request->validate([
+            'date'     => ['required', 'date_format:Y-m-d'],
+            'end_date' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:date'],
+            'event_id' => ['nullable', 'integer', 'exists:events,id'],
+        ]);
+
+        [$rangeStart, $rangeEnd] = $this->freeSlotResolver->range(
+            $request->input('date'),
+            $request->input('end_date'),
+        );
+
+        $rooms = Room::where('unlimited', false)->orderBy('name')->get();
+
+        // One events query for the whole set rather than one per room.
+        $slotsByRoom = $this->freeSlotResolver->forRooms(
+            $rooms,
+            $rangeStart,
+            $rangeEnd,
+            $request->integer('event_id') ?: null,
+        );
+
+        $result = array_map(fn (Room $room) => [
+            'room_id' => $room->id,
+            'slots'   => $this->freeSlotResolver->toArray($slotsByRoom[$room->id]),
+        ], $rooms->values()->all());
+
+        return response()->json($result);
     }
 
     /**
