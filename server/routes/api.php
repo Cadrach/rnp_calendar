@@ -15,12 +15,27 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-// TODO: remove this route after use — unauthenticated cache/config flush + diagnostics
+// TODO: remove this route after use — unauthenticated cache/config flush + migrate + diagnostics
 Route::get('/artisan-clear', function () {
     Artisan::call('config:clear');
     Artisan::call('cache:clear');
     Artisan::call('route:clear');
     Artisan::call('view:clear');
+
+    // Migrate after the clears so it runs against fresh config, and before the diagnostics below so
+    // the reported table list reflects the post-migration state.
+    // --force: required to run non-interactively once APP_ENV is production.
+    $migrateOk     = false;
+    $migrateOutput = null;
+    $migrateError  = null;
+    try {
+        $migrateOk     = Artisan::call('migrate', ['--force' => true]) === 0;
+        $migrateOutput = trim(Artisan::output());
+    } catch (\Throwable $e) {
+        // A failed migration must not turn the whole diagnostics page into a 500 HTML error,
+        // because the reason it failed is exactly what you came here to read.
+        $migrateError = $e->getMessage();
+    }
 
     $prefix = \Illuminate\Support\Facades\DB::getTablePrefix();
 
@@ -40,6 +55,9 @@ Route::get('/artisan-clear', function () {
 
     return response()->json([
         'message'          => 'Cleared.',
+        'migrate_ok'       => $migrateOk,
+        'migrate_output'   => $migrateOutput,
+        'migrate_error'    => $migrateError,
         'db_prefix_env'    => env('DB_PREFIX'),
         'db_prefix_config' => config('database.connections.mysql.prefix'),
         'db_prefix_live'   => $prefix,
