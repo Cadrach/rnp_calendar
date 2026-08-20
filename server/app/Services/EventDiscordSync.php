@@ -17,9 +17,9 @@ class EventDiscordSync
     {
         $event->load(['room', 'game', 'scenario']);
 
-        $title   = $this->buildTitle($event);
+        $title = $this->buildTitle($event);
         $content = $this->buildContent($event, cancelled: false);
-        $tagIds  = $this->openSpotsTagIds($event);
+        $tagIds = $this->openSpotsTagIds($event);
 
         if ($event->discord_thread_id) {
             $this->discord->editThread($event->discord_thread_id, $title);
@@ -28,7 +28,7 @@ class EventDiscordSync
             $this->discord->setThreadTags($event->discord_thread_id, $tagIds);
         } else {
             $channelId = config('services.discord.channel_seances');
-            $thread    = $this->discord->createForumThread($channelId, $title, $content, $tagIds);
+            $thread = $this->discord->createForumThread($channelId, $title, $content, $tagIds);
             $event->updateQuietly(['discord_thread_id' => $thread['id']]);
         }
     }
@@ -41,7 +41,7 @@ class EventDiscordSync
     {
         $tagId = config('services.discord.tag_id_looking_for_players');
 
-        if (! $tagId) {
+        if (!$tagId) {
             return [];
         }
 
@@ -57,7 +57,7 @@ class EventDiscordSync
      */
     public function cancel(Event $event): void
     {
-        if (! $event->discord_thread_id) {
+        if (!$event->discord_thread_id) {
             return;
         }
 
@@ -87,19 +87,19 @@ class EventDiscordSync
 
         return [
             'datetime_start' => Carbon::parse($event->datetime_start)->timezone($tz)->format('d/m/y H\hi'),
-            'datetime_end'   => Carbon::parse($event->datetime_end)->timezone($tz)->format('d/m/y H\hi'),
-            'mj_discord_id'  => $event->mj_discord_id,
-            'room'           => $event->room?->name ?? '—',
-            'game'           => $event->game?->name ?? '—',
-            'scenario'       => $event->scenario?->name,
-            'min_players'    => $event->min_players !== null ? (string) $event->min_players : null,
-            'max_players'    => $event->max_players !== null ? (string) $event->max_players : null,
+            'datetime_end' => Carbon::parse($event->datetime_end)->timezone($tz)->format('d/m/y H\hi'),
+            'mj_discord_id' => $event->mj_discord_id,
+            'room' => $event->room?->name ?? '—',
+            'game' => $event->game?->name ?? '—',
+            'scenario' => $event->scenario?->name,
+            'min_players' => $event->min_players !== null ? (string)$event->min_players : null,
+            'max_players' => $event->max_players !== null ? (string)$event->max_players : null,
         ];
     }
 
     public function trailRegistered(Event $event, string $discordId): void
     {
-        if (! $event->discord_thread_id) {
+        if (!$event->discord_thread_id) {
             return;
         }
 
@@ -111,7 +111,7 @@ class EventDiscordSync
 
     public function trailUnregistered(Event $event, string $discordId): void
     {
-        if (! $event->discord_thread_id) {
+        if (!$event->discord_thread_id) {
             return;
         }
 
@@ -119,6 +119,7 @@ class EventDiscordSync
             $event->discord_thread_id,
             "❌ <@{$discordId}> s'est désinscrit(e).",
         );
+
     }
 
     /**
@@ -126,11 +127,11 @@ class EventDiscordSync
      */
     public function trailUpdated(array $before, Event $event, string $editorDiscordId): void
     {
-        if (! $event->discord_thread_id) {
+        if (!$event->discord_thread_id) {
             return;
         }
 
-        $after   = $this->snapshot($event);
+        $after = $this->snapshot($event);
         $changes = $this->buildChangeDiff($before, $after);
 
         if (empty($changes)) {
@@ -147,7 +148,7 @@ class EventDiscordSync
 
     public function trailClosed(Event $event): void
     {
-        if (! $event->discord_thread_id) {
+        if (!$event->discord_thread_id) {
             return;
         }
 
@@ -159,7 +160,7 @@ class EventDiscordSync
 
     public function trailDeleted(Event $event, string $editorDiscordId): void
     {
-        if (! $event->discord_thread_id) {
+        if (!$event->discord_thread_id) {
             return;
         }
 
@@ -175,12 +176,12 @@ class EventDiscordSync
 
         $fieldLabels = [
             'datetime_start' => 'Début',
-            'datetime_end'   => 'Fin',
-            'room'           => 'Salle',
-            'game'           => 'Jeu',
-            'scenario'       => 'Scénario',
-            'min_players'    => 'Min joueurs',
-            'max_players'    => 'Max joueurs',
+            'datetime_end' => 'Fin',
+            'room' => 'Salle',
+            'game' => 'Jeu',
+            'scenario' => 'Scénario',
+            'min_players' => 'Min joueurs',
+            'max_players' => 'Max joueurs',
         ];
 
         foreach ($fieldLabels as $key => $label) {
@@ -201,7 +202,7 @@ class EventDiscordSync
 
     private function buildTitle(Event $event): string
     {
-        $date  = Carbon::parse($event->datetime_start)->timezone('Europe/Paris')->format('d/m/y');
+        $date = Carbon::parse($event->datetime_start)->timezone('Europe/Paris')->format('d/m/y');
         $title = "{$event->room->code} {$date} · {$event->game->name}";
 
         if ($event->scenario) {
@@ -213,13 +214,13 @@ class EventDiscordSync
 
     private function buildContent(Event $event, bool $cancelled = false): string
     {
-        $tz    = config('app.club_timezone');
+        $tz = config('app.club_timezone');
         $start = Carbon::parse($event->datetime_start)->timezone($tz)->locale('fr');
-        $end   = Carbon::parse($event->datetime_end)->timezone($tz)->locale('fr');
+        $end = Carbon::parse($event->datetime_end)->timezone($tz)->locale('fr');
 
-        $date     = $start->isoFormat('dddd D MMMM YYYY');
+        $date = $start->isoFormat('dddd D MMMM YYYY');
         $timeFrom = $start->format('H\hi');
-        $timeTo   = $end->format('H\hi');
+        $timeTo = $end->format('H\hi');
 
         $lines = [
             "## {$this->buildTitle($event)}",
@@ -255,18 +256,18 @@ class EventDiscordSync
 
         $playerIds = $event->player_ids ?? [];
 
-        if (! empty($playerIds)) {
-            $mentions = implode(', ', array_map(fn ($id) => "<@{$id}>", $playerIds));
-            $lines[]  = "🎭 **Inscrits :** {$mentions}";
+        if (!empty($playerIds)) {
+            $mentions = implode(', ', array_map(fn($id) => "<@{$id}>", $playerIds));
+            $lines[] = "🎭 **Inscrits :** {$mentions}";
         }
 
         $registeredCount = count($playerIds);
-        $isFull          = $event->max_players !== null && $registeredCount >= $event->max_players;
+        $isFull = $event->max_players !== null && $registeredCount >= $event->max_players;
 
         // A cancelled séance is soft-deleted right after this runs, so /show/{id} would 404 —
         // that is the one case that stays link-free.
-        if (! $cancelled) {
-            $url     = rtrim(config('app.frontend_url'), '/') . '/show/' . $event->id;
+        if (!$cancelled) {
+            $url = rtrim(config('app.frontend_url'), '/') . '/show/' . $event->id;
             $lines[] = '';
             $lines[] = $isFull
                 ? "👉 [Voir sur le calendrier]({$url})"

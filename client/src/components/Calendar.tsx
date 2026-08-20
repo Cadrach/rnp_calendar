@@ -1,7 +1,8 @@
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { Box, Modal } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { Calendar as BigCalendar, dateFnsLocalizer, SlotInfo } from "react-big-calendar";
+import type { View } from "react-big-calendar";
 import { format, parse, startOfWeek, getDay } from "date-fns";
 import { fr } from "date-fns/locale/fr";
 import "react-big-calendar/lib/css/react-big-calendar.css";
@@ -15,8 +16,10 @@ import { CreateEventModal } from "./CreateEventModal";
 import { EventShowModal } from "./EventShowModal";
 import { useDictionary } from "../contexts/DictionaryContext";
 import { useCalendarNavigation } from "../hooks/useCalendarNavigation";
+import type { CalendarView } from "../hooks/useCalendarNavigation";
 import { useCalendarAvailability } from "../hooks/useCalendarAvailability";
 import { useCalendarEvents } from "../hooks/useCalendarEvents";
+import { AvailabilityView } from "./AvailabilityView";
 
 const localizer = dateFnsLocalizer({
   format,
@@ -52,7 +55,7 @@ export function Calendar() {
   const navigate = useNavigate();
   const { id: showEventId } = useParams<{ id?: string }>();
 
-  const [slot, setSlot] = useState<{ start: Date; end: Date } | null>(null);
+  const [slot, setSlot] = useState<{ start: Date; end: Date; roomId?: number } | null>(null);
   const [filters, setFilters] = useState<CalendarFilters>(DEFAULT_FILTERS);
   const [createOpened, { open: openCreate, close: closeCreate }] = useDisclosure(false);
 
@@ -69,8 +72,32 @@ export function Calendar() {
     visibleRange,
     availabilityRange,
     handleNavigate,
+    navigateAction,
     handleRangeChange,
   } = useCalendarNavigation();
+
+  // The availability view is a scheduling tool: only MJ and admins get the button at all.
+  const canSeeAvailability = user.is_mj || user.is_admin;
+
+  const views = useMemo<CalendarView[]>(
+    () => [
+      "month",
+      "week",
+      "day",
+      "agenda",
+      ...(canSeeAvailability ? ["availability" as const] : []),
+    ],
+    [canSeeAvailability],
+  );
+
+  // Read through a ref so the toolbar component isn't recreated on every dictionary refresh.
+  const viewsRef = useRef(views);
+  viewsRef.current = views;
+
+  // Losing the role mid-session must not leave the user stuck on a view they can't switch away from.
+  useEffect(() => {
+    if (!canSeeAvailability && view === "availability") setView("month");
+  }, [canSeeAvailability, view, setView]);
 
   const { backgroundEvents, dayPropGetter, handleSelecting } = useCalendarAvailability(
     filters.roomId,
@@ -100,7 +127,15 @@ export function Calendar() {
       event: CalendarEvent,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       toolbar: (props: any) => (
-        <CalendarToolbar {...props} filtersRef={filtersRef} onFiltersChange={setFilters} />
+        <CalendarToolbar
+          label={props.label}
+          view={props.view}
+          views={viewsRef.current}
+          onNavigate={props.onNavigate}
+          onView={setView}
+          filtersRef={filtersRef}
+          onFiltersChange={setFilters}
+        />
       ),
     }),
     [],
@@ -109,27 +144,52 @@ export function Calendar() {
   return (
     <>
       <Box h="calc(100vh - var(--app-shell-header-height) - 10px)" p="md">
-        <BigCalendar
-          localizer={localizer}
-          events={calendarEvents}
-          backgroundEvents={backgroundEvents as unknown as typeof calendarEvents}
-          style={{ height: "100%" }}
-          date={date}
-          view={view}
-          onNavigate={handleNavigate}
-          onView={(v) => setView(v)}
-          onRangeChange={handleRangeChange}
-          onSelecting={handleSelecting}
-          onSelectSlot={handleSelectSlot}
-          onSelectEvent={handleSelectEvent}
-          selectable
-          culture="fr"
-          messages={messages}
-          formats={formats}
-          components={components}
-          eventPropGetter={eventStyleGetter}
-          dayPropGetter={dayPropGetter}
-        />
+        {view === "availability" ? (
+          <div className="availability-layout">
+            <CalendarToolbar
+              label={`${format(availabilityRange.start, "d MMM", { locale: fr })} – ${format(
+                availabilityRange.end,
+                "d MMM yyyy",
+                { locale: fr },
+              )}`}
+              view={view}
+              views={views}
+              onNavigate={navigateAction}
+              onView={setView}
+              showFilters={false}
+            />
+            <AvailabilityView
+              weekStart={availabilityRange.start}
+              weekEnd={availabilityRange.end}
+              onSlotClick={(start, end, roomId) => {
+                setSlot({ start, end, roomId });
+                openCreate();
+              }}
+            />
+          </div>
+        ) : (
+          <BigCalendar
+            localizer={localizer}
+            events={calendarEvents}
+            backgroundEvents={backgroundEvents as unknown as typeof calendarEvents}
+            style={{ height: "100%" }}
+            date={date}
+            view={view as View}
+            onNavigate={handleNavigate}
+            onView={(v) => setView(v)}
+            onRangeChange={handleRangeChange}
+            onSelecting={handleSelecting}
+            onSelectSlot={handleSelectSlot}
+            onSelectEvent={handleSelectEvent}
+            selectable
+            culture="fr"
+            messages={messages}
+            formats={formats}
+            components={components}
+            eventPropGetter={eventStyleGetter}
+            dayPropGetter={dayPropGetter}
+          />
+        )}
       </Box>
 
       <Modal opened={createOpened} onClose={closeCreate} title="Nouvelle partie">
@@ -138,7 +198,7 @@ export function Calendar() {
             start={slot.start}
             end={slot.end}
             onClose={closeCreate}
-            initialRoomId={filters.roomId}
+            initialRoomId={slot.roomId ?? filters.roomId}
           />
         )}
       </Modal>

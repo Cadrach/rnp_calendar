@@ -1,30 +1,47 @@
-import type { RefObject } from "react";
+import type { ReactNode, RefObject } from "react";
 import { Flex, Group } from "@mantine/core";
-import type { ToolbarProps, NavigateAction, View } from "react-big-calendar";
+import type { NavigateAction } from "react-big-calendar";
 import { FilterDropdown } from "./CalendarFilter";
 import type { CalendarFilters } from "../hooks/useCalendarFilters";
+import type { CalendarView } from "../hooks/useCalendarNavigation";
 import { IconArrowBigLeftFilled, IconArrowBigRightFilled } from "@tabler/icons-react";
 
-interface CalendarToolbarProps extends ToolbarProps {
-  filtersRef: RefObject<CalendarFilters>;
-  onFiltersChange: (filters: CalendarFilters) => void;
+const VIEW_LABELS: Record<string, string> = {
+  month: "Mois",
+  week: "Semaine",
+  day: "Jour",
+  agenda: "Agenda",
+  availability: "Dispos",
+};
+
+interface CalendarToolbarProps {
+  label: ReactNode;
+  view: CalendarView;
+  views: CalendarView[];
+  onNavigate: (action: NavigateAction) => void;
+  onView: (view: CalendarView) => void;
+  /** Filters are calendar-only; the availability view opts out. */
+  showFilters?: boolean;
+  filtersRef?: RefObject<CalendarFilters>;
+  onFiltersChange?: (filters: CalendarFilters) => void;
 }
 
 export function CalendarToolbar({
   label,
-  onNavigate,
-  onView,
   view,
   views,
+  onNavigate,
+  onView,
+  showFilters = true,
   filtersRef,
   onFiltersChange,
 }: CalendarToolbarProps) {
-  const viewNames = Array.isArray(views) ? views : (Object.keys(views ?? {}) as View[]);
-
   return (
     <div className="rbc-toolbar">
       <Group gap="sm" wrap="wrap">
-        <FilterDropdown filtersRef={filtersRef} onChange={onFiltersChange} />
+        {showFilters && filtersRef && onFiltersChange && (
+          <FilterDropdown filtersRef={filtersRef} onChange={onFiltersChange} />
+        )}
 
         <span className="rbc-btn-group">
           <button type="button" onClick={() => onNavigate("TODAY" as NavigateAction)}>
@@ -46,17 +63,14 @@ export function CalendarToolbar({
       <span className="rbc-toolbar-label">{label}</span>
 
       <span className="rbc-btn-group">
-        {viewNames.map((name) => (
+        {views.map((name) => (
           <button
             key={name}
             type="button"
             className={view === name ? "rbc-active" : ""}
             onClick={() => onView(name)}
           >
-            {name === "month" && "Mois"}
-            {name === "week" && "Semaine"}
-            {name === "day" && "Jour"}
-            {name === "agenda" && "Agenda"}
+            {VIEW_LABELS[name] ?? name}
           </button>
         ))}
       </span>

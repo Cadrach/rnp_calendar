@@ -103,6 +103,12 @@ export function CreateEventModal({ start, end, onClose, event, initialRoomId }: 
     if (eventId) {
       queryClient.invalidateQueries({ queryKey: getEventsShowQueryKey(eventId) });
     }
+    // Booking a room changes its free slots, so the availability grid and the calendar's greyed-out
+    // zones go stale too. Two calls: generated hooks key by URL, hand-written ones by ["rooms", …].
+    queryClient.invalidateQueries({
+      predicate: (q) => typeof q.queryKey[0] === "string" && q.queryKey[0].startsWith("/rooms/"),
+    });
+    queryClient.invalidateQueries({ queryKey: ["rooms"] });
   };
 
   // Images cannot ride along with the event payload: PHP never populates $_FILES on PUT/PATCH, and
