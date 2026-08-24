@@ -38,6 +38,13 @@ export function RoomsTable() {
 
   const columns = useMemo<MRT_ColumnDef<Room>[]>(
     () => [
+      {
+        accessorKey: "emoji",
+        header: "Emoji",
+        size: 70,
+        enableSorting: false,
+        Cell: ({ cell }) => cell.getValue<string | null>() ?? "—",
+      },
       { accessorKey: "code", header: "Code", size: 90 },
       { accessorKey: "name", header: "Nom" },
       {

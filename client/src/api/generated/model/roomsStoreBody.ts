@@ -17,5 +17,10 @@ export type RoomsStoreBody = {
   url?: string | null;
   /** @pattern ^#[0-9a-fA-F]{6}$ */
   color: string;
+  /**
+   * @maxLength 16
+   * @nullable
+   */
+  emoji?: string | null;
   unlimited?: boolean;
 };

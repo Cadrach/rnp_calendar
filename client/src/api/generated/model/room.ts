@@ -12,5 +12,7 @@ export interface Room {
   /** @nullable */
   url: string | null;
   color: string;
+  /** @nullable */
+  emoji: string | null;
   unlimited: boolean;
 }

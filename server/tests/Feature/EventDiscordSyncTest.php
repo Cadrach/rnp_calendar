@@ -87,6 +87,70 @@ class EventDiscordSyncTest extends TestCase
         $this->assertStringNotContainsString('/show/', $content);
     }
 
+    // ------------------------------------------------------- room emoji prefix
+
+    public function test_the_thread_name_is_prefixed_with_the_rooms_emoji(): void
+    {
+        $event = $this->event(['room_id' => $this->room('CAVE')->id]);
+
+        app(EventDiscordSync::class)->sync($event);
+
+        $this->assertStringStartsWith('🍷 CAVE ', $this->lastThreadName());
+    }
+
+    public function test_the_post_body_heading_carries_no_emoji(): void
+    {
+        // The whole reason buildThreadName() is separate from buildTitle(): the body already spells
+        // the room out on its own Salle line.
+        $content = $this->syncedContent($this->event(['room_id' => $this->room('CAVE')->id]));
+
+        $this->assertStringContainsString('## CAVE ', $content);
+        $this->assertStringNotContainsString('🍷', $content);
+    }
+
+    public function test_a_room_without_an_emoji_yields_the_bare_title(): void
+    {
+        $room = $this->room('CAVE');
+        $room->update(['emoji' => null]);
+
+        app(EventDiscordSync::class)->sync($this->event(['room_id' => $room->id]));
+
+        $name = $this->lastThreadName();
+
+        $this->assertStringStartsWith('CAVE ', $name);
+        $this->assertSame(ltrim($name), $name, 'no stray leading space');
+    }
+
+    public function test_a_blank_emoji_is_treated_as_none(): void
+    {
+        $room = $this->room('CAVE');
+        $room->update(['emoji' => '   ']);
+
+        app(EventDiscordSync::class)->sync($this->event(['room_id' => $room->id]));
+
+        $this->assertStringStartsWith('CAVE ', $this->lastThreadName());
+    }
+
+    public function test_a_cancelled_seance_keeps_the_emoji_after_the_marker(): void
+    {
+        $event = $this->event(['room_id' => $this->room('CAVE')->id]);
+
+        app(EventDiscordSync::class)->cancel($event);
+
+        $this->assertStringStartsWith('[ANNULÉ] 🍷 CAVE ', $this->lastThreadName());
+    }
+
+    public function test_changing_the_room_changes_the_emoji(): void
+    {
+        $event = $this->event(['room_id' => $this->room('CAVE')->id]);
+        app(EventDiscordSync::class)->sync($event);
+        $this->assertStringStartsWith('🍷 CAVE ', $this->lastThreadName());
+
+        $event->update(['room_id' => $this->room('BAR')->id]);
+        app(EventDiscordSync::class)->sync($event);
+        $this->assertStringStartsWith('🍺 BAR ', $this->lastThreadName());
+    }
+
     // ---------------------------------------------------------------- helpers
 
     private function event(array $attributes = []): Event
@@ -126,6 +190,31 @@ class EventDiscordSyncTest extends TestCase
         $this->assertNotNull($content, 'expected an edit carrying the message content');
 
         return $content;
+    }
+
+    private function room(string $code): Room
+    {
+        return Room::where('code', $code)->firstOrFail();
+    }
+
+    /** editThread / createForumThread are the only calls carrying a `name` field. */
+    private function lastThreadName(): string
+    {
+        $name = null;
+
+        Http::assertSent(function (ClientRequest $request) use (&$name) {
+            $body = $request->data();
+
+            if (($body['name'] ?? null) !== null) {
+                $name = $body['name'];
+            }
+
+            return true;
+        });
+
+        $this->assertNotNull($name, 'expected a call carrying the thread name');
+
+        return $name;
     }
 
     private function expectedUrl(): string

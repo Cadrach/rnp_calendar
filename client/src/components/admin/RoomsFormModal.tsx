@@ -33,6 +33,7 @@ export function RoomsFormModal({ opened, onClose, room }: Props) {
       name: room?.name ?? "",
       url: room?.url ?? "",
       color: room?.color ?? "#3b82f6",
+      emoji: room?.emoji ?? "",
       unlimited: room?.unlimited ?? false,
     },
     validate: {
@@ -48,6 +49,7 @@ export function RoomsFormModal({ opened, onClose, room }: Props) {
       name: room?.name ?? "",
       url: room?.url ?? "",
       color: room?.color ?? "#3b82f6",
+      emoji: room?.emoji ?? "",
       unlimited: room?.unlimited ?? false,
     });
     form.resetDirty();
@@ -58,6 +60,8 @@ export function RoomsFormModal({ opened, onClose, room }: Props) {
     const payload = {
       ...values,
       url: values.url || null,
+      // Clearing the box must null the column, not store an empty string.
+      emoji: values.emoji || null,
     };
 
     if (room) {
@@ -72,10 +76,25 @@ export function RoomsFormModal({ opened, onClose, room }: Props) {
       <form onSubmit={handleSubmit}>
         <Stack>
           <TextInput label="Code" required placeholder="CSb1" {...form.getInputProps("code")} />
-          <TextInput label="Nom" required placeholder="Centre Social (Salle 1)" {...form.getInputProps("name")} />
+          <TextInput
+            label="Nom"
+            required
+            placeholder="Centre Social (Salle 1)"
+            {...form.getInputProps("name")}
+          />
           <TextInput label="URL" placeholder="https://…" {...form.getInputProps("url")} />
           <ColorInput label="Couleur" required format="hex" {...form.getInputProps("color")} />
-          <Checkbox label="Illimitée (pas de vérification de disponibilité)" {...form.getInputProps("unlimited", { type: "checkbox" })} />
+          <TextInput
+            label="Emoji"
+            description="Affiché devant le titre du post Discord."
+            placeholder="🏢"
+            maxLength={16}
+            {...form.getInputProps("emoji")}
+          />
+          <Checkbox
+            label="Illimitée (pas de vérification de disponibilité)"
+            {...form.getInputProps("unlimited", { type: "checkbox" })}
+          />
           <Button type="submit" loading={isPending}>
             {room ? "Modifier" : "Créer"}
           </Button>

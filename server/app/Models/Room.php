@@ -11,13 +11,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string      $name       Full display name (e.g. "Centre Social (Salle 1)")
  * @property string|null $url        Optional URL shown as a clickable link in Discord posts
  * @property string      $color      Hex color used on the frontend calendar (e.g. "#06b6d4")
+ * @property string|null $emoji      Marker prefixed to the Discord forum thread name (e.g. "🏢")
  * @property bool        $unlimited  When true, all booking checks are bypassed — any time slot is accepted
  */
 class Room extends Model
 {
     public $timestamps = false;
 
-    protected $fillable = ['code', 'name', 'url', 'color', 'unlimited'];
+    protected $fillable = ['code', 'name', 'url', 'color', 'emoji', 'unlimited'];
 
     protected $casts = [
         'unlimited' => 'boolean',

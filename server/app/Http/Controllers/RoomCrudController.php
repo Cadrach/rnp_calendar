@@ -27,6 +27,7 @@ class RoomCrudController extends Controller
             'name'      => ['required', 'string', 'max:255'],
             'url'       => ['nullable', 'url', 'max:255'],
             'color'     => ['required', 'string', 'regex:/^#[0-9a-fA-F]{6}$/'],
+            'emoji'     => ['nullable', 'string', 'max:16'],
             'unlimited' => ['boolean'],
         ]);
 
@@ -42,6 +43,7 @@ class RoomCrudController extends Controller
             'name'      => ['sometimes', 'string', 'max:255'],
             'url'       => ['nullable', 'url', 'max:255'],
             'color'     => ['sometimes', 'string', 'regex:/^#[0-9a-fA-F]{6}$/'],
+            'emoji'     => ['nullable', 'string', 'max:16'],
             'unlimited' => ['boolean'],
         ]);
 

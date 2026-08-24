@@ -17,7 +17,7 @@ class EventDiscordSync
     {
         $event->load(['room', 'game', 'scenario']);
 
-        $title = $this->buildTitle($event);
+        $title = $this->buildThreadName($event);
         $content = $this->buildContent($event, cancelled: false);
         $tagIds = $this->openSpotsTagIds($event);
 
@@ -65,7 +65,7 @@ class EventDiscordSync
 
         $this->discord->editThread(
             $event->discord_thread_id,
-            '[ANNULÉ] ' . $this->buildTitle($event),
+            '[ANNULÉ] ' . $this->buildThreadName($event),
         );
 
         $this->discord->editMessage(
@@ -198,6 +198,21 @@ class EventDiscordSync
         }
 
         return $changes;
+    }
+
+    /**
+     * Thread name for the forum post: the title prefixed with the room's emoji, so the venue is
+     * identifiable straight from the forum list.
+     *
+     * Deliberately separate from buildTitle(), which also feeds the `## ` heading inside the post —
+     * that one stays plain, since the body already spells the room out on its 🏠 Salle line.
+     */
+    private function buildThreadName(Event $event): string
+    {
+        $emoji = trim((string) $event->room->emoji);
+        $title = $this->buildTitle($event);
+
+        return $emoji === '' ? $title : "{$emoji} {$title}";
     }
 
     private function buildTitle(Event $event): string
