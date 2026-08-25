@@ -15,7 +15,14 @@ export function AuthVerify() {
         window.location.href = (data as unknown as { redirect: string }).redirect;
       },
       onError: () => {
-        navigate("/login");
+        // A dead link does not mean a dead session: the token is one-shot, but the session it
+        // created may well still be live. Let the app decide — / renders straight away when it is,
+        // and falls into the normal /login flow when it is not. Sending the user to /login here
+        // instead is what closed the expired-link loop.
+        //
+        // A full load rather than navigate("/") so the app boots fresh and refetches the dictionary,
+        // which is what establishes whether the session is still good.
+        window.location.href = "/";
       },
     },
   });
@@ -29,7 +36,7 @@ export function AuthVerify() {
     } else {
       navigate("/login");
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -40,7 +47,9 @@ export function AuthVerify() {
         ) : (
           <>
             <Loader color="neon" />
-            <Text c="dimmed" size="sm">Connexion en cours…</Text>
+            <Text c="dimmed" size="sm">
+              Connexion en cours…
+            </Text>
           </>
         )}
       </Stack>

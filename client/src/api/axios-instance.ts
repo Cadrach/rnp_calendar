@@ -9,10 +9,22 @@ const client = axios.create({
   },
 });
 
+/**
+ * A 401 from the verify endpoint means "bad or expired token", not "session expired". Bouncing to
+ * /login with the current URL as `redirect` caused the expired-link login loop: that URL carries a
+ * one-shot token which can never be replayed, so every later login landed back on a dead link.
+ * AuthVerify handles this case itself.
+ */
+const isVerifyCall = (url = "") => url.includes("/auth/discord/verify");
+
 client.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error?.response?.status === 401 && window.location.pathname !== "/login") {
+    if (
+      error?.response?.status === 401 &&
+      !isVerifyCall(error?.config?.url) &&
+      window.location.pathname !== "/login"
+    ) {
       const redirect = window.location.pathname + window.location.search;
       window.location.replace(`/login?redirect=${encodeURIComponent(redirect)}`);
     }
